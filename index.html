@@ -1,0 +1,58 @@
+<!-- Email vertex: planogenerator@planogenerator.iam.gserviceaccount.com-->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Planos de Curso</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gerador Automático de Plano de Curso</h1>
+            <p>Preencha os dados abaixo e anexe o PDF da Unidade Curricular para gerar o plano de ensino instantaneamente.</p>
+        </header>
+
+        <form id="courseForm">
+            <div class="form-group">
+                <label for="courseName">Nome do Curso:</label>
+                <input type="text" id="courseName" name="courseName" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ucName">Nome da Unidade Curricular (UC):</label>
+                <input type="text" id="ucName" name="ucName" required>
+            </div>
+
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="startDate">Data de Início:</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="endDate">Data de Fim:</label>
+                    <input type="date" id="endDate" name="endDate" required>
+                </div>
+            </div>
+
+             <div class="form-group">
+                <label for="totalHours">Carga Horária Total (ex: 80 horas):</label>
+                <input type="text" id="totalHours" name="totalHours" required>
+            </div>
+
+            <div class="form-group">
+                <label for="pdfFile">Arquivo PDF da Unidade Curricular:</label>
+                <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+            </div>
+
+            <button type="submit" id="submitBtn">Gerar Plano de Curso</button>
+        </form>
+
+        <div id="resultArea" class="hidden">
+            </div>
+    </div>
+
+    <script src="assets/script.js"></script>
+</body>
+</html>
