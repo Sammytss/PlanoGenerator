@@ -1,28 +1,31 @@
-// --- server.js ---
+// --- server.js Final: Com Formatação Obrigatória de Estratégia ---
 
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const axios = require('axios');
 const multer = require('multer');
-const cors = require('cors'); // Importa o pacote CORS
+const cors = require('cors');
 
-// Configuração do servidor
 const app = express();
 const port = 3000;
-const upload = multer({ storage: multer.memoryStorage() }); // Para receber arquivos em memória
+const upload = multer({ storage: multer.memoryStorage() });
 
-app.use(cors()); // Habilita o CORS para que sua página web possa chamar este servidor
-app.use(express.json()); // Permite que o servidor entenda JSON
+app.use(cors());
+app.use(express.json());
 
-// --- CONFIGURAÇÃO DAS SUAS CHAVES ---
-const GEMINI_API_KEY = "AIzaSyBwMp1n1KPAo4z8kkwvYPIeZXqTd4sLAF0"; // <-- COLOQUE SUA CHAVE AQUI
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzjhausZnorbTPezSG6G1Nwdw7FA9fS-6ygG71DXpElhR50yDUXPod1BFfhUW2ZnRN7/exec"; // <-- COLOQUE O URL DA SUA "FÁBRICA" AQUI
+// PREENCHA AS SUAS CHAVES AQUI
+const GEMINI_API_KEY = "AIzaSyBwMp1n1KPAo4z8kkwvYPIeZXqTd4sLAF0";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzjhausZnorbTPezSG6G1Nwdw7FA9fS-6ygG71DXpElhR50yDUXPod1BFfhUW2ZnRN7/exec";
 
-// Inicializa o cliente do Gemini
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+const generationConfig = {
+    temperature: 0.4,
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
+};
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest", generationConfig });
 
-// Endpoint principal que a sua página web irá chamar
+
 app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
     console.log("Recebido pedido para gerar plano...");
 
@@ -33,47 +36,6 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
         if (!pdfFile) {
             return res.status(400).send({ error: 'Nenhum arquivo PDF foi enviado.' });
         }
-
-        // 1. ANÁLISE DO PDF COM GEMINI
-        console.log("Enviando PDF para análise do Gemini...");
-        
-       // =================================================================================
-        //  ✨ PROMPT FINAL - COMBINANDO EXPERTISE PEDAGÓGICA E REQUISITOS TÉCNICOS ✨
-        // =================================================================================
-        const prompt = `
-            Sua tarefa é atuar como um professor especialista em design instrucional para ensino técnico. Analise o PDF e os dados fornecidos para elaborar um plano de curso completo e detalhado.
-
-            Dados de entrada:
-            - Nome do Curso: ${courseName}
-            - Nome da UC: ${ucName}
-            - Período: ${startDate} a ${endDate}
-            - Carga Horária Total: ${totalHours}
-
-            Siga RIGOROSAMENTE as seguintes regras para extrair e gerar o conteúdo:
-
-            1.  **CÁLCULO DE DATAS E CARGA HORÁRIA:**
-                * Distribua a "Carga Horária Total" de forma lógica entre os tópicos do conteúdo.
-                * Calcule as datas de "Início" e "Fim" para cada tópico, baseando-se no período total do curso e na carga horária de cada tópico. Assuma uma carga diária de 4 horas/dia se não especificado.
-
-            2.  **ESTRUTURA DO CONTEÚDO (chave "oque"):**
-                * Para cada tópico principal do PDF, o valor da chave "oque" deve ser uma string formatada exatamente assim:
-                    "[Listar capacidades trabalhadas no tópico, separadas por ponto e vírgula];
-                    Por meio de:
-                    TÓPICO PRINCIPAL EM MAIÚSCULAS
-                    X.1. Subtópico 1
-                    X.2. Subtópico 2"
-
-            3.  **ESTRATÉGIAS DE ENSINO (chave "como"):**
-                * Para cada tópico, detalhe as estratégias, como "Exposição Dialogada", "Atividades Práticas", etc. As descrições devem ser ricas e com exemplos práticos. Ex: "Exposição Dialogada: Apresentar os conceitos de IoT com exemplos do cotidiano, como smartwatches e assistentes virtuais...".
-
-            4.  **CRITÉRIOS DE AVALIAÇÃO (chave "criterios"):**
-                * Para cada tópico, defina critérios claros no formato "O aluno demonstrou...".
-
-            5.  **GERAÇÃO DA SAÍDA:**
-                * Sua resposta final deve ser EXCLUSIVAMENTE um objeto JSON válido, sem nenhum texto, saudação ou explicação fora do JSON.
-                * O objeto JSON DEVE ter a chave "conteudoDetalhado", que é um array de objetos.
-                * Cada objeto no array DEVE conter TODAS as seguintes chaves, preenchidas com o conteúdo gerado: "oque", "como", "onde", "recursos", "cargaHoraria", "criterios", "instrumentos", "situacaoAprendizagem", "inicio", "fim".
-        `;
         
         const filePart = {
             inlineData: {
@@ -82,36 +44,88 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
             },
         };
 
-        const result = await model.generateContent([prompt, filePart]);
-        const responseText = result.response.text();
+        // --- ETAPA 1: O EXTRATOR ---
+        console.log("--- ETAPA 1: Extraindo lista de tópicos... ---");
+        const extractorPrompt = `
+            Sua única tarefa é analisar a seção "CONHECIMENTOS" do PDF fornecido e extrair a lista completa de todos os tópicos principais numerados.
+            Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave chamada "topicos", que contém um array de strings.
+        `;
 
-        // Limpeza e extração do JSON (caso o modelo ainda use markdown)
-        const match = responseText.match(/```json([\s\S]*?)```/);
-        let jsonString;
-        if (match && match[1]) {
-            jsonString = match[1].trim(); // Pega o conteúdo de dentro do bloco markdown
-        } else {
-            jsonString = responseText.trim(); // Assume que a resposta já é JSON puro
+        const extractorResult = await model.generateContent([extractorPrompt, filePart]);
+        const topicListJson = JSON.parse(extractorResult.response.text());
+        const topicTitles = topicListJson.topicos;
+
+        if (!topicTitles || topicTitles.length === 0) {
+            throw new Error("A Etapa 1 (Extrator) não conseguiu encontrar nenhum tópico no PDF.");
         }
-        
-        const geminiJson = JSON.parse(jsonString);
-        
-        console.log("Gemini retornou o conteúdo detalhado.");
+        console.log(`Extração concluída. Encontrados ${topicTitles.length} tópicos.`);
 
-        // 2. CHAMADA PARA O GOOGLE APPS SCRIPT
+
+        // --- ETAPA 2: O ELABORADOR ---
+        console.log("--- ETAPA 2: Elaborando conteúdo para cada tópico... ---");
+        const conteudoDetalhado = [];
+
+        for (const title of topicTitles) {
+            console.log(`   - Elaborando: "${title}"`);
+            
+            // =========================================================================
+            //  ✨ PROMPT DO ELABORADOR COM FORMATAÇÃO OBRIGATÓRIA ✨
+            // =========================================================================
+            const elaboratorPrompt = `
+                Você é um professor especialista em design instrucional. Sua tarefa é elaborar o conteúdo detalhado para um único tópico de um plano de curso, seguindo uma matriz de decisão pedagógica de forma INFLEXÍVEL.
+
+                Tópico a ser detalhado: "${title}"
+
+                Gere um único objeto JSON aplicando as seguintes regras de conteúdo:
+
+                1.  **PARA A CHAVE "oque":**
+                    * Formate o valor EXATAMENTE assim:
+                        "[Listar as capacidades técnicas relevantes para este tópico, extraídas do PDF];
+                        Por meio de:
+                        ${title.toUpperCase()}
+                        X.1. Subtópico 1
+                        X.2. Subtópico 2..."
+
+                2.  **PARA A CHAVE "como" (Estratégia de Ensino):**
+                    * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Atividade avaliativa", "Gamificação", "Sala de aula invertida", "Trabalho em grupo/dupla/trio"].
+                    * **FORMATAÇÃO OBRIGATÓRIA:** O texto final DEVE seguir este formato exato: comece com o nome da estratégia escolhida, seguido de dois pontos e um espaço, e então a descrição com verbos no infinitivo impessoal seguindo a taxonomia de bloom.
+                    * **EXEMPLOS DE FORMATO:**
+                        * "Exposição dialogada: Apresentar os conceitos..."
+                        * Se houver duas estratégias, separe-as com uma linha em branco.
+                    * A descrição deve ser rica e com exemplos práticos.
+
+                3.  **PARA AS CHAVES "instrumentos" e "criterios":**
+                    * **"instrumentos":** ESCOLHA apenas 1 instrumento da lista a seguir: ["Ficha de Observação", "Relatório", "Portfólio", "Prova Objetiva", "Prova de Resposta Construída", "Prova Prática", "Autoavaliação"]. A escolha DEVE ser coerente com a estratégia de ensino definida em "como".
+                    * **"criterios":** Defina UM critério de avaliação claro, direto e no passado, no formato "O aluno...", que se relacione com o instrumento escolhido.
+
+                4.  **PARA AS OUTRAS CHAVES ("onde", "recursos", "situacaoAprendizagem"):**
+                    * Preencha com informações pertinentes e diretas para o tópico em questão.
+                
+                5.  **CÁLCULOS:**
+                    * Estime uma "cargaHoraria" lógica para este tópico.
+                    * Estime datas de "inicio" e "fim" para este tópico.
+            `;
+
+            const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
+            const topicDetailJson = JSON.parse(elaboratorResult.response.text());
+            conteudoDetalhado.push(topicDetailJson);
+        }
+        console.log("Elaboração de todos os tópicos concluída.");
+
+        // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
+        // (O resto do código continua sem alterações)
         const payloadParaAppsScript = {
             nomeCurso: courseName,
             nomeUC: ucName,
-            dataInicioCurso: new Date(startDate).toLocaleDateString('pt-BR', {timeZone: 'UTC'}),
-            dataFimCurso: new Date(endDate).toLocaleDateString('pt-BR', {timeZone: 'UTC'}),
+            dataInicioCurso: new Date(startDate).toLocaleString('pt-BR', {timeZone: 'UTC'}),
+            dataFimCurso: new Date(endDate).toLocaleString('pt-BR', {timeZone: 'UTC'}),
             cargaHorariaTotal: totalHours,
-            conteudoDetalhado: geminiJson.conteudoDetalhado
+            conteudoDetalhado: conteudoDetalhado
         };
 
         console.log("Enviando dados para o Google Apps Script...");
         const appsScriptResponse = await axios.post(APPS_SCRIPT_URL, payloadParaAppsScript);
 
-        // 3. RETORNO PARA O FRONTEND
         console.log("Planilha criada! Retornando link para o usuário.");
         res.send(appsScriptResponse.data);
 
@@ -121,7 +135,6 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
     }
 });
 
-// Inicia o servidor
 app.listen(port, () => {
     console.log(`Servidor backend rodando em http://localhost:${port}`);
 });
