@@ -1,58 +1,148 @@
 <!-- Email vertex: planogenerator@planogenerator.iam.gserviceaccount.com-->
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Planos de Curso</title>
+    <title>Gerador de Planos de Curso - Sistema Acadêmico</title>
     <link rel="stylesheet" href="assets/style.css">
 </head>
+
 <body>
-    <div class="container">
-        <header>
-            <h1>Plano <generator>Generator</generatos></h1>
-            <p>Seu Gerador Automático de Plano de Aula. <br>Preencha os dados abaixo e anexe o PDF da Unidade Curricular para gerar o plano de ensino instantaneamente.</p>
-        </header>
-
-        <form id="courseForm">
-            <div class="form-group">
-                <label for="courseName">Nome do Curso:</label>
-                <input type="text" id="courseName" name="courseName" required>
-            </div>
-
-            <div class="form-group">
-                <label for="ucName">Nome da Unidade Curricular (UC):</label>
-                <input type="text" id="ucName" name="ucName" required>
-            </div>
-
-            <div class="form-group-row">
-                <div class="form-group">
-                    <label for="startDate">Data de Início:</label>
-                    <input type="date" id="startDate" name="startDate" required>
+    <!-- Cabeçalho institucional -->
+    <div class="institutional-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-space">
+                    <img src="assets/Images/Logo Plano Generator.png" alt="">
                 </div>
-                <div class="form-group">
-                    <label for="endDate">Data de Fim:</label>
-                    <input type="date" id="endDate" name="endDate" required>
+                <div class="institution-info">
+                    <h1>Plano Generator</h1>
+                    <p>Gerador de Planos de Curso</p>
                 </div>
             </div>
-
-             <div class="form-group">
-                <label for="totalHours">Carga Horária Total (ex: 80 horas):</label>
-                <input type="text" id="totalHours" name="totalHours" required>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar">🔗</div>
+                    <a href="https://linkedin.com/in/samuel-teles-dos-santos-662003237"> <span>Samuel Teles</span></a>
+                </div>
             </div>
-
-            <div class="form-group">
-                <label for="pdfFile">Arquivo PDF da Unidade Curricular:</label>
-                <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
-            </div>
-
-            <button type="submit" id="submitBtn">Gerar Plano de Curso</button>
-        </form>
-
-        <div id="resultArea" class="hidden">
-            </div>
+        </div>
     </div>
 
+    <div class="main-content">
+        <!-- <div class="page-header">
+            <h1 class="page-title">Gerador de Planos de Curso</h1>
+            <p class="page-subtitle">
+                Ferramenta automatizada para criação de planos de ensino. 
+                Preencha as informações do curso e anexe a documentação da UC para gerar 
+                um plano completo e estruturado instantaneamente.
+            </p>
+        </div> -->
+
+        <div class="form-container">
+            <div class="progress-indicator">
+                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+            </div>
+
+            <div class="form-header">
+                <h2 class="form-title">Dados do Curso</h2>
+                <p class="form-description">Preencha as informações básicas para gerar seu plano de ensino</p>
+            </div>
+
+            <form id="courseForm">
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">📋</div>
+                        Informações Básicas
+                    </div>
+
+                    <div class="form-group">
+                        <label for="courseName">Nome do Curso <span class="required">*</span></label>
+                        <input type="text" id="courseName" name="courseName" required
+                            placeholder="Ex: Técnico em Informática">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ucName">Nome da Unidade Curricular (UC) <span class="required">*</span></label>
+                        <input type="text" id="ucName" name="ucName" required placeholder="Ex: Desenvolvimento Web">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">📅</div>
+                        Cronograma
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="startDate">Data de Início <span class="required">*</span></label>
+                            <input type="date" id="startDate" name="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="endDate">Data de Término <span class="required">*</span></label>
+                            <input type="date" id="endDate" name="endDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="totalHours">Carga Horária Total <span class="required">*</span></label>
+                        <input type="text" id="totalHours" name="totalHours" required placeholder="Ex: 80 horas">
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">📄</div>
+                        Documentação
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pdfFile">Arquivo PDF da Unidade Curricular <span class="required">*</span></label>
+                        <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <button type="submit" id="submitBtn">🚀 Gerar Plano de Curso</button>
+                </div>
+            </form>
+
+            <div id="resultArea" class="hidden"></div>
+        </div>
+
+        <div class="footer-info">
+            <p>💡 <strong>Dica:</strong> Certifique-se de que o PDF da UC contém todas as informações necessárias para
+                um plano completo.</p>
+        </div>
+    </div>
     <script src="assets/script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('courseForm');
+            const inputs = form.querySelectorAll('input[required]');
+            const progressSteps = document.querySelectorAll('.progress-step');
+
+            function updateProgress() {
+                const filledInputs = Array.from(inputs).filter(input => input.value.trim() !== '');
+                const progress = Math.min(Math.floor((filledInputs.length / inputs.length) * 3), 3);
+
+                progressSteps.forEach((step, index) => {
+                    step.classList.toggle('active', index < progress);
+                });
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('input', updateProgress);
+                input.addEventListener('change', updateProgress);
+            });
+        });
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'96fc8c093519f632',t:'MTc1NTMwMTMzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
 </body>
+
 </html>

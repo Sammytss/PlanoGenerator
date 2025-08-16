@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             resultArea.innerHTML = `<p style="color: red; font-weight: bold;">Ocorreu um erro na comunicação.</p><p>${error.message}</p>`;
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Gerar Plano de Curso';
+            submitBtn.textContent = '🚀Gerar Plano de Curso';
         }
     });
 });
