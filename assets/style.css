@@ -236,7 +236,7 @@ input[type="file"]:hover {
     text-align: center;
 }
 
-button {
+#submitBtn {
     background: linear-gradient(135deg, #02287a, #2f7a56);
     color: white;
     border: none;
@@ -250,18 +250,150 @@ button {
     min-width: 250px;
 }
 
-button:hover {
+#submitBtn:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 35px rgba(2, 40, 122, 0.4);
 }
 
-button:active {
+#submitBtn:active {
     transform: translateY(0);
+}
+
+/* Estilos do ícone de ajuda */
+.help-icon {
+    width: 24px;
+    height: 24px;
+    background: linear-gradient(135deg, #02287a, #2f7a56);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-left: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.help-icon:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(2, 40, 122, 0.3);
+}
+
+/* Estilos do card de ajuda */
+.help-card {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.help-card-content {
+    background: white;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.help-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 2px solid #e2e8f0;
+    background: linear-gradient(135deg, #02287a, #2f7a56);
+    color: white;
+}
+
+.help-card-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.help-card-body {
+    padding: 2rem;
+}
+
+.help-section {
+    margin-bottom: 1.5rem;
+}
+
+.help-section:last-child {
+    margin-bottom: 0;
+}
+
+.help-section h4 {
+    color: #2d3748;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.help-section p {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 0.25rem;
+}
+
+.help-section p:last-child {
+    margin-bottom: 0;
+}
+
+.help-section p strong {
+    color: #2d3748;
 }
 
 #resultArea {
     margin-top: 2rem;
-    padding: 1.5rem;
+    padding: 2.5rem;
     border-radius: 8px;
 }
 
@@ -274,9 +406,60 @@ button:active {
     font-weight: 500;
     color: #1a73e8;
 }
+
 .loader::after {
     content: ' .';
     animation: dots 1.5s steps(5, end) infinite;
+}
+
+
+@keyframes dots {
+
+    0%,
+    20% {
+        color: rgba(0, 0, 0, 0);
+        text-shadow: .25em 0 0 rgba(0, 0, 0, 0), .5em 0 0 rgba(0, 0, 0, 0);
+    }
+
+    40% {
+        color: #1a73e8;
+        text-shadow: .25em 0 0 rgba(0, 0, 0, 0), .5em 0 0 rgba(0, 0, 0, 0);
+    }
+
+    60% {
+        text-shadow: .25em 0 0 #1a73e8, .5em 0 0 rgba(0, 0, 0, 0);
+    }
+
+    80%,
+    100% {
+        text-shadow: .25em 0 0 #1a73e8, .5em 0 0 #1a73e8;
+    }
+}
+
+/* Indicadores de progresso fixos no cabeçalho */
+.header-progress {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.header-progress.visible {
+    display: flex;
+}
+
+.header-progress .progress-step {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.header-progress .progress-step.active {
+    background: linear-gradient(135deg, #02287a, #2f7a56);
 }
 
 .progress-indicator {

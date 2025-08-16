@@ -22,10 +22,57 @@
                     <p>Gerador de Planos de Curso</p>
                 </div>
             </div>
+
+             <!-- Indicadores de progresso fixos no cabeçalho -->
+            <div id="headerProgress" class="header-progress">
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+            </div>
+
             <div class="header-actions">
                 <div class="user-info">
                     <div class="user-avatar">🔗</div>
                     <a href="https://linkedin.com/in/samuel-teles-dos-santos-662003237"> <span>Samuel Teles</span></a>
+                </div>
+                <div class="help-icon" onclick="toggleHelpCard()">
+                        <span>?</span>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card de Ajuda -->
+    <div id="helpCard" class="help-card hidden">
+        <div class="help-card-content">
+            <div class="help-card-header">
+                <h3>Informações do Sistema</h3>
+                <button class="close-btn" onclick="toggleHelpCard()">×</button>
+            </div>
+            <div class="help-card-body">
+                <div class="help-section">
+                    <h4>📧 Contato</h4>
+                    <p><strong>Email:</strong> planogenerator@planogenerator.iam.gserviceaccount.com</p>
+                </div>
+                <div class="help-section">
+                    <h4>🔧 Suporte Técnico</h4>
+                    <p>Para questões técnicas ou problemas com o sistema, entre em contato através do email acima.</p>
+                </div>
+                <div class="help-section">
+                    <h4>📚 Como Usar</h4>
+                    <p>1. Preencha todos os campos obrigatórios</p>
+                    <p>2. Anexe o PDF da Unidade Curricular</p>
+                    <p>3. Clique em "Gerar Plano de Curso"</p>
+                    <p>4. Aguarde o processamento automático</p>
+                </div>
+                <div class="help-section">
+                    <h4>⚠️ Requisitos</h4>
+                    <p>• O arquivo PDF deve conter informações completas da UC</p>
+                    <p>• Tamanho máximo do arquivo: 10MB</p>
+                    <p>• Formatos aceitos: PDF apenas</p>
                 </div>
             </div>
         </div>
@@ -43,7 +90,10 @@
 
         <div class="form-container">
             <div class="progress-indicator">
-                <div class="progress-step active"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
+                <div class="progress-step"></div>
                 <div class="progress-step"></div>
                 <div class="progress-step"></div>
             </div>
@@ -122,24 +172,73 @@
     </div>
     <script src="assets/script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+       // Animação de progresso simulada
+        document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('courseForm');
             const inputs = form.querySelectorAll('input[required]');
-            const progressSteps = document.querySelectorAll('.progress-step');
-
+            const headerProgress = document.getElementById('headerProgress');
+            const originalProgress = document.querySelector('.progress-indicator');
+            
+            // Seleciona os indicadores separadamente para evitar conflitos
+            const originalProgressSteps = originalProgress.querySelectorAll('.progress-step');
+            const headerProgressSteps = headerProgress.querySelectorAll('.progress-step');
+            
             function updateProgress() {
                 const filledInputs = Array.from(inputs).filter(input => input.value.trim() !== '');
-                const progress = Math.min(Math.floor((filledInputs.length / inputs.length) * 3), 3);
-
-                progressSteps.forEach((step, index) => {
+                const progress = Math.min(Math.floor((filledInputs.length / inputs.length) * 7), 6);
+                
+                // Atualiza os indicadores originais do container
+                originalProgressSteps.forEach((step, index) => {
+                    step.classList.toggle('active', index < progress);
+                });
+                
+                // Atualiza os indicadores do cabeçalho
+                headerProgressSteps.forEach((step, index) => {
                     step.classList.toggle('active', index < progress);
                 });
             }
-
+            
             inputs.forEach(input => {
                 input.addEventListener('input', updateProgress);
                 input.addEventListener('change', updateProgress);
             });
+
+            // Controle de scroll para mostrar/ocultar indicadores no cabeçalho
+            function handleScroll() {
+                const originalProgressRect = originalProgress.getBoundingClientRect();
+                const headerHeight = document.querySelector('.institutional-header').offsetHeight;
+                
+                // Se os indicadores originais sumiram abaixo do cabeçalho
+                if (originalProgressRect.bottom < headerHeight) {
+                    headerProgress.classList.add('visible');
+                } else {
+                    headerProgress.classList.remove('visible');
+                }
+            }
+            
+            window.addEventListener('scroll', handleScroll);
+            
+            // Chama uma vez para definir o estado inicial
+                       handleScroll();
+        });
+
+         // Função para abrir/fechar o card de ajuda
+        function toggleHelpCard() {
+            const helpCard = document.getElementById('helpCard');
+            helpCard.classList.toggle('hidden');
+        }
+
+        // Fechar card ao clicar fora dele
+        document.addEventListener('click', function(event) {
+            const helpCard = document.getElementById('helpCard');
+            const helpCardContent = document.querySelector('.help-card-content');
+            const helpIcon = document.querySelector('.help-icon');
+            
+            if (!helpCard.classList.contains('hidden') && 
+                !helpCardContent.contains(event.target) && 
+                !helpIcon.contains(event.target)) {
+                helpCard.classList.add('hidden');
+            }
         });
     </script>
     <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'96fc8c093519f632',t:'MTc1NTMwMTMzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
