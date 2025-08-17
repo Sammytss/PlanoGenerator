@@ -15,7 +15,8 @@ app.use(express.json());
 
 // PREENCHA AS SUAS CHAVES AQUI
 const GEMINI_API_KEY = "AIzaSyBwMp1n1KPAo4z8kkwvYPIeZXqTd4sLAF0";
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzjhausZnorbTPezSG6G1Nwdw7FA9fS-6ygG71DXpElhR50yDUXPod1BFfhUW2ZnRN7/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMD3VdA6awCyL8KBoOcc7e0qN-gyh9aOxRnByBFYxN8mmpOk79562lJqGUGVsK1ynr/exec";
+const LOGOTIPO_URL = "https://www.imagemhost.com.br/images/2024/11/22/Logo-novo-SENAI_-sem-slogan_755X325.png";
 
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const generationConfig = {
@@ -30,13 +31,14 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
     console.log("Recebido pedido para gerar plano...");
 
     try {
-        const { courseName, ucName, startDate, endDate, totalHours } = req.body;
+        // Adicione imageUrl aqui
+        const { courseName, ucName, startDate, endDate, totalHours, imageUrl } = req.body;
         const pdfFile = req.file;
 
         if (!pdfFile) {
             return res.status(400).send({ error: 'Nenhum arquivo PDF foi enviado.' });
         }
-        
+
         const filePart = {
             inlineData: {
                 data: pdfFile.buffer.toString("base64"),
@@ -67,7 +69,7 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
 
         for (const title of topicTitles) {
             console.log(`   - Elaborando: "${title}"`);
-            
+
             // =========================================================================
             //  ✨ PROMPT DO ELABORADOR COM FORMATAÇÃO OBRIGATÓRIA ✨
             // =========================================================================
@@ -90,7 +92,7 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
                     * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Atividade avaliativa", "Gamificação", "Sala de aula invertida", "Trabalho em grupo/dupla/trio"].
                     * **FORMATAÇÃO OBRIGATÓRIA:** O texto final DEVE seguir este formato exato: comece com o nome da estratégia escolhida, seguido de dois pontos e um espaço, e então a descrição com verbos no infinitivo impessoal seguindo a taxonomia de bloom.
                     * **EXEMPLOS DE FORMATO:**
-                        * "Exposição dialogada: Apresentar os conceitos..."
+                        * "[Estratégia de ensino]: [Verbo...]"
                         * Se houver duas estratégias, separe-as com uma linha em branco.
                     * A descrição deve ser rica e com exemplos práticos.
 
@@ -102,8 +104,9 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
                     * Preencha com informações pertinentes e diretas para o tópico em questão.
                 
                 5.  **CÁLCULOS:**
-                    * Estime uma "cargaHoraria" lógica para este tópico.
-                    * Estime datas de "inicio" e "fim" para este tópico.
+                    * Estime uma "cargaHoraria" lógica para este tópico usando como base dataInicioCurso e dataFimCurso.
+                    // ✨ AJUSTE 1: INSTRUÇÃO DE FORMATO DE DATA PARA A IA ✨
+                    * Estime datas de "inicio" e "fim" para este tópico. As datas DEVEM estar no formato "DD/MM/AAAA".
             `;
 
             const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
@@ -117,10 +120,11 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
         const payloadParaAppsScript = {
             nomeCurso: courseName,
             nomeUC: ucName,
-            dataInicioCurso: new Date(startDate).toLocaleString('pt-BR', {timeZone: 'UTC'}),
-            dataFimCurso: new Date(endDate).toLocaleString('pt-BR', {timeZone: 'UTC'}),
+            dataInicioCurso: new Date(startDate).toLocaleString('pt-BR', { timeZone: 'UTC' }),
+            dataFimCurso: new Date(endDate).toLocaleString('pt-BR', { timeZone: 'UTC' }),
             cargaHorariaTotal: totalHours,
-            conteudoDetalhado: conteudoDetalhado
+            conteudoDetalhado: conteudoDetalhado,
+            imageUrl: LOGOTIPO_URL // ✨ Adicione esta linha ✨
         };
 
         console.log("Enviando dados para o Google Apps Script...");

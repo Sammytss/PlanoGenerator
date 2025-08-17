@@ -93,6 +93,7 @@ body {
     color: white;
     font-weight: 600;
     font-size: 0.9rem;
+    font-size: 20px;
 }
 
 /* Conteúdo principal */
@@ -493,6 +494,11 @@ input[type="file"]:hover {
 .hidden {
     display: none;
 }
+
+    .criador{
+        text-decoration: none;
+        color: #2d3748;;
+    }
 
 /* Responsividade */
 @media (max-width: 768px) {
