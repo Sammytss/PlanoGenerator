@@ -10,48 +10,78 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- VERSÃO FINAL DO SCRIPT.JS ---
 
-    form.addEventListener('submit', async (event) => {
-        event.preventDefault();
+    // --- script.js ATUALIZADO PARA EXIBIR MENSAGENS NO MESMO LUGAR ---
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processando...';
-        resultArea.classList.remove('hidden');
-        resultArea.innerHTML = `<div class="loader">Analisando PDF e gerando a planilha</div>`;
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-        const formData = new FormData(form);
-        const backendUrl = 'http://localhost:3000/gerar-plano';
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processando...';
+    resultArea.classList.remove('hidden');
+    
+    // ✨ ALTERAÇÃO 1: Prepara uma única área de texto para as atualizações ✨
+    resultArea.innerHTML = `<div class="loader" id="progress-text">Aguarde...</div>`;
+    const progressTextElement = document.getElementById('progress-text');
 
-        try {
-            const response = await fetch(backendUrl, {
-                method: 'POST',
-                body: formData,
-            });
+    const formData = new FormData(form);
+    const backendUrl = 'http://localhost:3000/gerar-plano';
 
-            // A resposta do backend agora é um JSON
-            const resultData = await response.json();
+    try {
+        const response = await fetch(backendUrl, {
+            method: 'POST',
+            body: formData,
+        });
 
-            if (!response.ok || !resultData.success) {
-                throw new Error(resultData.details || 'Ocorreu um erro no servidor.');
-            }
-
-            // Constrói o HTML de sucesso dinamicamente usando os dados recebidos
-            const successHtml = `
-            <div style="text-align: center;">
-                <h2 style="color: #1e8e3e;">✅ Planilha Gerada com Sucesso!</h2>
-                <p>Seu plano de curso "<strong>${resultData.spreadsheetName}</strong>" está pronto.</p>
-                <a href="${resultData.spreadsheetUrl}" target="_blank" style="display: inline-block; font-size: 1.1em; padding: 12px 20px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
-                    Clique aqui para abrir a planilha
-                </a>
-            </div>`;
-
-            resultArea.innerHTML = successHtml;
-
-        } catch (error) {
-            console.error('Ocorreu um erro:', error);
-            resultArea.innerHTML = `<p style="color: red; font-weight: bold;">Ocorreu um erro na comunicação.</p><p>${error.message}</p>`;
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = '🚀 Gerar Plano de Curso';
+        if (!response.ok) {
+            throw new Error('A resposta do servidor não foi bem-sucedida.');
         }
-    });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        if (progressTextElement) {
+            progressTextElement.textContent = 'Conexão estabelecida. A iniciar o processo...';
+        }
+
+        while (true) {
+            const { value, done } = await reader.read();
+            if (done) {
+                break;
+            }
+            
+            buffer += decoder.decode(value, { stream: true });
+
+            while (buffer.includes('\n')) {
+                const messageEnd = buffer.indexOf('\n');
+                const message = buffer.substring(0, messageEnd);
+                buffer = buffer.substring(messageEnd + 1);
+
+                if (message.startsWith('DONE:')) {
+                    // ✨ ALTERAÇÃO 2: A mensagem final substitui tudo na área de resultado ✨
+                    const finalData = JSON.parse(message.substring(5));
+                    resultArea.innerHTML = `
+                        <div style="text-align: center;">
+                            <h2 style="color: #1e8e3e;">✅ Planilha Gerada com Sucesso!</h2>
+                            <p>O seu plano de curso "<strong>${finalData.spreadsheetName}</strong>" está pronto.</p>
+                            <a href="${finalData.spreadsheetUrl}" target="_blank" style="display: inline-block; font-size: 1.1em; padding: 12px 20px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
+                                Clique aqui para abrir a planilha
+                            </a>
+                        </div>`;
+                } else if (progressTextElement) {
+                    // ✨ ALTERAÇÃO 3: Atualiza o texto do elemento em vez de criar um novo ✨
+                    progressTextElement.textContent = message;
+                }
+            }
+        }
+
+    } catch (error) {
+        console.error('Ocorreu um erro:', error);
+        // Em caso de erro, também atualiza a área de resultado
+        resultArea.innerHTML = `<p style="color: red;">❌ Erro: ${error.message}</p>`;
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Gerar Plano de Curso';
+    }
+});
 });

@@ -29,14 +29,21 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest", generat
 
 app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
     console.log("Recebido pedido para gerar plano...");
+// Configura os cabeçalhos para uma resposta em fluxo
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Transfer-Encoding', 'chunked');
 
+    // Função auxiliar para enviar atualizações para o frontend
+    const sendUpdate = (message) => {
+        res.write(`${message}\n`);
+    };
     try {
         // Adicione imageUrl aqui
         const { courseName, ucName, startDate, endDate, totalHours, imageUrl } = req.body;
         const pdfFile = req.file;
 
         if (!pdfFile) {
-            return res.status(400).send({ error: 'Nenhum arquivo PDF foi enviado.' });
+            throw new Error('Nenhum ficheiro PDF foi enviado.');
         }
 
         const filePart = {
@@ -45,7 +52,7 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
                 mimeType: pdfFile.mimetype
             },
         };
-
+        sendUpdate("ETAPA 1: A extrair a lista de tópicos do PDF");
         // --- ETAPA 1: O EXTRATOR ---
         console.log("--- ETAPA 1: Extraindo lista de tópicos... ---");
         const extractorPrompt = `
@@ -61,14 +68,16 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
             throw new Error("A Etapa 1 (Extrator) não conseguiu encontrar nenhum tópico no PDF.");
         }
         console.log(`Extração concluída. Encontrados ${topicTitles.length} tópicos.`);
-
+        sendUpdate(`Extração concluída. Encontrados ${topicTitles.length} tópicos.`);
 
         // --- ETAPA 2: O ELABORADOR ---
         console.log("--- ETAPA 2: Elaborando conteúdo para cada tópico... ---");
+        sendUpdate("ETAPA 2: A elaborar o conteúdo para cada tópico (isto pode demorar)");
         const conteudoDetalhado = [];
 
-        for (const title of topicTitles) {
+        for (const [index, title] of topicTitles.entries()) {
             console.log(`   - Elaborando: "${title}"`);
+            sendUpdate(`   - A processar tópico ${index + 1} de ${topicTitles.length}: "${title}"`);
 
             // =========================================================================
             //  ✨ PROMPT DO ELABORADOR COM FORMATAÇÃO OBRIGATÓRIA ✨
@@ -114,6 +123,75 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
             conteudoDetalhado.push(topicDetailJson);
         }
         console.log("Elaboração de todos os tópicos concluída.");
+        sendUpdate("Elaboração de todos os tópicos concluída.");
+// =========================================================================
+        // ✨ NOVA ETAPA 2.4: O NORMALIZADOR DE CARGA HORÁRIA ✨
+        // =========================================================================
+        console.log("--- ETAPA 2.4: Normalizando a carga horária total... ---");
+        sendUpdate("ETAPA 2.4: A ajustar a carga horária total");
+        const somaEstimada = conteudoDetalhado.reduce((acc, item) => acc + (parseInt(item.cargaHoraria, 10) || 0), 0);
+
+        if (somaEstimada > 0) {
+            const fatorDeAjuste = totalHours / somaEstimada;
+            let somaAjustada = 0;
+
+            conteudoDetalhado.forEach((item, index) => {
+                const cargaEstimada = parseInt(item.cargaHoraria, 10) || 0;
+                // Arredonda a nova carga horária para o inteiro mais próximo
+                const novaCarga = Math.round(cargaEstimada * fatorDeAjuste);
+                item.cargaHoraria = novaCarga;
+                somaAjustada += novaCarga;
+            });
+
+            // Ajusta o último item para corrigir quaisquer erros de arredondamento e garantir a soma exata
+            const diferenca = totalHours - somaAjustada;
+            conteudoDetalhado[conteudoDetalhado.length - 1].cargaHoraria += diferenca;
+            
+            console.log(`Carga horária ajustada de ${somaEstimada}h para ${totalHours}h.`);
+            sendUpdate("Carga horária ajustada com sucesso");
+        }
+
+        // =========================================================================
+        // ✨ NOVA ETAPA 2.5: O CALCULISTA DE DATAS ✨
+        // =========================================================================
+        console.log("--- ETAPA 2.5: Calculando datas sequenciais... ---");
+        sendUpdate("ETAPA 2.5: A calcular o cronograma de aulas");
+        let dataAtual = new Date(startDate);
+        const cargaDiaria = 4; // Carga horária por dia
+
+        for(let i = 0; i < conteudoDetalhado.length; i++) {
+            let item = conteudoDetalhado[i];
+            
+            // Pula para o próximo dia útil se a data atual cair num fim de semana
+            while (dataAtual.getDay() === 0 || dataAtual.getDay() === 6) { // 0 = Domingo, 6 = Sábado
+                dataAtual.setDate(dataAtual.getDate() + 1);
+            }
+            
+            // Define a data de início
+            item.inicio = dataAtual.toLocaleDateString('pt-BR');
+            
+            // Calcula a duração em dias (arredondando para cima)
+            let cargaHoraria = parseInt(item.cargaHoraria, 10) || cargaDiaria;
+            let duracaoEmDias = Math.ceil(cargaHoraria / cargaDiaria);
+            
+            // Calcula a data de fim, contando apenas dias úteis
+            let dataFim = new Date(dataAtual);
+            let diasAdicionados = 0;
+            while(diasAdicionados < duracaoEmDias - 1) {
+                dataFim.setDate(dataFim.getDate() + 1);
+                // Conta apenas dias úteis para a duração
+                if (dataFim.getDay() !== 0 && dataFim.getDay() !== 6) {
+                    diasAdicionados++;
+                }
+            }
+            item.fim = dataFim.toLocaleDateString('pt-BR');
+            
+            // Prepara a data de início para o próximo tópico
+            dataAtual = new Date(dataFim);
+            dataAtual.setDate(dataAtual.getDate() + 1);
+        }
+        console.log("Cálculo de datas concluído.");
+        sendUpdate("Cronograma calculado com sucesso");
 
         // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
         // (O resto do código continua sem alterações)
@@ -131,11 +209,14 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
         const appsScriptResponse = await axios.post(APPS_SCRIPT_URL, payloadParaAppsScript);
 
         console.log("Planilha criada! Retornando link para o usuário.");
-        res.send(appsScriptResponse.data);
+        sendUpdate(`DONE:${JSON.stringify(appsScriptResponse.data)}`);
+        // Termina a conexão
+        res.end();
 
     } catch (error) {
         console.error("Erro no processo:", error);
-        res.status(500).send({ error: "Falha ao processar a solicitação.", details: error.message });
+        sendUpdate(`ERRO: ${error.message}`);
+        res.end();
     }
 });
 
