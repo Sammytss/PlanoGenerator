@@ -85,7 +85,7 @@ body {
 .user-avatar {
     width: 32px;
     height: 32px;
-    background: linear-gradient(135deg, #e1452a, #2f7a56);
+    background: linear-gradient(135deg, #e1452a, #062f8d);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -201,7 +201,8 @@ label {
 
 input[type="text"],
 input[type="date"],
-input[type="file"] {
+input[type="file"],
+select {
     width: 100%;
     padding: 1rem;
     border: 2px solid #e2e8f0;
@@ -210,6 +211,29 @@ input[type="file"] {
     font-family: inherit;
     transition: all 0.3s ease;
     background: #f7fafc;
+}
+
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
+    background-repeat: no-repeat;
+    background-size: 1rem;
+    padding-right: 3rem;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: #02287a;
+    background: white;
+    box-shadow: 0 0 0 3px rgba(2, 40, 122, 0.1);
+    transform: translateY(-1px);
+}
+
+select:hover {
+    border-color: #cbd5e0;
 }
 
 input:focus {
@@ -495,10 +519,11 @@ input[type="file"]:hover {
     display: none;
 }
 
-    .criador{
-        text-decoration: none;
-        color: #2d3748;;
-    }
+.criador {
+    text-decoration: none;
+    color: #2d3748;
+    ;
+}
 
 /* Responsividade */
 @media (max-width: 768px) {

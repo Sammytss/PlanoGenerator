@@ -23,7 +23,7 @@
                 </div>
             </div>
 
-             <!-- Indicadores de progresso fixos no cabeçalho -->
+            <!-- Indicadores de progresso fixos no cabeçalho -->
             <div id="headerProgress" class="header-progress">
                 <div class="progress-step"></div>
                 <div class="progress-step"></div>
@@ -36,11 +36,12 @@
             <div class="header-actions">
                 <div class="user-info">
                     <div class="user-avatar">in</div>
-                    <a class ='criador' href="https://linkedin.com/in/samuel-teles-dos-santos-662003237"> <span>Samuel Teles</span></a>
+                    <a class='criador' href="https://linkedin.com/in/samuel-teles-dos-santos-662003237"> <span>Samuel
+                            Teles</span></a>
                 </div>
                 <div class="help-icon" onclick="toggleHelpCard()">
-                        <span>?</span>
-                    </div>
+                    <span>?</span>
+                </div>
             </div>
         </div>
     </div>
@@ -139,9 +140,18 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group-row">
+                        <div class="form-group">
                         <label for="totalHours">Carga Horária Total <span class="required">*</span></label>
                         <input type="text" id="totalHours" name="totalHours" required placeholder="Ex: 80 horas">
+                        </div>
+                        <div class="form-group">
+                            <label for="shift">Turno das Aulas <span class="required">*</span></label>
+                            <select id="shift" name="shift" required>
+                                <option value="diurno" selected>Manhã / Tarde (4h aula)</option>
+                                <option value="noturno">Noite (3h aula)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -172,32 +182,32 @@
     </div>
     <script src="assets/script.js"></script>
     <script>
-       // Animação de progresso simulada
-        document.addEventListener('DOMContentLoaded', function() {
+        // Animação de progresso simulada
+        document.addEventListener('DOMContentLoaded', function () {
             const form = document.getElementById('courseForm');
             const inputs = form.querySelectorAll('input[required]');
             const headerProgress = document.getElementById('headerProgress');
             const originalProgress = document.querySelector('.progress-indicator');
-            
+
             // Seleciona os indicadores separadamente para evitar conflitos
             const originalProgressSteps = originalProgress.querySelectorAll('.progress-step');
             const headerProgressSteps = headerProgress.querySelectorAll('.progress-step');
-            
+
             function updateProgress() {
                 const filledInputs = Array.from(inputs).filter(input => input.value.trim() !== '');
                 const progress = Math.min(Math.floor((filledInputs.length / inputs.length) * 7), 6);
-                
+
                 // Atualiza os indicadores originais do container
                 originalProgressSteps.forEach((step, index) => {
                     step.classList.toggle('active', index < progress);
                 });
-                
+
                 // Atualiza os indicadores do cabeçalho
                 headerProgressSteps.forEach((step, index) => {
                     step.classList.toggle('active', index < progress);
                 });
             }
-            
+
             inputs.forEach(input => {
                 input.addEventListener('input', updateProgress);
                 input.addEventListener('change', updateProgress);
@@ -207,7 +217,7 @@
             function handleScroll() {
                 const originalProgressRect = originalProgress.getBoundingClientRect();
                 const headerHeight = document.querySelector('.institutional-header').offsetHeight;
-                
+
                 // Se os indicadores originais sumiram abaixo do cabeçalho
                 if (originalProgressRect.bottom < headerHeight) {
                     headerProgress.classList.add('visible');
@@ -215,27 +225,27 @@
                     headerProgress.classList.remove('visible');
                 }
             }
-            
+
             window.addEventListener('scroll', handleScroll);
-            
+
             // Chama uma vez para definir o estado inicial
-                       handleScroll();
+            handleScroll();
         });
 
-         // Função para abrir/fechar o card de ajuda
+        // Função para abrir/fechar o card de ajuda
         function toggleHelpCard() {
             const helpCard = document.getElementById('helpCard');
             helpCard.classList.toggle('hidden');
         }
 
         // Fechar card ao clicar fora dele
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const helpCard = document.getElementById('helpCard');
             const helpCardContent = document.querySelector('.help-card-content');
             const helpIcon = document.querySelector('.help-icon');
-            
-            if (!helpCard.classList.contains('hidden') && 
-                !helpCardContent.contains(event.target) && 
+
+            if (!helpCard.classList.contains('hidden') &&
+                !helpCardContent.contains(event.target) &&
                 !helpIcon.contains(event.target)) {
                 helpCard.classList.add('hidden');
             }

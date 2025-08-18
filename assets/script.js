@@ -20,7 +20,7 @@ form.addEventListener('submit', async (event) => {
     resultArea.classList.remove('hidden');
     
     // ✨ ALTERAÇÃO 1: Prepara uma única área de texto para as atualizações ✨
-    resultArea.innerHTML = `<div class="loader" id="progress-text">Aguarde...</div>`;
+    resultArea.innerHTML = `<div class="loader" id="progress-text">Aguarde</div>`;
     const progressTextElement = document.getElementById('progress-text');
 
     const formData = new FormData(form);

@@ -29,7 +29,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest", generat
 
 app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
     console.log("Recebido pedido para gerar plano...");
-// Configura os cabeçalhos para uma resposta em fluxo
+    // Configura os cabeçalhos para uma resposta em fluxo
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Transfer-Encoding', 'chunked');
 
@@ -39,7 +39,7 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
     };
     try {
         // Adicione imageUrl aqui
-        const { courseName, ucName, startDate, endDate, totalHours, imageUrl } = req.body;
+        const { courseName, ucName, startDate, endDate, totalHours, imageUrl, shift } = req.body;
         const pdfFile = req.file;
 
         if (!pdfFile) {
@@ -106,7 +106,7 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
                     * A descrição deve ser rica e com exemplos práticos.
 
                 3.  **PARA AS CHAVES "instrumentos" e "criterios":**
-                    * **"instrumentos":** ESCOLHA apenas 1 instrumento da lista a seguir: ["Ficha de Observação", "Relatório", "Portfólio", "Prova Objetiva", "Prova de Resposta Construída", "Prova Prática", "Autoavaliação"]. A escolha DEVE ser coerente com a estratégia de ensino definida em "como".
+                    * **"instrumentos":** ESCOLHA apenas 1 instrumento da lista a seguir: ["Ficha de Observação", "Relatório", "Portfólio", "Prova Objetiva", "Prova de Resposta Construída", "Prova Prática", "Autoavaliação"]. A escolha DEVE ser coerente com a estratégia de ensino definida em "como" sendo Prova Prática e Prova Objetiva somente no final da Unidade curricular (filnal da carga horária total) ultimas datas.
                     * **"criterios":** Defina UM critério de avaliação claro, direto e no passado, no formato "O aluno...", que se relacione com o instrumento escolhido.
 
                 4.  **PARA AS OUTRAS CHAVES ("onde", "recursos", "situacaoAprendizagem"):**
@@ -124,7 +124,7 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
         }
         console.log("Elaboração de todos os tópicos concluída.");
         sendUpdate("Elaboração de todos os tópicos concluída.");
-// =========================================================================
+        // =========================================================================
         // ✨ NOVA ETAPA 2.4: O NORMALIZADOR DE CARGA HORÁRIA ✨
         // =========================================================================
         console.log("--- ETAPA 2.4: Normalizando a carga horária total... ---");
@@ -146,60 +146,76 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
             // Ajusta o último item para corrigir quaisquer erros de arredondamento e garantir a soma exata
             const diferenca = totalHours - somaAjustada;
             conteudoDetalhado[conteudoDetalhado.length - 1].cargaHoraria += diferenca;
-            
+
             console.log(`Carga horária ajustada de ${somaEstimada}h para ${totalHours}h.`);
             sendUpdate("Carga horária ajustada com sucesso");
         }
-
+// =========================================================================
+        // ✨ ETAPA 2.5 ATUALIZADA: O CALCULISTA DE DATAS E HORAS-AULA ✨
         // =========================================================================
-        // ✨ NOVA ETAPA 2.5: O CALCULISTA DE DATAS ✨
-        // =========================================================================
-        console.log("--- ETAPA 2.5: Calculando datas sequenciais... ---");
-        sendUpdate("ETAPA 2.5: A calcular o cronograma de aulas");
-        let dataAtual = new Date(startDate);
-        const cargaDiaria = 4; // Carga horária por dia
+        console.log("--- ETAPA 2.5: Calculando datas e distribuindo horas-aula... ---");
+        let dataAtual = new Date(startDate + 'T00:00:00');
+        const cargaDiaria = shift === 'noturno' ? 3 : 4;
 
         for(let i = 0; i < conteudoDetalhado.length; i++) {
             let item = conteudoDetalhado[i];
             
-            // Pula para o próximo dia útil se a data atual cair num fim de semana
-            while (dataAtual.getDay() === 0 || dataAtual.getDay() === 6) { // 0 = Domingo, 6 = Sábado
+            // Pula para o próximo dia útil
+            while (dataAtual.getDay() === 0 || dataAtual.getDay() === 6) {
                 dataAtual.setDate(dataAtual.getDate() + 1);
             }
             
-            // Define a data de início
             item.inicio = dataAtual.toLocaleDateString('pt-BR');
             
-            // Calcula a duração em dias (arredondando para cima)
-            let cargaHoraria = parseInt(item.cargaHoraria, 10) || cargaDiaria;
-            let duracaoEmDias = Math.ceil(cargaHoraria / cargaDiaria);
+            let cargaHorariaTotalDoTopico = parseInt(item.cargaHoraria, 10) || cargaDiaria;
+            let cargaRestante = cargaHorariaTotalDoTopico;
+            let duracaoEmDias = Math.ceil(cargaHorariaTotalDoTopico / cargaDiaria);
+            let horasPorDia = [];
             
-            // Calcula a data de fim, contando apenas dias úteis
             let dataFim = new Date(dataAtual);
-            let diasAdicionados = 0;
-            while(diasAdicionados < duracaoEmDias - 1) {
-                dataFim.setDate(dataFim.getDate() + 1);
-                // Conta apenas dias úteis para a duração
+            let diasContados = 0;
+
+            // Loop para distribuir as horas e encontrar a data de fim
+            while(diasContados < duracaoEmDias) {
+                // Se o dia atual for um dia útil
                 if (dataFim.getDay() !== 0 && dataFim.getDay() !== 6) {
-                    diasAdicionados++;
+                    if (cargaRestante >= cargaDiaria) {
+                        horasPorDia.push(cargaDiaria);
+                        cargaRestante -= cargaDiaria;
+                    } else if (cargaRestante > 0) {
+                        horasPorDia.push(cargaRestante);
+                        cargaRestante = 0;
+                    }
+                    diasContados++;
+                }
+                
+                // Se ainda não for o último dia, avança para a próxima data
+                if (diasContados < duracaoEmDias) {
+                    dataFim.setDate(dataFim.getDate() + 1);
                 }
             }
+
+            // Define a nova carga horária como uma string formatada (ex: "3, 3, 3")
+            item.cargaHoraria = horasPorDia.join(', ');
             item.fim = dataFim.toLocaleDateString('pt-BR');
             
             // Prepara a data de início para o próximo tópico
             dataAtual = new Date(dataFim);
             dataAtual.setDate(dataAtual.getDate() + 1);
         }
-        console.log("Cálculo de datas concluído.");
+        console.log("Cálculo de datas e horas-aula concluído.");
         sendUpdate("Cronograma calculado com sucesso");
+        // ✨ NOVO: Captura a data final real calculada a partir do último tópico ✨
+        const dataFimCalculada = conteudoDetalhado[conteudoDetalhado.length - 1].fim;
 
         // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
         // (O resto do código continua sem alterações)
         const payloadParaAppsScript = {
             nomeCurso: courseName,
             nomeUC: ucName,
-            dataInicioCurso: new Date(startDate).toLocaleString('pt-BR', { timeZone: 'UTC' }),
-            dataFimCurso: new Date(endDate).toLocaleString('pt-BR', { timeZone: 'UTC' }),
+            // ✨ CORREÇÃO DE FUSO HORÁRIO: Garante que a data do cabeçalho também use o fuso local ✨
+            dataInicioCurso: new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR'),
+            dataFimCurso: dataFimCalculada, // ✨ ALTERADO: Usa a data final real calculada ✨
             cargaHorariaTotal: totalHours,
             conteudoDetalhado: conteudoDetalhado,
             imageUrl: LOGOTIPO_URL // ✨ Adicione esta linha ✨
