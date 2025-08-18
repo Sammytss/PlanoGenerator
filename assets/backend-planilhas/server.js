@@ -125,81 +125,83 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
         console.log("Elaboração de todos os tópicos concluída.");
         sendUpdate("Elaboração de todos os tópicos concluída.");
         // =========================================================================
-        // ✨ NOVA ETAPA 2.4: O NORMALIZADOR DE CARGA HORÁRIA ✨
+        // ✨ ETAPAS 2.4 e 2.5 UNIFICADAS E CORRIGIDAS ✨
         // =========================================================================
-        console.log("--- ETAPA 2.4: Normalizando a carga horária total... ---");
-        sendUpdate("ETAPA 2.4: A ajustar a carga horária total");
-        const somaEstimada = conteudoDetalhado.reduce((acc, item) => acc + (parseInt(item.cargaHoraria, 10) || 0), 0);
+        console.log("--- ETAPA 2.4: Normalizando para horas-aula completas... ---");
 
-        if (somaEstimada > 0) {
-            const fatorDeAjuste = totalHours / somaEstimada;
-            let somaAjustada = 0;
+        // Declara a cargaDiaria UMA ÚNICA VEZ
+        const cargaDiaria = shift === 'noturno' ? 3 : 4;
+        const totalAulasNecessarias = Math.ceil(totalHours / cargaDiaria);
 
-            conteudoDetalhado.forEach((item, index) => {
-                const cargaEstimada = parseInt(item.cargaHoraria, 10) || 0;
-                // Arredonda a nova carga horária para o inteiro mais próximo
-                const novaCarga = Math.round(cargaEstimada * fatorDeAjuste);
-                item.cargaHoraria = novaCarga;
-                somaAjustada += novaCarga;
-            });
+        // Converte as estimativas de horas da IA em estimativas de número de aulas
+        let estimativaAulas = conteudoDetalhado.map(item => {
+            const horasEstimadas = parseInt(item.cargaHoraria, 10) || 0;
+            // Garante que cada tópico tenha pelo menos 1 aula se tiver carga horária
+            return horasEstimadas > 0 ? Math.max(1, Math.round(horasEstimadas / cargaDiaria)) : 0;
+        });
 
-            // Ajusta o último item para corrigir quaisquer erros de arredondamento e garantir a soma exata
-            const diferenca = totalHours - somaAjustada;
-            conteudoDetalhado[conteudoDetalhado.length - 1].cargaHoraria += diferenca;
+        let somaAulasEstimadas = estimativaAulas.reduce((acc, val) => acc + val, 0);
+        let diferencaAulas = totalAulasNecessarias - somaAulasEstimadas;
 
-            console.log(`Carga horária ajustada de ${somaEstimada}h para ${totalHours}h.`);
-            sendUpdate("Carga horária ajustada com sucesso");
+        // Ajusta a contagem de aulas para corresponder ao total necessário
+        // (A lógica de ajuste continua a mesma)
+        while (diferencaAulas !== 0) {
+            if (diferencaAulas > 0) {
+                let indexParaAumentar = estimativaAulas.indexOf(Math.min(...estimativaAulas));
+                estimativaAulas[indexParaAumentar]++;
+                diferencaAulas--;
+            } else {
+                let indexParaDiminuir = estimativaAulas.indexOf(Math.max(...estimativaAulas));
+                if (estimativaAulas[indexParaDiminuir] > 1) {
+                    estimativaAulas[indexParaDiminuir]--;
+                    diferencaAulas++;
+                } else {
+                    break;
+                }
+            }
         }
-// =========================================================================
-        // ✨ ETAPA 2.5 ATUALIZADA: O CALCULISTA DE DATAS E HORAS-AULA ✨
-        // =========================================================================
+
+        // Atualiza a carga horária final de cada item no objeto principal
+        conteudoDetalhado.forEach((item, index) => {
+            item.cargaHoraria = estimativaAulas[index] * cargaDiaria;
+        });
+
+        const somaFinalHoras = conteudoDetalhado.reduce((acc, item) => acc + item.cargaHoraria, 0);
+        console.log(`Carga horária final ajustada para ${somaFinalHoras}h, dividida em ${totalAulasNecessarias} aulas de ${cargaDiaria}h.`);
+
+
+        // --- Início da Etapa 2.5: Calculista de Datas e Horas-Aula ---
         console.log("--- ETAPA 2.5: Calculando datas e distribuindo horas-aula... ---");
         let dataAtual = new Date(startDate + 'T00:00:00');
-        const cargaDiaria = shift === 'noturno' ? 3 : 4;
+        // A constante cargaDiaria já foi declarada acima
 
-        for(let i = 0; i < conteudoDetalhado.length; i++) {
+        for (let i = 0; i < conteudoDetalhado.length; i++) {
             let item = conteudoDetalhado[i];
-            
-            // Pula para o próximo dia útil
+            if (item.cargaHoraria === 0) continue; // Pula tópicos sem carga horária
+
             while (dataAtual.getDay() === 0 || dataAtual.getDay() === 6) {
                 dataAtual.setDate(dataAtual.getDate() + 1);
             }
-            
+
             item.inicio = dataAtual.toLocaleDateString('pt-BR');
-            
-            let cargaHorariaTotalDoTopico = parseInt(item.cargaHoraria, 10) || cargaDiaria;
-            let cargaRestante = cargaHorariaTotalDoTopico;
-            let duracaoEmDias = Math.ceil(cargaHorariaTotalDoTopico / cargaDiaria);
-            let horasPorDia = [];
-            
+
+            let cargaHorariaTotalDoTopico = parseInt(item.cargaHoraria, 10);
+            let duracaoEmDias = cargaHorariaTotalDoTopico / cargaDiaria;
+            let horasPorDia = Array(duracaoEmDias).fill(cargaDiaria);
+
             let dataFim = new Date(dataAtual);
             let diasContados = 0;
 
-            // Loop para distribuir as horas e encontrar a data de fim
-            while(diasContados < duracaoEmDias) {
-                // Se o dia atual for um dia útil
+            while (diasContados < duracaoEmDias - 1) {
+                dataFim.setDate(dataFim.getDate() + 1);
                 if (dataFim.getDay() !== 0 && dataFim.getDay() !== 6) {
-                    if (cargaRestante >= cargaDiaria) {
-                        horasPorDia.push(cargaDiaria);
-                        cargaRestante -= cargaDiaria;
-                    } else if (cargaRestante > 0) {
-                        horasPorDia.push(cargaRestante);
-                        cargaRestante = 0;
-                    }
                     diasContados++;
-                }
-                
-                // Se ainda não for o último dia, avança para a próxima data
-                if (diasContados < duracaoEmDias) {
-                    dataFim.setDate(dataFim.getDate() + 1);
                 }
             }
 
-            // Define a nova carga horária como uma string formatada (ex: "3, 3, 3")
             item.cargaHoraria = horasPorDia.join(', ');
             item.fim = dataFim.toLocaleDateString('pt-BR');
-            
-            // Prepara a data de início para o próximo tópico
+
             dataAtual = new Date(dataFim);
             dataAtual.setDate(dataAtual.getDate() + 1);
         }
