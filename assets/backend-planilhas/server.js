@@ -1,14 +1,21 @@
-// --- server.js Final: Com Formatação Obrigatória de Estratégia ---
+// --- server.js VERSÃO FINAL E COMPLETA ---
 
 const express = require('express');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const axios = require('axios');
 const multer = require('multer');
 const cors = require('cors');
+const XLSX = require('xlsx');
 
+// ✨ CORREÇÃO: A criação do 'app' deve estar aqui no início ✨
 const app = express();
 const port = 3000;
-const upload = multer({ storage: multer.memoryStorage() });
+
+// Configuração do Multer para múltiplos ficheiros
+const upload = multer({ storage: multer.memoryStorage() }).fields([
+    { name: 'pdfFile', maxCount: 1 },
+    { name: 'matrixFile', maxCount: 1 }
+]);
 
 app.use(cors());
 app.use(express.json());
@@ -27,61 +34,80 @@ const generationConfig = {
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest", generationConfig });
 
 
-app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
-    console.log("Recebido pedido para gerar plano...");
-    // Configura os cabeçalhos para uma resposta em fluxo
+app.post('/gerar-plano', upload, async (req, res) => {
+    // A configuração de streaming e a função sendUpdate permanecem as mesmas
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Transfer-Encoding', 'chunked');
-
-    // Função auxiliar para enviar atualizações para o frontend
     const sendUpdate = (message) => {
         res.write(`${message}\n`);
     };
+
     try {
-        // Adicione imageUrl aqui
-        const { courseName, ucName, startDate, endDate, totalHours, imageUrl, shift } = req.body;
-        const pdfFile = req.file;
+        const { courseName, ucName, startDate, endDate, totalHours, shift } = req.body;
+        const pdfFile = req.files.pdfFile[0];
+        const matrixFile = req.files.matrixFile[0];
 
-        if (!pdfFile) {
-            throw new Error('Nenhum ficheiro PDF foi enviado.');
+        if (!pdfFile || !matrixFile) {
+            throw new Error('É necessário enviar tanto o PDF quanto a Matriz XLSX.');
         }
+        
+        // --- ETAPA DE PRÉ-PROCESSAMENTO DO XLSX ---
+        sendUpdate("A ler e a processar o ficheiro da Matriz de Referência .xlsx...");
+        const workbook = XLSX.read(matrixFile.buffer, { type: 'buffer' });
+        const sheetDetalhamento = workbook.Sheets['Detalhamento'];
+        const sheetRelacionamento = workbook.Sheets['Relacionamento'];
+        const csvDetalhamento = XLSX.utils.sheet_to_csv(sheetDetalhamento);
+        const csvRelacionamento = XLSX.utils.sheet_to_csv(sheetRelacionamento);
+        const dossieMatriz = `
+--- DADOS DA PLANILHA 'DETALHAMENTO' ---
+${csvDetalhamento}
+--- FIM DOS DADOS DA PLANILHA 'DETALHAMENTO' ---
 
-        const filePart = {
-            inlineData: {
-                data: pdfFile.buffer.toString("base64"),
-                mimeType: pdfFile.mimetype
-            },
-        };
-        sendUpdate("ETAPA 1: A extrair a lista de tópicos do PDF");
-        // --- ETAPA 1: O EXTRATOR ---
-        console.log("--- ETAPA 1: Extraindo lista de tópicos... ---");
-        const extractorPrompt = `
-            Sua única tarefa é analisar a seção "CONHECIMENTOS" do PDF fornecido e extrair a lista completa de todos os tópicos principais numerados.
-            Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave chamada "topicos", que contém um array de strings.
+--- DADOS DA PLANILHA 'RELACIONAMENTO' ---
+${csvRelacionamento}
+--- FIM DOS DADOS DA PLANILHA 'RELACIONAMENTO' ---
         `;
+        console.log("Dossiê da Matriz criado com sucesso.");
 
+        const filePart = { inlineData: { data: pdfFile.buffer.toString("base64"), mimeType: pdfFile.mimetype } };
+
+        // --- ETAPA 1: O EXTRATOR ---
+        sendUpdate("ETAPA 1: A extrair a lista de tópicos do PDF...");
+        const extractorPrompt = `Sua única tarefa é analisar a seção "CONHECIMENTOS" do PDF e extrair a lista completa de todos os tópicos principais numerados. Responda EXCLUSIVAMENTE com um objeto JSON com uma única chave chamada "topicos".`;
         const extractorResult = await model.generateContent([extractorPrompt, filePart]);
         const topicListJson = JSON.parse(extractorResult.response.text());
         const topicTitles = topicListJson.topicos;
-
-        if (!topicTitles || topicTitles.length === 0) {
-            throw new Error("A Etapa 1 (Extrator) não conseguiu encontrar nenhum tópico no PDF.");
-        }
-        console.log(`Extração concluída. Encontrados ${topicTitles.length} tópicos.`);
+        if (!topicTitles || topicTitles.length === 0) throw new Error("A Etapa 1 não conseguiu encontrar tópicos no PDF.");
         sendUpdate(`Extração concluída. Encontrados ${topicTitles.length} tópicos.`);
 
-        // --- ETAPA 2: O ELABORADOR ---
-        console.log("--- ETAPA 2: Elaborando conteúdo para cada tópico... ---");
-        sendUpdate("ETAPA 2: A elaborar o conteúdo para cada tópico (isto pode demorar)");
+        // --- ETAPA 2 OTIMIZADA: ANÁLISE ÚNICA DA MATRIZ + ELABORAÇÃO ---
+        
+        // ETAPA 2.1: ANÁLISE DA MATRIZ (UMA ÚNICA VEZ)
+        sendUpdate("ETAPA 2.1: A analisar a Matriz SAEP para a Unidade Curricular...");
+        const saepAnalysisPrompt = `
+            Você é um analista de dados. Sua única tarefa é analisar o dossiê de texto da Matriz de Referência SAEP fornecido.
+            Encontre a Unidade Curricular (UC) "${ucName}" e execute as seguintes extrações:
+            1. Extraia o código e a descrição completa da "CAPACIDADE SAEP" principal associada a esta UC.
+            2. Extraia a lista completa de números e descrições textuais dos "CONHECIMENTOS" vinculados a esta UC.
+            FORMATE O RESULTADO como uma única string de texto com múltiplas linhas, seguindo EXATAMENTE este formato:
+            "CÓDIGO - Descrição completa da Capacidade SAEP
+            
+            Número - Descrição do Conhecimento 1
+            Número - Descrição do Conhecimento 2
+            ..."
+            Responda APENAS com esta string formatada, sem nenhum texto adicional.
+        `;
+        const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+        const saepResult = await modelTextOnly.generateContent([saepAnalysisPrompt, dossieMatriz]);
+        const saepMatrixString = saepResult.response.text();
+        console.log("Análise da Matriz concluída.");
+        sendUpdate("Análise da Matriz concluída.");
+
+        // ETAPA 2.2: ELABORAÇÃO DO CONTEÚDO DE CADA TÓPICO
+        sendUpdate("ETAPA 2.2: A elaborar o conteúdo de cada tópico do PDF...");
         const conteudoDetalhado = [];
-
         for (const [index, title] of topicTitles.entries()) {
-            console.log(`   - Elaborando: "${title}"`);
             sendUpdate(`   - A processar tópico ${index + 1} de ${topicTitles.length}: "${title}"`);
-
-            // =========================================================================
-            //  ✨ PROMPT DO ELABORADOR COM FORMATAÇÃO OBRIGATÓRIA ✨
-            // =========================================================================
             const elaboratorPrompt = `
                 Você é um professor especialista em design instrucional. Sua tarefa é elaborar o conteúdo detalhado para um único tópico de um plano de curso, seguindo uma matriz de decisão pedagógica de forma INFLEXÍVEL.
 
@@ -115,36 +141,26 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
                 5.  **CÁLCULOS:**
                     * Estime uma "cargaHoraria" lógica para este tópico usando como base dataInicioCurso e dataFimCurso.
                     // ✨ AJUSTE 1: INSTRUÇÃO DE FORMATO DE DATA PARA A IA ✨
-                    * Estime datas de "inicio" e "fim" para este tópico. As datas DEVEM estar no formato "DD/MM/AAAA".
+                    * Estime datas de "inicio" e "fim" para este tópico. As datas DEVEM estar no formato "DD/MM/AAAA"
             `;
-
             const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
             const topicDetailJson = JSON.parse(elaboratorResult.response.text());
+            topicDetailJson.saep = saepMatrixString;
             conteudoDetalhado.push(topicDetailJson);
         }
         console.log("Elaboração de todos os tópicos concluída.");
         sendUpdate("Elaboração de todos os tópicos concluída.");
-        // =========================================================================
-        // ✨ ETAPAS 2.4 e 2.5 UNIFICADAS E CORRIGIDAS ✨
-        // =========================================================================
-        console.log("--- ETAPA 2.4: Normalizando para horas-aula completas... ---");
 
-        // Declara a cargaDiaria UMA ÚNICA VEZ
+        // --- ETAPA 2.4 E 2.5: NORMALIZAÇÃO E CÁLCULO ---
+        console.log("--- ETAPA 2.4: Normalizando para horas-aula completas... ---");
         const cargaDiaria = shift === 'noturno' ? 3 : 4;
         const totalAulasNecessarias = Math.ceil(totalHours / cargaDiaria);
-
-        // Converte as estimativas de horas da IA em estimativas de número de aulas
         let estimativaAulas = conteudoDetalhado.map(item => {
             const horasEstimadas = parseInt(item.cargaHoraria, 10) || 0;
-            // Garante que cada tópico tenha pelo menos 1 aula se tiver carga horária
             return horasEstimadas > 0 ? Math.max(1, Math.round(horasEstimadas / cargaDiaria)) : 0;
         });
-
         let somaAulasEstimadas = estimativaAulas.reduce((acc, val) => acc + val, 0);
         let diferencaAulas = totalAulasNecessarias - somaAulasEstimadas;
-
-        // Ajusta a contagem de aulas para corresponder ao total necessário
-        // (A lógica de ajuste continua a mesma)
         while (diferencaAulas !== 0) {
             if (diferencaAulas > 0) {
                 let indexParaAumentar = estimativaAulas.indexOf(Math.min(...estimativaAulas));
@@ -160,75 +176,52 @@ app.post('/gerar-plano', upload.single('pdfFile'), async (req, res) => {
                 }
             }
         }
-
-        // Atualiza a carga horária final de cada item no objeto principal
         conteudoDetalhado.forEach((item, index) => {
             item.cargaHoraria = estimativaAulas[index] * cargaDiaria;
         });
-
-        const somaFinalHoras = conteudoDetalhado.reduce((acc, item) => acc + item.cargaHoraria, 0);
-        console.log(`Carga horária final ajustada para ${somaFinalHoras}h, dividida em ${totalAulasNecessarias} aulas de ${cargaDiaria}h.`);
-
-
-        // --- Início da Etapa 2.5: Calculista de Datas e Horas-Aula ---
+        
         console.log("--- ETAPA 2.5: Calculando datas e distribuindo horas-aula... ---");
         let dataAtual = new Date(startDate + 'T00:00:00');
-        // A constante cargaDiaria já foi declarada acima
-
         for (let i = 0; i < conteudoDetalhado.length; i++) {
             let item = conteudoDetalhado[i];
-            if (item.cargaHoraria === 0) continue; // Pula tópicos sem carga horária
-
+            if (item.cargaHoraria === 0) continue;
             while (dataAtual.getDay() === 0 || dataAtual.getDay() === 6) {
                 dataAtual.setDate(dataAtual.getDate() + 1);
             }
-
             item.inicio = dataAtual.toLocaleDateString('pt-BR');
-
             let cargaHorariaTotalDoTopico = parseInt(item.cargaHoraria, 10);
             let duracaoEmDias = cargaHorariaTotalDoTopico / cargaDiaria;
             let horasPorDia = Array(duracaoEmDias).fill(cargaDiaria);
-
             let dataFim = new Date(dataAtual);
             let diasContados = 0;
-
             while (diasContados < duracaoEmDias - 1) {
                 dataFim.setDate(dataFim.getDate() + 1);
                 if (dataFim.getDay() !== 0 && dataFim.getDay() !== 6) {
                     diasContados++;
                 }
             }
-
             item.cargaHoraria = horasPorDia.join(', ');
             item.fim = dataFim.toLocaleDateString('pt-BR');
-
             dataAtual = new Date(dataFim);
             dataAtual.setDate(dataAtual.getDate() + 1);
         }
-        console.log("Cálculo de datas e horas-aula concluído.");
         sendUpdate("Cronograma calculado com sucesso");
-        // ✨ NOVO: Captura a data final real calculada a partir do último tópico ✨
-        const dataFimCalculada = conteudoDetalhado[conteudoDetalhado.length - 1].fim;
+        const dataFimCalculada = conteudoDetalhado.length > 0 ? conteudoDetalhado[conteudoDetalhado.length - 1].fim : new Date(endDate + 'T00:00:00').toLocaleDateString('pt-BR');
 
         // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
-        // (O resto do código continua sem alterações)
         const payloadParaAppsScript = {
             nomeCurso: courseName,
             nomeUC: ucName,
-            // ✨ CORREÇÃO DE FUSO HORÁRIO: Garante que a data do cabeçalho também use o fuso local ✨
             dataInicioCurso: new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR'),
-            dataFimCurso: dataFimCalculada, // ✨ ALTERADO: Usa a data final real calculada ✨
+            dataFimCurso: dataFimCalculada,
             cargaHorariaTotal: totalHours,
             conteudoDetalhado: conteudoDetalhado,
-            imageUrl: LOGOTIPO_URL // ✨ Adicione esta linha ✨
+            imageUrl: LOGOTIPO_URL
         };
 
-        console.log("Enviando dados para o Google Apps Script...");
+        sendUpdate("ETAPA 3: A comunicar com o Google e a criar a sua planilha...");
         const appsScriptResponse = await axios.post(APPS_SCRIPT_URL, payloadParaAppsScript);
-
-        console.log("Planilha criada! Retornando link para o usuário.");
         sendUpdate(`DONE:${JSON.stringify(appsScriptResponse.data)}`);
-        // Termina a conexão
         res.end();
 
     } catch (error) {

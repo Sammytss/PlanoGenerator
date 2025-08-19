@@ -5,7 +5,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Planos de Curso - Sistema Acadêmico</title>
+    <title>Plano Generator</title>
+    <link rel="icon" type="image/x-icon" href="assets/Images/LogoTipo_PlanoGenerator.png">
     <link rel="stylesheet" href="assets/style.css">
 </head>
 
@@ -15,11 +16,13 @@
         <div class="header-content">
             <div class="logo-section">
                 <div class="logo-space">
-                    <img src="assets/Images/Logo Plano Generator.png" alt="">
+                    <a href="#">
+                    <img src="assets/Images/Logo Plano Generator.png" alt="Logo Plano Generator">
+                    </a>
                 </div>
                 <div class="institution-info">
-                    <h1>Plano Generator</h1>
-                    <p>Gerador de Planos de Curso</p>
+                    <h1><azul class="azul">Plano</azul> <laranja class="laranja">Generator</laranja></h1>
+                    <p>Gerador de Planejamento Docente</p>
                 </div>
             </div>
 
@@ -71,9 +74,10 @@
                 </div>
                 <div class="help-section">
                     <h4>⚠️ Requisitos</h4>
-                    <p>• O arquivo PDF deve conter informações completas da UC</p>
+                    <p>• O arquivo PDF deve estar atualizado e conter informações completas da UC</p>
+                    <p>• A matriz SAEP deve estar atualizada</p>
                     <p>• Tamanho máximo do arquivo: 10MB</p>
-                    <p>• Formatos aceitos: PDF apenas</p>
+                    <p>• Formatos aceitos: PDF, xls e xlsx</p>
                 </div>
             </div>
         </div>
@@ -142,8 +146,8 @@
 
                     <div class="form-group-row">
                         <div class="form-group">
-                        <label for="totalHours">Carga Horária Total <span class="required">*</span></label>
-                        <input type="text" id="totalHours" name="totalHours" required placeholder="Ex: 80 horas">
+                            <label for="totalHours">Carga Horária Total <span class="required">*</span></label>
+                            <input type="text" id="totalHours" name="totalHours" required placeholder="Ex: 80 horas">
                         </div>
                         <div class="form-group">
                             <label for="shift">Turno das Aulas <span class="required">*</span></label>
@@ -161,9 +165,17 @@
                         Documentação
                     </div>
 
-                    <div class="form-group">
-                        <label for="pdfFile">Arquivo PDF da Unidade Curricular <span class="required">*</span></label>
-                        <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="pdfFile">Arquivo PDF da Unidade Curricular <span
+                                    class="required">*</span></label>
+                            <input type="file" id="pdfFile" name="pdfFile" accept=".pdf" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="matrixFile">Anexar Matriz de Referência:</label>
+                            <input type="file" id="matrixFile" name="matrixFile"
+                                accept=".xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                        </div>
                     </div>
                 </div>
 
@@ -195,7 +207,7 @@
 
             function updateProgress() {
                 const filledInputs = Array.from(inputs).filter(input => input.value.trim() !== '');
-                const progress = Math.min(Math.floor((filledInputs.length / inputs.length) * 7), 6);
+                const progress = Math.min(Math.floor((filledInputs.length / inputs.length) * 9), 8);
 
                 // Atualiza os indicadores originais do container
                 originalProgressSteps.forEach((step, index) => {

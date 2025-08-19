@@ -13,7 +13,12 @@ body {
     min-height: 100vh;
     line-height: 1.6;
 }
-
+.laranja{
+    color: #e1452a;
+}
+.azul{
+    color: #02287a;
+}
 /* Cabeçalho institucional */
 .institutional-header {
     background: rgba(255, 255, 255, 0.95);
