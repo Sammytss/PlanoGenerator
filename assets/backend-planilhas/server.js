@@ -45,29 +45,11 @@ app.post('/gerar-plano', upload, async (req, res) => {
     try {
         const { courseName, ucName, startDate, endDate, totalHours, shift } = req.body;
         const pdfFile = req.files.pdfFile[0];
-        const matrixFile = req.files.matrixFile[0];
+        const matrixFile = req.files.matrixFile ? req.files.matrixFile[0] : null;
 
-        if (!pdfFile || !matrixFile) {
-            throw new Error('É necessário enviar tanto o PDF quanto a Matriz XLSX.');
+        if (!pdfFile) {
+            throw new Error('É necessário enviar o PDF para a elaboração do plano.');
         }
-        
-        // --- ETAPA DE PRÉ-PROCESSAMENTO DO XLSX ---
-        sendUpdate("A ler e a processar o ficheiro da Matriz de Referência .xlsx...");
-        const workbook = XLSX.read(matrixFile.buffer, { type: 'buffer' });
-        const sheetDetalhamento = workbook.Sheets['Detalhamento'];
-        const sheetRelacionamento = workbook.Sheets['Relacionamento'];
-        const csvDetalhamento = XLSX.utils.sheet_to_csv(sheetDetalhamento);
-        const csvRelacionamento = XLSX.utils.sheet_to_csv(sheetRelacionamento);
-        const dossieMatriz = `
---- DADOS DA PLANILHA 'DETALHAMENTO' ---
-${csvDetalhamento}
---- FIM DOS DADOS DA PLANILHA 'DETALHAMENTO' ---
-
---- DADOS DA PLANILHA 'RELACIONAMENTO' ---
-${csvRelacionamento}
---- FIM DOS DADOS DA PLANILHA 'RELACIONAMENTO' ---
-        `;
-        console.log("Dossiê da Matriz criado com sucesso.");
 
         const filePart = { inlineData: { data: pdfFile.buffer.toString("base64"), mimeType: pdfFile.mimetype } };
 
@@ -80,34 +62,67 @@ ${csvRelacionamento}
         if (!topicTitles || topicTitles.length === 0) throw new Error("A Etapa 1 não conseguiu encontrar tópicos no PDF.");
         sendUpdate(`Extração concluída. Encontrados ${topicTitles.length} tópicos.`);
 
-        // --- ETAPA 2 OTIMIZADA: ANÁLISE ÚNICA DA MATRIZ + ELABORAÇÃO ---
+        // =========================================================================
+        // ✨ ETAPA 2 FINAL: LÓGICA CONDICIONAL DA MATRIZ SAEP ✨
+        // =========================================================================
         
-        // ETAPA 2.1: ANÁLISE DA MATRIZ (UMA ÚNICA VEZ)
-        sendUpdate("ETAPA 2.1: A analisar a Matriz SAEP para a Unidade Curricular...");
-        const saepAnalysisPrompt = `
-            Você é um analista de dados. Sua única tarefa é analisar o dossiê de texto da Matriz de Referência SAEP fornecido.
-            Encontre a Unidade Curricular (UC) "${ucName}" e execute as seguintes extrações:
-            1. Extraia o código e a descrição completa da "CAPACIDADE SAEP" principal associada a esta UC.
-            2. Extraia a lista completa de números e descrições textuais dos "CONHECIMENTOS" vinculados a esta UC.
-            FORMATE O RESULTADO como uma única string de texto com múltiplas linhas, seguindo EXATAMENTE este formato:
-            "CÓDIGO - Descrição completa da Capacidade SAEP
-            
-            Número - Descrição do Conhecimento 1
-            Número - Descrição do Conhecimento 2
-            ..."
-            Responda APENAS com esta string formatada, sem nenhum texto adicional.
-        `;
-        const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
-        const saepResult = await modelTextOnly.generateContent([saepAnalysisPrompt, dossieMatriz]);
-        const saepMatrixString = saepResult.response.text();
-        console.log("Análise da Matriz concluída.");
-        sendUpdate("Análise da Matriz concluída.");
+        let saepMatrixString = "Não possui cruzamento de MATRIZ"; // Valor padrão
 
-        // ETAPA 2.2: ELABORAÇÃO DO CONTEÚDO DE CADA TÓPICO
+        // --- ETAPA 2.1: ANÁLISE DA MATRIZ (SE O FICHEIRO EXISTIR) ---
+        if (matrixFile) {
+            sendUpdate("ETAPA 2.1: A analisar a Matriz SAEP para a Unidade Curricular...");
+            console.log("--- ETAPA 2.1: Analisando a Matriz SAEP... ---");
+            
+            // O seu código de pré-processamento do XLSX permanece aqui
+            const workbook = XLSX.read(matrixFile.buffer, { type: 'buffer' });
+            const sheetDetalhamento = workbook.Sheets['Detalhamento'];
+            const sheetRelacionamento = workbook.Sheets['Relacionamento'];
+            const csvDetalhamento = XLSX.utils.sheet_to_csv(sheetDetalhamento);
+            const csvRelacionamento = XLSX.utils.sheet_to_csv(sheetRelacionamento);
+            const dossieMatriz = `
+--- DADOS DA PLANILHA 'DETALHAMENTO' ---
+${csvDetalhamento}
+--- FIM DOS DADOS DA PLANILHA 'DETALHAMENTO' ---
+
+--- DADOS DA PLANILHA 'RELACIONAMENTO' ---
+${csvRelacionamento}
+--- FIM DOS DADOS DA PLANILHA 'RELACIONAMENTO' ---
+            `;
+
+            const saepAnalysisPrompt = `
+                Você é um analista de dados. Sua tarefa é analisar o dossiê da Matriz SAEP.
+                Encontre a Unidade Curricular (UC) "${ucName}".
+                Se encontrar a UC, extraia e formate a "CAPACIDADE SAEP" principal e os "CONHECIMENTOS" associados no formato: "CÓDIGO - Descrição...".
+                Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
+            `;
+            
+            const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+            const saepResult = await modelTextOnly.generateContent([saepAnalysisPrompt, dossieMatriz]);
+            const analysisResult = saepResult.response.text();
+            
+            // Verifica se a IA encontrou a UC
+            if (analysisResult.trim() !== "NAO_ENCONTRADO") {
+                saepMatrixString = analysisResult; // Atualiza com o resultado real
+                console.log("Análise da Matriz concluída com sucesso.");
+                sendUpdate("Análise da Matriz concluída com sucesso.");
+            } else {
+                console.log(`A UC "${ucName}" não foi encontrada na Matriz SAEP.`);
+                sendUpdate(`Aviso: A UC "${ucName}" não foi encontrada na Matriz SAEP.`);
+            }
+        } else {
+            console.log("Nenhum ficheiro de Matriz SAEP foi enviado. A usar valor padrão.");
+            sendUpdate("Aviso: Nenhum ficheiro de Matriz SAEP foi enviado. A prosseguir sem cruzamento.");
+        }
+
+        // --- ETAPA 2.2: ELABORAÇÃO DO CONTEÚDO DE CADA TÓPICO ---
+        // (Esta parte do código permanece exatamente a mesma, pois já usa a variável saepMatrixString)
         sendUpdate("ETAPA 2.2: A elaborar o conteúdo de cada tópico do PDF...");
+        console.log("--- ETAPA 2.2: Elaborando conteúdo de cada tópico... ---");
         const conteudoDetalhado = [];
+
         for (const [index, title] of topicTitles.entries()) {
             sendUpdate(`   - A processar tópico ${index + 1} de ${topicTitles.length}: "${title}"`);
+            
             const elaboratorPrompt = `
                 Você é um professor especialista em design instrucional. Sua tarefa é elaborar o conteúdo detalhado para um único tópico de um plano de curso, seguindo uma matriz de decisão pedagógica de forma INFLEXÍVEL.
 
@@ -143,9 +158,13 @@ ${csvRelacionamento}
                     // ✨ AJUSTE 1: INSTRUÇÃO DE FORMATO DE DATA PARA A IA ✨
                     * Estime datas de "inicio" e "fim" para este tópico. As datas DEVEM estar no formato "DD/MM/AAAA"
             `;
+
             const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
             const topicDetailJson = JSON.parse(elaboratorResult.response.text());
+
+            // Adiciona o resultado da análise (ou o texto padrão) ao JSON
             topicDetailJson.saep = saepMatrixString;
+            
             conteudoDetalhado.push(topicDetailJson);
         }
         console.log("Elaboração de todos os tópicos concluída.");
