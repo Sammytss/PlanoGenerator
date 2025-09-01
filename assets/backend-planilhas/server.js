@@ -55,7 +55,25 @@ app.post('/gerar-plano', upload, async (req, res) => {
 
         // --- ETAPA 1: O EXTRATOR ---
         sendUpdate("ETAPA 1: A extrair a lista de tópicos do PDF...");
-        const extractorPrompt = `Sua única tarefa é analisar a seção "CONHECIMENTOS" do PDF e extrair a lista completa de todos os tópicos principais numerados. Responda EXCLUSIVAMENTE com um objeto JSON com uma única chave chamada "topicos".`;
+        // =========================================================================
+        // ✨ PROMPT DO EXTRATOR FINAL: COM AGRUPAMENTO HIERÁRQUICO ✨
+        // =========================================================================
+        const extractorPrompt = `
+            Você é um especialista em análise de documentos pedagógicos. Sua tarefa é analisar o Plano de Curso em PDF e extrair a lista de "Conhecimentos" de forma estruturada.
+
+            1.  **Identifique os Conhecimentos Principais:** Localize a lista de conteúdos a serem ensinados (pode chamar-se "Conhecimentos", "Conteúdo Programático", etc.). Os conhecimentos principais são geralmente numerados (ex: "1. TEMA", "2. TEMA").
+            2.  **Identifique os Subtópicos:** Para cada conhecimento principal, identifique todos os seus subtópicos associados (ex: "1.1. Subtema", "1.2. Subtema").
+            3.  **Agrupe o Conteúdo:** Para cada conhecimento principal, crie uma ÚNICA string de texto. Esta string DEVE começar com o conhecimento principal, seguido por todos os seus subtópicos, cada um numa nova linha.
+            
+            **EXEMPLO DE AGRUPAMENTO CORRETO:**
+            Se o PDF tiver:
+            2. MICROCONTROLADORES
+            2.1. Aplicações
+            2.2. Arduino
+            A sua string de saída para este item deve ser: "2. MICROCONTROLADORES\n2.1. Aplicações\n2.2. Arduino"
+
+            4.  **Formato de Saída:** Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave chamada "topicos", que contém um array destas strings agrupadas.
+        `;
         const extractorResult = await model.generateContent([extractorPrompt, filePart]);
         const topicListJson = JSON.parse(extractorResult.response.text());
         const topicTitles = topicListJson.topicos;
@@ -90,10 +108,13 @@ ${csvRelacionamento}
             `;
 
             const saepAnalysisPrompt = `
-                Você é um analista de dados. Sua tarefa é analisar o dossiê da Matriz SAEP.
-                Encontre a Unidade Curricular (UC) "${ucName}".
-                Se encontrar a UC, extraia e formate a "CAPACIDADE SAEP" principal e os "CONHECIMENTOS" associados no formato: "CÓDIGO - Descrição...".
-                Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
+            Você é um analista de dados. Sua única tarefa é analisar o dossiê de texto da Matriz de Referência SAEP fornecido.
+            Encontre a Unidade Curricular (UC) "${ucName}" e execute as seguintes extrações:
+            1. Extraia o código e a descrição completa da "CAPACIDADE SAEP" principal associada a esta UC.
+            2. Extraia a lista completa de números e descrições textuais dos "CONHECIMENTOS" vinculados a esta UC.
+            FORMATE O RESULTADO como uma única string de texto com múltiplas linhas, seguindo EXATAMENTE este formato:
+            "CÓDIGO - Descrição completa da Capacidade SAEP.
+            Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
             `;
             
             const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
@@ -123,40 +144,48 @@ ${csvRelacionamento}
         for (const [index, title] of topicTitles.entries()) {
             sendUpdate(`   - A processar tópico ${index + 1} de ${topicTitles.length}: "${title}"`);
             
+            // =========================================================================
+            // ✨ PROMPT ATUALIZADO COM MATRIZ DE DECISÃO PARA AVALIAÇÃO ✨
+            // =========================================================================
             const elaboratorPrompt = `
                 Você é um professor especialista em design instrucional. Sua tarefa é elaborar o conteúdo detalhado para um único tópico de um plano de curso, seguindo uma matriz de decisão pedagógica de forma INFLEXÍVEL.
 
                 Tópico a ser detalhado: "${title}"
+                Contexto da Posição: Este é o tópico número ${index + 1} de um total de ${topicTitles.length} tópicos.
 
                 Gere um único objeto JSON aplicando as seguintes regras de conteúdo:
 
                 1.  **PARA A CHAVE "oque":**
                     * Formate o valor EXATAMENTE assim:
                         "[Listar as capacidades técnicas relevantes para este tópico, extraídas do PDF];
+
                         Por meio de:
+
                         ${title.toUpperCase()}
+                        *Se houver subtópicos, liste-os numericamente, por exemplo:
                         X.1. Subtópico 1
                         X.2. Subtópico 2..."
 
                 2.  **PARA A CHAVE "como" (Estratégia de Ensino):**
-                    * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Atividade avaliativa", "Gamificação", "Sala de aula invertida", "Trabalho em grupo/dupla/trio"].
-                    * **FORMATAÇÃO OBRIGATÓRIA:** O texto final DEVE seguir este formato exato: comece com o nome da estratégia escolhida, seguido de dois pontos e um espaço, e então a descrição com verbos no infinitivo impessoal seguindo a taxonomia de bloom.
-                    * **EXEMPLOS DE FORMATO:**
-                        * "[Estratégia de ensino]: [Verbo...]"
-                        * Se houver duas estratégias, separe-as com uma linha em branco.
-                    * A descrição deve ser rica e com exemplos práticos.
+                    * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Trabalho em grupo"].
+                    * **FORMATAÇÃO OBRIGATÓRIA:** O texto final DEVE seguir este formato exato: comece com o nome da estratégia escolhida, seguido de dois pontos e um espaço, e então a descrição com verbos no infinitivo impessoal.
+                    * Se houver duas estratégias, separe-as com uma linha em branco.
+                    * A descrição deve ser bem resumida e com exemplos práticos.
 
                 3.  **PARA AS CHAVES "instrumentos" e "criterios":**
-                    * **"instrumentos":** ESCOLHA apenas 1 instrumento da lista a seguir: ["Ficha de Observação", "Relatório", "Portfólio", "Prova Objetiva", "Prova de Resposta Construída", "Prova Prática", "Autoavaliação"]. A escolha DEVE ser coerente com a estratégia de ensino definida em "como" sendo Prova Prática e Prova Objetiva somente no final da Unidade curricular (filnal da carga horária total) ultimas datas.
-                    * **"criterios":** Defina UM critério de avaliação claro, direto e no passado, no formato "O aluno...", que se relacione com o instrumento escolhido.
+                    * **MATRIZ DE DECISÃO PARA "instrumentos":** Sua escolha DEVE seguir estritamente estas regras, baseada na primeira estratégia escolhida em "como":
+                        * Se a estratégia for "Atividade prática": ESCOLHA entre "Ficha de Observação", "Relatório" ou "Portfólio".
+                        * Se a estratégia for "Exposição dialogada": ESCOLHA entre "Prova de Resposta Construída" ou "Autoavaliação".
+                        * Se a estratégia for "Trabalho em grupo": ESCOLHA entre "Relatório" ou "Portfólio".
+                    * **REGRA ESPECIAL DE FIM DE CURSO:** Se este tópico for o último ou o penúltimo (ou seja, se o número do tópico for ${topicTitles.length} ou ${topicTitles.length - 1}), você PODE escolher "Prova Prática" ou "Prova Objetiva", caso seja a opção mais lógica. Fora isso, EVITE estes dois instrumentos.
+                    * **"criterios":** Defina UM critério de avaliação claro, direto e no passado, no formato "O aluno...", que se relacione DIRETAMENTE com o instrumento escolhido.
 
                 4.  **PARA AS OUTRAS CHAVES ("onde", "recursos", "situacaoAprendizagem"):**
                     * Preencha com informações pertinentes e diretas para o tópico em questão.
                 
                 5.  **CÁLCULOS:**
-                    * Estime uma "cargaHoraria" lógica para este tópico usando como base dataInicioCurso e dataFimCurso.
-                    // ✨ AJUSTE 1: INSTRUÇÃO DE FORMATO DE DATA PARA A IA ✨
-                    * Estime datas de "inicio" e "fim" para este tópico. As datas DEVEM estar no formato "DD/MM/AAAA"
+                    * Estime uma "cargaHoraria" numérica lógica para este tópico.
+                    * Deixe as chaves "inicio" e "fim" como strings vazias, pois elas serão calculadas depois.
             `;
 
             const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
@@ -169,6 +198,41 @@ ${csvRelacionamento}
         }
         console.log("Elaboração de todos os tópicos concluída.");
         sendUpdate("Elaboração de todos os tópicos concluída.");
+
+        // =========================================================================
+        // ✨ NOVA ETAPA 2.3: GERADOR INTELIGENTE DE AVALIAÇÃO FINAL ✨
+        // =========================================================================
+        if (conteudoDetalhado.length > 0) {
+            sendUpdate("ETAPA 2.3: A gerar uma avaliação final contextualizada...");
+            console.log("--- ETAPA 2.3: Gerando avaliação final contextualizada... ---");
+
+            const todosOsTopicos = topicTitles.join('; ');
+            const ultimoTopico = conteudoDetalhado[conteudoDetalhado.length - 1];
+
+            const finalAssessmentPrompt = `
+                Você é um coordenador pedagógico encarregado de criar a avaliação final para a Unidade Curricular (UC) "${ucName}".
+                A UC abordou os seguintes tópicos: "${todosOsTopicos}".
+
+                Sua tarefa é criar um objeto JSON com três chaves ("instrumentos", "como", "criterios") para a avaliação somativa final.
+
+                Siga estas regras INFLEXIVELMENTE:
+                1.  **PARA A CHAVE "instrumentos":** Analise os tópicos e escolha o instrumento de avaliação final mais adequado da seguinte lista: ["Trabalho Final", "Prova Prática", "Prova Objetiva"]. A sua escolha deve ser a que melhor avalia o conjunto das competências desenvolvidas.
+                2.  **PARA A CHAVE "como":** Crie uma descrição resumida para a "Estratégia de Ensino" (neste caso, uma atividade avaliativa) que seja coerente com o instrumento escolhido e que abranja os principais temas da UC. Use verbos no infinitivo.
+                3.  **PARA A CHAVE "criterios":** Defina UM critério de avaliação claro, direto e no passado (formato "O aluno..."), que avalie o desempenho do aluno na atividade final proposta.
+            `;
+            
+            // Usamos o modelo que espera JSON
+            const assessmentResult = await model.generateContent([finalAssessmentPrompt, filePart]);
+            const assessmentJson = JSON.parse(assessmentResult.response.text());
+
+            // Substituímos os valores do último tópico pelos valores gerados
+            ultimoTopico.instrumentos = assessmentJson.instrumentos || "Prova Prática";
+            ultimoTopico.como = assessmentJson.como || "Atividade avaliativa final.";
+            ultimoTopico.criterios = assessmentJson.criterios || "O aluno demonstrou as competências da UC.";
+            
+            console.log(`Avaliação final definida como: "${ultimoTopico.instrumentos}".`);
+            sendUpdate(`Avaliação final definida como: "${ultimoTopico.instrumentos}".`);
+        }
 
         // --- ETAPA 2.4 E 2.5: NORMALIZAÇÃO E CÁLCULO ---
         console.log("--- ETAPA 2.4: Normalizando para horas-aula completas... ---");

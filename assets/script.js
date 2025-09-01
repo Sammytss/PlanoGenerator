@@ -24,7 +24,7 @@ form.addEventListener('submit', async (event) => {
     const progressTextElement = document.getElementById('progress-text');
 
     const formData = new FormData(form);
-    const backendUrl = 'http://localhost:3000/gerar-plano';
+    const backendUrl = 'http://10.24.1.8:3000/gerar-plano';
 
     try {
         const response = await fetch(backendUrl, {
