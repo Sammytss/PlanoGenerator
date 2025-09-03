@@ -160,6 +160,38 @@
                             </select>
                         </div>
                     </div>
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="weekdays">Dias da Semana (se aplicável):</label>
+                            <div class="weekdays-selector">
+                                <input type="checkbox" id="mon" name="weekdays" value="1"><label for="mon">Seg</label>
+                                <input type="checkbox" id="tue" name="weekdays" value="2"><label for="tue">Ter</label>
+                                <input type="checkbox" id="wed" name="weekdays" value="3"><label for="wed">Qua</label>
+                                <input type="checkbox" id="thu" name="weekdays" value="4"><label for="thu">Qui</label>
+                                <input type="checkbox" id="fri" name="weekdays" value="5"><label for="fri">Sex</label>
+                            </div>
+                            <p style="font-size: 0.8em; color: #666;">* Se nenhum dia for selecionado, o sistema
+                                considerará todos os dias úteis (Seg-Sex).</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="holidays">Feriados (separados por vírgula):</label>
+                            <input type="text" id="holidays" name="holidays" placeholder="Ex: 25/12/2024, 01/01/2025">
+                        </div>
+                    </div>
+                    <div>
+                        <label>Período de Férias, se houver (Opcional):</label>
+                        <div class="form-group-row">
+                            <div>
+                                <label for="vacationStart">Início:</label>
+                                <input type="date" id="vacationStart" name="vacationStart">
+                            </div>
+                            <div>
+                                <label for="vacationEnd">Fim:</label>
+                                <input type="date" id="vacationEnd" name="vacationEnd">
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-section">

@@ -529,7 +529,17 @@ input[type="file"]:hover {
     color: #2d3748;
     ;
 }
-
+.weekdays-selector {
+    display: flex;
+    gap: 10px;
+}
+.weekdays-selector label {
+    margin-left: 2px;
+}
+.ferias-linha{display: block;}
+.ferias-linha .form-group{display: flex;
+justify-content: space-between;}
+.ferias-linha .form-group input{width: 100%;}
 /* Responsividade */
 @media (max-width: 768px) {
     .header-content {

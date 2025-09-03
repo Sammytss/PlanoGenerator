@@ -43,7 +43,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
     };
 
     try {
-        const { courseName, ucName, startDate, endDate, totalHours, shift } = req.body;
+        let { courseName, ucName, startDate, endDate, totalHours, shift, capacidades, topicos, weekdays, holidays, vacationStart, vacationEnd } = req.body;
         const pdfFile = req.files.pdfFile[0];
         const matrixFile = req.files.matrixFile ? req.files.matrixFile[0] : null;
 
@@ -61,9 +61,10 @@ app.post('/gerar-plano', upload, async (req, res) => {
         const extractorPrompt = `
             Você é um especialista em análise de documentos pedagógicos. Sua tarefa é analisar o Plano de Curso em PDF e extrair a lista de "Conhecimentos" de forma estruturada.
 
-            1.  **Identifique os Conhecimentos Principais:** Localize a lista de conteúdos a serem ensinados (pode chamar-se "Conhecimentos", "Conteúdo Programático", etc.). Os conhecimentos principais são geralmente numerados (ex: "1. TEMA", "2. TEMA").
-            2.  **Identifique os Subtópicos:** Para cada conhecimento principal, identifique todos os seus subtópicos associados (ex: "1.1. Subtema", "1.2. Subtema").
-            3.  **Agrupe o Conteúdo:** Para cada conhecimento principal, crie uma ÚNICA string de texto. Esta string DEVE começar com o conhecimento principal, seguido por todos os seus subtópicos, cada um numa nova linha.
+            1.  **Encontre o Ponto de Início:** Percorra o documento e localize o ponto exato onde a Unidade Curricular "${ucName}" é formalmente introduzida. IGNORE todo o conteúdo que aparecer ANTES deste ponto.
+            2.  **Identifique os Conhecimentos Principais:** Localize a lista de conteúdos a serem ensinados (pode chamar-se "Conhecimentos", "Conteúdo Programático", etc.). Os conhecimentos principais são geralmente numerados (ex: "1. TEMA", "2. TEMA").
+            3.  **Identifique os Subtópicos:** Para cada conhecimento principal, identifique todos os seus subtópicos associados (ex: "1.1. Subtema", "1.2. Subtema").
+            4.  **Agrupe o Conteúdo:** Para cada conhecimento principal, crie uma ÚNICA string de texto. Esta string DEVE começar com o conhecimento principal, seguido por todos os seus subtópicos, cada um numa nova linha.
             
             **EXEMPLO DE AGRUPAMENTO CORRETO:**
             Se o PDF tiver:
@@ -72,7 +73,8 @@ app.post('/gerar-plano', upload, async (req, res) => {
             2.2. Arduino
             A sua string de saída para este item deve ser: "2. MICROCONTROLADORES\n2.1. Aplicações\n2.2. Arduino"
 
-            4.  **Formato de Saída:** Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave chamada "topicos", que contém um array destas strings agrupadas.
+            5.  **Defina o Ponto Final:** Pare a sua análise assim que encontrar o início de uma NOVA Unidade Curricular. A sua extração deve conter APENAS os conhecimentos da UC "${ucName}".
+            6.  **Formato de Saída:** Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave chamada "topicos", que contém um array destas strings agrupadas.
         `;
         const extractorResult = await model.generateContent([extractorPrompt, filePart]);
         const topicListJson = JSON.parse(extractorResult.response.text());
@@ -83,14 +85,14 @@ app.post('/gerar-plano', upload, async (req, res) => {
         // =========================================================================
         // ✨ ETAPA 2 FINAL: LÓGICA CONDICIONAL DA MATRIZ SAEP ✨
         // =========================================================================
-        
+
         let saepMatrixString = "Não possui cruzamento de MATRIZ"; // Valor padrão
 
         // --- ETAPA 2.1: ANÁLISE DA MATRIZ (SE O FICHEIRO EXISTIR) ---
         if (matrixFile) {
             sendUpdate("ETAPA 2.1: A analisar a Matriz SAEP para a Unidade Curricular...");
             console.log("--- ETAPA 2.1: Analisando a Matriz SAEP... ---");
-            
+
             // O seu código de pré-processamento do XLSX permanece aqui
             const workbook = XLSX.read(matrixFile.buffer, { type: 'buffer' });
             const sheetDetalhamento = workbook.Sheets['Detalhamento'];
@@ -116,11 +118,11 @@ ${csvRelacionamento}
             "CÓDIGO - Descrição completa da Capacidade SAEP.
             Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
             `;
-            
+
             const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
             const saepResult = await modelTextOnly.generateContent([saepAnalysisPrompt, dossieMatriz]);
             const analysisResult = saepResult.response.text();
-            
+
             // Verifica se a IA encontrou a UC
             if (analysisResult.trim() !== "NAO_ENCONTRADO") {
                 saepMatrixString = analysisResult; // Atualiza com o resultado real
@@ -143,49 +145,53 @@ ${csvRelacionamento}
 
         for (const [index, title] of topicTitles.entries()) {
             sendUpdate(`   - A processar tópico ${index + 1} de ${topicTitles.length}: "${title}"`);
-            
+
             // =========================================================================
             // ✨ PROMPT ATUALIZADO COM MATRIZ DE DECISÃO PARA AVALIAÇÃO ✨
             // =========================================================================
             const elaboratorPrompt = `
-                Você é um professor especialista em design instrucional. Sua tarefa é elaborar o conteúdo detalhado para um único tópico de um plano de curso, seguindo uma matriz de decisão pedagógica de forma INFLEXÍVEL.
+                Você é um professor especialista em design instrucional. Sua tarefa é elaborar o conteúdo detalhado para um único Conhecimento de um plano de curso, que já inclui seus subtópicos.
 
-                Tópico a ser detalhado: "${title}"
-                Contexto da Posição: Este é o tópico número ${index + 1} de um total de ${topicTitles.length} tópicos.
+                Conhecimento a ser detalhado (pode incluir subtópicos): 
+                ---
+                ${title}
+                ---
+                Contexto da Posição: Este é o conhecimento número ${index + 1} de um total de ${topicTitles.length}.
 
                 Gere um único objeto JSON aplicando as seguintes regras de conteúdo:
 
                 1.  **PARA A CHAVE "oque":**
                     * Formate o valor EXATAMENTE assim:
-                        "[Listar as capacidades técnicas relevantes para este tópico, extraídas do PDF];
-
+                        "[Listar as capacidades técnicas relevantes para este conhecimento, extraídas do PDF];
+                        
                         Por meio de:
+                        
+                        ${title}" 
+                        
+                2.  **PARA A CHAVE "como" (Estratégia de Ensino):**
 
-                        ${title.toUpperCase()}
-                        *Se houver subtópicos, liste-os numericamente, por exemplo:
-                        X.1. Subtópico 1
-                        X.2. Subtópico 2..."
+                    * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Trabalho em grupo"].
 
-                2.  **PARA A CHAVE "como" (Estratégia de Ensino):**
-                    * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Trabalho em grupo"].
-                    * **FORMATAÇÃO OBRIGATÓRIA:** O texto final DEVE seguir este formato exato: comece com o nome da estratégia escolhida, seguido de dois pontos e um espaço, e então a descrição com verbos no infinitivo impessoal.
-                    * Se houver duas estratégias, separe-as com uma linha em branco.
-                    * A descrição deve ser bem resumida e com exemplos práticos.
+                    * **FORMATAÇÃO OBRIGATÓRIA:** O texto final DEVE seguir este formato exato: comece com o nome da estratégia escolhida, seguido de dois pontos e um espaço, e então a descrição com verbos no infinitivo impessoal.
+
+                    * Se houver duas estratégias, separe-as com uma linha em branco.
+
+                    * A descrição deve ser bem resumida e com exemplos práticos.
 
                 3.  **PARA AS CHAVES "instrumentos" e "criterios":**
-                    * **MATRIZ DE DECISÃO PARA "instrumentos":** Sua escolha DEVE seguir estritamente estas regras, baseada na primeira estratégia escolhida em "como":
+                    * **MATRIZ DE DECISÃO PARA "instrumentos":** Sua escolha DEVE seguir estritamente estas regras:
                         * Se a estratégia for "Atividade prática": ESCOLHA entre "Ficha de Observação", "Relatório" ou "Portfólio".
                         * Se a estratégia for "Exposição dialogada": ESCOLHA entre "Prova de Resposta Construída" ou "Autoavaliação".
                         * Se a estratégia for "Trabalho em grupo": ESCOLHA entre "Relatório" ou "Portfólio".
-                    * **REGRA ESPECIAL DE FIM DE CURSO:** Se este tópico for o último ou o penúltimo (ou seja, se o número do tópico for ${topicTitles.length} ou ${topicTitles.length - 1}), você PODE escolher "Prova Prática" ou "Prova Objetiva", caso seja a opção mais lógica. Fora isso, EVITE estes dois instrumentos.
+                    * **REGRA DE FIM DE CURSO:** Se este for o último ou penúltimo conhecimento, você PODE escolher "Prova Prática" ou "Prova Objetiva" se for lógico. Fora isso, EVITE-OS.
                     * **"criterios":** Defina UM critério de avaliação claro, direto e no passado, no formato "O aluno...", que se relacione DIRETAMENTE com o instrumento escolhido.
 
                 4.  **PARA AS OUTRAS CHAVES ("onde", "recursos", "situacaoAprendizagem"):**
-                    * Preencha com informações pertinentes e diretas para o tópico em questão.
+                    * Preencha com informações pertinentes para o conhecimento em questão.
                 
                 5.  **CÁLCULOS:**
-                    * Estime uma "cargaHoraria" numérica lógica para este tópico.
-                    * Deixe as chaves "inicio" e "fim" como strings vazias, pois elas serão calculadas depois.
+                    * Estime uma "cargaHoraria" numérica lógica.
+                    * Deixe as chaves "inicio" e "fim" como strings vazias.
             `;
 
             const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
@@ -193,7 +199,7 @@ ${csvRelacionamento}
 
             // Adiciona o resultado da análise (ou o texto padrão) ao JSON
             topicDetailJson.saep = saepMatrixString;
-            
+
             conteudoDetalhado.push(topicDetailJson);
         }
         console.log("Elaboração de todos os tópicos concluída.");
@@ -220,7 +226,7 @@ ${csvRelacionamento}
                 2.  **PARA A CHAVE "como":** Crie uma descrição resumida para a "Estratégia de Ensino" (neste caso, uma atividade avaliativa) que seja coerente com o instrumento escolhido e que abranja os principais temas da UC. Use verbos no infinitivo.
                 3.  **PARA A CHAVE "criterios":** Defina UM critério de avaliação claro, direto e no passado (formato "O aluno..."), que avalie o desempenho do aluno na atividade final proposta.
             `;
-            
+
             // Usamos o modelo que espera JSON
             const assessmentResult = await model.generateContent([finalAssessmentPrompt, filePart]);
             const assessmentJson = JSON.parse(assessmentResult.response.text());
@@ -229,7 +235,7 @@ ${csvRelacionamento}
             ultimoTopico.instrumentos = assessmentJson.instrumentos || "Prova Prática";
             ultimoTopico.como = assessmentJson.como || "Atividade avaliativa final.";
             ultimoTopico.criterios = assessmentJson.criterios || "O aluno demonstrou as competências da UC.";
-            
+
             console.log(`Avaliação final definida como: "${ultimoTopico.instrumentos}".`);
             sendUpdate(`Avaliação final definida como: "${ultimoTopico.instrumentos}".`);
         }
@@ -262,32 +268,74 @@ ${csvRelacionamento}
         conteudoDetalhado.forEach((item, index) => {
             item.cargaHoraria = estimativaAulas[index] * cargaDiaria;
         });
+
+        // =========================================================================
+        // ✨ ETAPA 2.5 CORRIGIDA: O CALCULISTA DE DATAS INTELIGENTE ✨
+        // =========================================================================
+        console.log("--- ETAPA 2.5: Calculando cronograma com feriados e dias específicos... ---");
         
-        console.log("--- ETAPA 2.5: Calculando datas e distribuindo horas-aula... ---");
+        // --- PREPARAÇÃO DAS REGRAS DE DATA ---
+        if (!weekdays) {
+            weekdays = [];
+        } else if (!Array.isArray(weekdays)) {
+            weekdays = [weekdays];
+        }
+        const parsedHolidays = (holidays || '')
+            .split(',')
+            .map(h => h.trim())
+            .filter(h => h)
+            .map(h => {
+                const [day, month, year] = h.split('/');
+                return new Date(`${year}-${month}-${day}T00:00:00`).getTime();
+            });
+        const vacationStartDate = vacationStart ? new Date(vacationStart + 'T00:00:00') : null;
+        const vacationEndDate = vacationEnd ? new Date(vacationEnd + 'T00:00:00') : null;
+
+        const isClassDay = (date) => {
+            const dayOfWeek = date.getDay();
+            const dateTimestamp = date.getTime();
+            if (dayOfWeek === 0 || dayOfWeek === 6) return false;
+            if (weekdays.length > 0 && !weekdays.includes(dayOfWeek.toString())) return false;
+            if (parsedHolidays.includes(dateTimestamp)) return false;
+            if (vacationStartDate && vacationEndDate && date >= vacationStartDate && date <= vacationEndDate) return false;
+            return true;
+        };
+
+        // --- CÁLCULO DO CRONOGRAMA ---
         let dataAtual = new Date(startDate + 'T00:00:00');
+        
         for (let i = 0; i < conteudoDetalhado.length; i++) {
             let item = conteudoDetalhado[i];
             if (item.cargaHoraria === 0) continue;
-            while (dataAtual.getDay() === 0 || dataAtual.getDay() === 6) {
+
+            while (!isClassDay(dataAtual)) {
                 dataAtual.setDate(dataAtual.getDate() + 1);
             }
             item.inicio = dataAtual.toLocaleDateString('pt-BR');
-            let cargaHorariaTotalDoTopico = parseInt(item.cargaHoraria, 10);
-            let duracaoEmDias = cargaHorariaTotalDoTopico / cargaDiaria;
+
+            // Recalcula a duração em dias a partir da carga horária já normalizada
+            let duracaoEmDias = parseInt(item.cargaHoraria, 10) / cargaDiaria;
             let horasPorDia = Array(duracaoEmDias).fill(cargaDiaria);
+
             let dataFim = new Date(dataAtual);
-            let diasContados = 0;
-            while (diasContados < duracaoEmDias - 1) {
+            let diasDeAulaContados = 1;
+
+            while (diasDeAulaContados < duracaoEmDias) {
                 dataFim.setDate(dataFim.getDate() + 1);
-                if (dataFim.getDay() !== 0 && dataFim.getDay() !== 6) {
-                    diasContados++;
+                if (isClassDay(dataFim)) {
+                    diasDeAulaContados++;
                 }
             }
-            item.cargaHoraria = horasPorDia.join(', ');
             item.fim = dataFim.toLocaleDateString('pt-BR');
+            
+            // ✨ ✨ ✨ AQUI ESTÁ A CORREÇÃO CRUCIAL ✨ ✨ ✨
+            // Converte o número de horas (ex: 8) para uma string formatada (ex: "4, 4")
+            item.cargaHoraria = horasPorDia.join(', ');
+
             dataAtual = new Date(dataFim);
             dataAtual.setDate(dataAtual.getDate() + 1);
         }
+        console.log("Cálculo de datas e horas-aula concluído.");
         sendUpdate("Cronograma calculado com sucesso");
         const dataFimCalculada = conteudoDetalhado.length > 0 ? conteudoDetalhado[conteudoDetalhado.length - 1].fim : new Date(endDate + 'T00:00:00').toLocaleDateString('pt-BR');
 
