@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plano Generator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="icon" type="image/x-icon" href="assets/Images/LogoTipo_PlanoGenerator.png">
     <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -160,6 +161,8 @@
                             </select>
                         </div>
                     </div>
+                    <div class="section-title">
+                        ⏳ Definição dos Dias de Aula</div>
                     <div class="form-group-row">
                         <div class="form-group">
                             <label for="weekdays">Dias da Semana (se aplicável):</label>
@@ -173,11 +176,17 @@
                             <p style="font-size: 0.8em; color: #666;">* Se nenhum dia for selecionado, o sistema
                                 considerará todos os dias úteis (Seg-Sex).</p>
                         </div>
-
                         <div class="form-group">
-                            <label for="holidays">Feriados (separados por vírgula):</label>
-                            <input type="text" id="holidays" name="holidays" placeholder="Ex: 25/12/2024, 01/01/2025">
+                            <label>Datas específicas (se aplicável):</label>
+                            <label for="classDates" style="font-weight: normal; margin-top: 10px;">Use o calendário para
+                                selecionar datas específicas e não sequenciais:</label>
+                            <input type="text" id="classDates" name="classDates"
+                                placeholder="Selecione todas as datas em que haverá aula...">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="holidays">Feriados (clique para selecionar no calendário):</label>
+                        <input type="text" id="holidays" name="holidays" placeholder="Selecione um ou mais dias...">
                     </div>
                     <div>
                         <label>Período de Férias, se houver (Opcional):</label>
@@ -211,6 +220,13 @@
                             <input type="file" id="matrixFile" name="matrixFile"
                                 accept=".xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="observacoes">Observações e Instruções Especiais para a IA (Opcional):</label>
+                        <textarea id="observacoes" name="observacoes" rows="5"
+                            placeholder="Ex: Para esta UC, considere os conhecimentos da UC 'Lógica de Programação' como base. A avaliação final deve ser um projeto prático em grupo..."></textarea>
+                        <p style="font-size: 0.8em; color: #666;">* Use este campo para guiar a IA em casos especiais de
+                            conteúdo, metodologia ou avaliação.</p>
                     </div>
                 </div>
 
@@ -299,6 +315,23 @@
         });
     </script>
     <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'96fc8c093519f632',t:'MTc1NTMwMTMzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+    <script>
+        // Ativa o calendário no nosso campo de feriados
+        flatpickr("#holidays", {
+            mode: "multiple",       // Permite selecionar múltiplas datas
+            dateFormat: "d/m/Y",    // Formata a data como DD/MM/AAAA
+            locale: "pt"            // Usa a tradução para português
+        });
+
+        // Ativa o novo calendário para as datas das aulas
+        flatpickr("#classDates", {
+            mode: "multiple",
+            dateFormat: "d/m/Y",
+            locale: "pt"
+        });
+    </script>
 </body>
 
 </html>

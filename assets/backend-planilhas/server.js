@@ -43,9 +43,19 @@ app.post('/gerar-plano', upload, async (req, res) => {
     };
 
     try {
-        let { courseName, ucName, startDate, endDate, totalHours, shift, capacidades, topicos, weekdays, holidays, vacationStart, vacationEnd } = req.body;
+        let { courseName, ucName, startDate, endDate, totalHours, shift, capacidades, topicos, classDates, weekdays, holidays, vacationStart, vacationEnd, observacoes } = req.body;
         const pdfFile = req.files.pdfFile[0];
         const matrixFile = req.files.matrixFile ? req.files.matrixFile[0] : null;
+         // Prepara o contexto das instruções do utilizador, se existirem
+    let userInstructionsContext = "";
+        if (observacoes && observacoes.trim() !== '') {
+            userInstructionsContext = `
+            ATENÇÃO: O utilizador forneceu as seguintes instruções especiais que DEVEM ser consideradas com alta prioridade:
+            --- INSTRUÇÕES DO UTILIZADOR ---
+            ${observacoes}
+            --- FIM DAS INSTRUÇÕES ---
+            `;
+        }
 
         if (!pdfFile) {
             throw new Error('É necessário enviar o PDF para a elaboração do plano.');
@@ -58,7 +68,9 @@ app.post('/gerar-plano', upload, async (req, res) => {
         // =========================================================================
         // ✨ PROMPT DO EXTRATOR FINAL: COM AGRUPAMENTO HIERÁRQUICO ✨
         // =========================================================================
-        const extractorPrompt = `
+         const extractorPrompt = `
+        Você é um especialista em análise de documentos pedagógicos.
+        ${userInstructionsContext} // <<-- INSTRUÇÕES INJETADAS AQUI
             Você é um especialista em análise de documentos pedagógicos. Sua tarefa é analisar o Plano de Curso em PDF e extrair a lista de "Conhecimentos" de forma estruturada.
 
             1.  **Encontre o Ponto de Início:** Percorra o documento e localize o ponto exato onde a Unidade Curricular "${ucName}" é formalmente introduzida. IGNORE todo o conteúdo que aparecer ANTES deste ponto.
@@ -138,6 +150,7 @@ ${csvRelacionamento}
         }
 
         // --- ETAPA 2.2: ELABORAÇÃO DO CONTEÚDO DE CADA TÓPICO ---
+      
         // (Esta parte do código permanece exatamente a mesma, pois já usa a variável saepMatrixString)
         sendUpdate("ETAPA 2.2: A elaborar o conteúdo de cada tópico do PDF...");
         console.log("--- ETAPA 2.2: Elaborando conteúdo de cada tópico... ---");
@@ -240,16 +253,54 @@ ${csvRelacionamento}
             sendUpdate(`Avaliação final definida como: "${ultimoTopico.instrumentos}".`);
         }
 
-        // --- ETAPA 2.4 E 2.5: NORMALIZAÇÃO E CÁLCULO ---
-        console.log("--- ETAPA 2.4: Normalizando para horas-aula completas... ---");
+        // =========================================================================
+        // ✨ LÓGICA DE DATAS REESCRITA E CORRIGIDA ✨
+        // =========================================================================
         const cargaDiaria = shift === 'noturno' ? 3 : 4;
-        const totalAulasNecessarias = Math.ceil(totalHours / cargaDiaria);
-        let estimativaAulas = conteudoDetalhado.map(item => {
-            const horasEstimadas = parseInt(item.cargaHoraria, 10) || 0;
-            return horasEstimadas > 0 ? Math.max(1, Math.round(horasEstimadas / cargaDiaria)) : 0;
-        });
+        const parsedHolidays = (holidays || '').split(',').map(h => h.trim()).filter(h => h).map(h => new Date(h.split('/').reverse().join('-') + 'T00:00:00').getTime());
+        const vacationStartDate = vacationStart ? new Date(vacationStart + 'T00:00:00') : null;
+        const vacationEndDate = vacationEnd ? new Date(vacationEnd + 'T00:00:00') : null;
+        const isExceptionDay = (date) => {
+            const dateTimestamp = date.getTime();
+            if (parsedHolidays.includes(dateTimestamp)) return true;
+            if (vacationStartDate && vacationEndDate && date >= vacationStartDate && date <= vacationEndDate) return true;
+            return false;
+        };
+        
+        let validClassDays = [];
+
+        if (classDates && classDates.trim() !== '') {
+            console.log("MODO DE AGENDAMENTO: Datas Específicas (Calendário).");
+            validClassDays = classDates.split(', ')
+                .map(d => new Date(d.split('/').reverse().join('-') + 'T00:00:00'))
+                .filter(date => !isExceptionDay(date))
+                .sort((a, b) => a - b);
+        } else {
+            let totalAulasNecessarias = Math.ceil(parseInt(totalHours, 10) / cargaDiaria);
+            let selectedWeekdays = (Array.isArray(weekdays) ? weekdays : (weekdays ? [weekdays] : [])).map(Number);
+            let currentDate = new Date(startDate + 'T00:00:00');
+            const endDateObj = new Date(endDate + 'T00:00:00');
+            
+            while (validClassDays.length < totalAulasNecessarias && currentDate <= endDateObj) {
+                const dayOfWeek = currentDate.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    if ((selectedWeekdays.length > 0 && selectedWeekdays.includes(dayOfWeek)) || selectedWeekdays.length === 0) {
+                        if (!isExceptionDay(currentDate)) {
+                            validClassDays.push(new Date(currentDate));
+                        }
+                    }
+                }
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        }
+
+        if (validClassDays.length === 0) throw new Error("Nenhuma data de aula válida foi encontrada.");
+        console.log(`DIAGNÓSTICO FINAL: ${validClassDays.length} dias de aula válidos foram processados para o agendamento.`);
+
+        const totalAulasDisponiveis = validClassDays.length;
+        let estimativaAulas = conteudoDetalhado.map(item => Math.max(1, Math.round((parseInt(item.cargaHoraria, 10) || 0) / cargaDiaria)));
         let somaAulasEstimadas = estimativaAulas.reduce((acc, val) => acc + val, 0);
-        let diferencaAulas = totalAulasNecessarias - somaAulasEstimadas;
+        let diferencaAulas = totalAulasDisponiveis - somaAulasEstimadas;
         while (diferencaAulas !== 0) {
             if (diferencaAulas > 0) {
                 let indexParaAumentar = estimativaAulas.indexOf(Math.min(...estimativaAulas));
@@ -269,76 +320,20 @@ ${csvRelacionamento}
             item.cargaHoraria = estimativaAulas[index] * cargaDiaria;
         });
 
-        // =========================================================================
-        // ✨ ETAPA 2.5 CORRIGIDA: O CALCULISTA DE DATAS INTELIGENTE ✨
-        // =========================================================================
-        console.log("--- ETAPA 2.5: Calculando cronograma com feriados e dias específicos... ---");
-        
-        // --- PREPARAÇÃO DAS REGRAS DE DATA ---
-        if (!weekdays) {
-            weekdays = [];
-        } else if (!Array.isArray(weekdays)) {
-            weekdays = [weekdays];
-        }
-        const parsedHolidays = (holidays || '')
-            .split(',')
-            .map(h => h.trim())
-            .filter(h => h)
-            .map(h => {
-                const [day, month, year] = h.split('/');
-                return new Date(`${year}-${month}-${day}T00:00:00`).getTime();
-            });
-        const vacationStartDate = vacationStart ? new Date(vacationStart + 'T00:00:00') : null;
-        const vacationEndDate = vacationEnd ? new Date(vacationEnd + 'T00:00:00') : null;
-
-        const isClassDay = (date) => {
-            const dayOfWeek = date.getDay();
-            const dateTimestamp = date.getTime();
-            if (dayOfWeek === 0 || dayOfWeek === 6) return false;
-            if (weekdays.length > 0 && !weekdays.includes(dayOfWeek.toString())) return false;
-            if (parsedHolidays.includes(dateTimestamp)) return false;
-            if (vacationStartDate && vacationEndDate && date >= vacationStartDate && date <= vacationEndDate) return false;
-            return true;
-        };
-
-        // --- CÁLCULO DO CRONOGRAMA ---
-        let dataAtual = new Date(startDate + 'T00:00:00');
-        
+        let classDayIndex = 0;
         for (let i = 0; i < conteudoDetalhado.length; i++) {
             let item = conteudoDetalhado[i];
-            if (item.cargaHoraria === 0) continue;
-
-            while (!isClassDay(dataAtual)) {
-                dataAtual.setDate(dataAtual.getDate() + 1);
-            }
-            item.inicio = dataAtual.toLocaleDateString('pt-BR');
-
-            // Recalcula a duração em dias a partir da carga horária já normalizada
-            let duracaoEmDias = parseInt(item.cargaHoraria, 10) / cargaDiaria;
-            let horasPorDia = Array(duracaoEmDias).fill(cargaDiaria);
-
-            let dataFim = new Date(dataAtual);
-            let diasDeAulaContados = 1;
-
-            while (diasDeAulaContados < duracaoEmDias) {
-                dataFim.setDate(dataFim.getDate() + 1);
-                if (isClassDay(dataFim)) {
-                    diasDeAulaContados++;
-                }
-            }
-            item.fim = dataFim.toLocaleDateString('pt-BR');
-            
-            // ✨ ✨ ✨ AQUI ESTÁ A CORREÇÃO CRUCIAL ✨ ✨ ✨
-            // Converte o número de horas (ex: 8) para uma string formatada (ex: "4, 4")
-            item.cargaHoraria = horasPorDia.join(', ');
-
-            dataAtual = new Date(dataFim);
-            dataAtual.setDate(dataAtual.getDate() + 1);
+            let duracaoEmDias = item.cargaHoraria / cargaDiaria;
+            if (duracaoEmDias === 0) continue;
+            if (classDayIndex + duracaoEmDias > validClassDays.length) throw new Error(`As datas de aula (${validClassDays.length}) são insuficientes.`);
+            item.inicio = validClassDays[classDayIndex].toLocaleDateString('pt-BR');
+            item.fim = validClassDays[classDayIndex + duracaoEmDias - 1].toLocaleDateString('pt-BR');
+            item.cargaHoraria = Array(duracaoEmDias).fill(cargaDiaria).join(', ');
+            classDayIndex += duracaoEmDias;
         }
-        console.log("Cálculo de datas e horas-aula concluído.");
-        sendUpdate("Cronograma calculado com sucesso");
-        const dataFimCalculada = conteudoDetalhado.length > 0 ? conteudoDetalhado[conteudoDetalhado.length - 1].fim : new Date(endDate + 'T00:00:00').toLocaleDateString('pt-BR');
-
+        
+        const dataFimCalculada = classDayIndex > 0 ? validClassDays[classDayIndex - 1].toLocaleDateString('pt-BR') : endDate;
+        sendUpdate("Cronograma distribuído com sucesso");
         // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
         const payloadParaAppsScript = {
             nomeCurso: courseName,
@@ -347,7 +342,9 @@ ${csvRelacionamento}
             dataFimCurso: dataFimCalculada,
             cargaHorariaTotal: totalHours,
             conteudoDetalhado: conteudoDetalhado,
-            imageUrl: LOGOTIPO_URL
+            imageUrl: LOGOTIPO_URL,
+            // ✨ ✨ ✨ AQUI ESTÁ A ALTERAÇÃO CRUCIAL ✨ ✨ ✨
+            diasDeAulaValidos: validClassDays.map(date => date.toLocaleDateString('pt-BR')) // Envia a lista de datas formatada
         };
 
         sendUpdate("ETAPA 3: A comunicar com o Google e a criar a sua planilha...");
