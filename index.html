@@ -8,7 +8,7 @@
     <title>Plano Generator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <link rel="icon" type="image/x-icon" href="assets/Images/LogoTipo_PlanoGenerator.png">
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
@@ -243,95 +243,11 @@
                 um plano completo.</p>
         </div>
     </div>
-    <script src="assets/script.js"></script>
-    <script>
-        // Animação de progresso simulada
-        document.addEventListener('DOMContentLoaded', function () {
-            const form = document.getElementById('courseForm');
-            const inputs = form.querySelectorAll('input[required]');
-            const headerProgress = document.getElementById('headerProgress');
-            const originalProgress = document.querySelector('.progress-indicator');
-
-            // Seleciona os indicadores separadamente para evitar conflitos
-            const originalProgressSteps = originalProgress.querySelectorAll('.progress-step');
-            const headerProgressSteps = headerProgress.querySelectorAll('.progress-step');
-
-            function updateProgress() {
-                const filledInputs = Array.from(inputs).filter(input => input.value.trim() !== '');
-                const progress = Math.min(Math.floor((filledInputs.length / inputs.length) * 9), 8);
-
-                // Atualiza os indicadores originais do container
-                originalProgressSteps.forEach((step, index) => {
-                    step.classList.toggle('active', index < progress);
-                });
-
-                // Atualiza os indicadores do cabeçalho
-                headerProgressSteps.forEach((step, index) => {
-                    step.classList.toggle('active', index < progress);
-                });
-            }
-
-            inputs.forEach(input => {
-                input.addEventListener('input', updateProgress);
-                input.addEventListener('change', updateProgress);
-            });
-
-            // Controle de scroll para mostrar/ocultar indicadores no cabeçalho
-            function handleScroll() {
-                const originalProgressRect = originalProgress.getBoundingClientRect();
-                const headerHeight = document.querySelector('.institutional-header').offsetHeight;
-
-                // Se os indicadores originais sumiram abaixo do cabeçalho
-                if (originalProgressRect.bottom < headerHeight) {
-                    headerProgress.classList.add('visible');
-                } else {
-                    headerProgress.classList.remove('visible');
-                }
-            }
-
-            window.addEventListener('scroll', handleScroll);
-
-            // Chama uma vez para definir o estado inicial
-            handleScroll();
-        });
-
-        // Função para abrir/fechar o card de ajuda
-        function toggleHelpCard() {
-            const helpCard = document.getElementById('helpCard');
-            helpCard.classList.toggle('hidden');
-        }
-
-        // Fechar card ao clicar fora dele
-        document.addEventListener('click', function (event) {
-            const helpCard = document.getElementById('helpCard');
-            const helpCardContent = document.querySelector('.help-card-content');
-            const helpIcon = document.querySelector('.help-icon');
-
-            if (!helpCard.classList.contains('hidden') &&
-                !helpCardContent.contains(event.target) &&
-                !helpIcon.contains(event.target)) {
-                helpCard.classList.add('hidden');
-            }
-        });
-    </script>
-    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'96fc8c093519f632',t:'MTc1NTMwMTMzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+    <script src="assets/js/script.js"></script>
+    <script src="assets/js/ui-interactions.js"></script>
+    <script src="assets/js/calendar-init.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
-    <script>
-        // Ativa o calendário no nosso campo de feriados
-        flatpickr("#holidays", {
-            mode: "multiple",       // Permite selecionar múltiplas datas
-            dateFormat: "d/m/Y",    // Formata a data como DD/MM/AAAA
-            locale: "pt"            // Usa a tradução para português
-        });
-
-        // Ativa o novo calendário para as datas das aulas
-        flatpickr("#classDates", {
-            mode: "multiple",
-            dateFormat: "d/m/Y",
-            locale: "pt"
-        });
-    </script>
 </body>
 
 </html>

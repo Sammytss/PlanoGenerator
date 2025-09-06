@@ -1,13 +1,29 @@
 // --- server.js VERSÃO FINAL E COMPLETA ---
-
 const express = require('express');
+const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const axios = require('axios');
 const multer = require('multer');
 const cors = require('cors');
 const XLSX = require('xlsx');
 
-// ✨ CORREÇÃO: A criação do 'app' deve estar aqui no início ✨
+// 1. Diz ao dotenv para encontrar o ficheiro .env no diretório atual
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
+// 2. Atribui o valor do .env a uma constante
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+// ✨ Diagnóstico para confirmar (pode remover depois) ✨
+console.log("Chave de API atribuída à constante:", GEMINI_API_KEY ? "SUCESSO" : "FALHA - undefined");
+
+// 3. Verifica se a chave foi carregada antes de continuar
+if (!GEMINI_API_KEY) {
+    throw new Error("A chave GEMINI_API_KEY não foi encontrada no ficheiro .env. Verifique o ficheiro e reinicie o servidor.");
+}
+
+// 4. Agora, inicializa o cliente do Google AI com a constante que sabemos que existe
+const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
 const app = express();
 const port = 3000;
 
@@ -20,12 +36,10 @@ const upload = multer({ storage: multer.memoryStorage() }).fields([
 app.use(cors());
 app.use(express.json());
 
-// PREENCHA AS SUAS CHAVES AQUI
-const GEMINI_API_KEY = "AIzaSyBwMp1n1KPAo4z8kkwvYPIeZXqTd4sLAF0";
+// // PREENCHA AS SUAS CHAVES AQUI
+// const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMD3VdA6awCyL8KBoOcc7e0qN-gyh9aOxRnByBFYxN8mmpOk79562lJqGUGVsK1ynr/exec";
 const LOGOTIPO_URL = "https://www.imagemhost.com.br/images/2024/11/22/Logo-novo-SENAI_-sem-slogan_755X325.png";
-
-const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 const generationConfig = {
     temperature: 0.4,
     maxOutputTokens: 8192,
@@ -158,12 +172,12 @@ ${csvRelacionamento}
 
         for (const [index, title] of topicTitles.entries()) {
             sendUpdate(`   - A processar tópico ${index + 1} de ${topicTitles.length}: "${title}"`);
-
+            
             // =========================================================================
-            // ✨ PROMPT ATUALIZADO COM MATRIZ DE DECISÃO PARA AVALIAÇÃO ✨
+            // ✨ PROMPT DO ELABORADOR FINAL (COM METODOLOGIA SENAI INTEGRADA) ✨
             // =========================================================================
             const elaboratorPrompt = `
-                Você é um professor especialista em design instrucional. Sua tarefa é elaborar o conteúdo detalhado para um único Conhecimento de um plano de curso, que já inclui seus subtópicos.
+                Você é um especialista em Design Instrucional do SENAI. Sua tarefa é elaborar o conteúdo detalhado para um único Conhecimento, seguindo estritamente a Metodologia SENAI.
 
                 Conhecimento a ser detalhado (pode incluir subtópicos): 
                 ---
@@ -173,23 +187,21 @@ ${csvRelacionamento}
 
                 Gere um único objeto JSON aplicando as seguintes regras de conteúdo:
 
-                1.  **PARA A CHAVE "oque":**
-                    * Formate o valor EXATAMENTE assim:
-                        "[Listar as capacidades técnicas relevantes para este conhecimento, extraídas do PDF];
+                1.  **PARA A CHAVE "oque" (Associação Capacidade-Conhecimento):**
+                    * Primeiro, analise a lista completa de "Capacidades Técnicas" apresentada no PDF para a Unidade Curricular "${ucName}".
+                    * Em seguida, para o Conhecimento "${title}", identifique e selecione da lista completa **APENAS a(s) Capacidade(s) Técnica(s) que são diretamente desenvolvidas por este Conhecimento**.
+                    * **FORMATAÇÃO OBRIGATÓRIA:** Formate o valor EXATAMENTE assim:
+                        "[Liste AQUI a(s) capacidade(s) técnica(s) que você selecionou];
                         
                         Por meio de:
                         
                         ${title}" 
-                        
-                2.  **PARA A CHAVE "como" (Estratégia de Ensino):**
 
-                    * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Trabalho em grupo"].
-
-                    * **FORMATAÇÃO OBRIGATÓRIA:** O texto final DEVE seguir este formato exato: comece com o nome da estratégia escolhida, seguido de dois pontos e um espaço, e então a descrição com verbos no infinitivo impessoal.
-
-                    * Se houver duas estratégias, separe-as com uma linha em branco.
-
-                    * A descrição deve ser bem resumida e com exemplos práticos.
+                2.  **PARA A CHAVE "como" (Estratégia de Ensino):**
+                    * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Trabalho em grupo"].
+                    * **FORMATAÇÃO OBRIGATÓRIA:** O texto final DEVE seguir este formato exato: comece com o nome da estratégia escolhida, seguido de dois pontos e um espaço, e então a descrição com verbos no infinitivo impessoal.
+                    * Se houver duas estratégias, separe-as com uma linha em branco.
+                    * A descrição deve ser bem resumida e com exemplos práticos.
 
                 3.  **PARA AS CHAVES "instrumentos" e "criterios":**
                     * **MATRIZ DE DECISÃO PARA "instrumentos":** Sua escolha DEVE seguir estritamente estas regras:
