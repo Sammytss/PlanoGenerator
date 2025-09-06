@@ -141,4 +141,3 @@ PlanoGenerator/
 Este projeto foi idealizado e desenvolvido por **Samuel Teles dos Santos**.
 
 - **LinkedIn:** [linkedin.com/in/samuel-teles-dos-santos-662003237](https://linkedin.com/in/samuel-teles-dos-santos-662003237)
-- **Email:** samuelsantos@sistemafieto.com.br
