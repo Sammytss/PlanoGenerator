@@ -37,7 +37,6 @@ app.use(cors());
 app.use(express.json());
 
 // // PREENCHA AS SUAS CHAVES AQUI
-// const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMD3VdA6awCyL8KBoOcc7e0qN-gyh9aOxRnByBFYxN8mmpOk79562lJqGUGVsK1ynr/exec";
 const LOGOTIPO_URL = "https://www.imagemhost.com.br/images/2024/11/22/Logo-novo-SENAI_-sem-slogan_755X325.png";
 const generationConfig = {
@@ -60,8 +59,8 @@ app.post('/gerar-plano', upload, async (req, res) => {
         let { courseName, ucName, startDate, endDate, totalHours, shift, capacidades, topicos, classDates, weekdays, holidays, vacationStart, vacationEnd, observacoes } = req.body;
         const pdfFile = req.files.pdfFile[0];
         const matrixFile = req.files.matrixFile ? req.files.matrixFile[0] : null;
-         // Prepara o contexto das instruções do utilizador, se existirem
-    let userInstructionsContext = "";
+        // Prepara o contexto das instruções do utilizador, se existirem
+        let userInstructionsContext = "";
         if (observacoes && observacoes.trim() !== '') {
             userInstructionsContext = `
             ATENÇÃO: O utilizador forneceu as seguintes instruções especiais que DEVEM ser consideradas com alta prioridade:
@@ -78,11 +77,11 @@ app.post('/gerar-plano', upload, async (req, res) => {
         const filePart = { inlineData: { data: pdfFile.buffer.toString("base64"), mimeType: pdfFile.mimetype } };
 
         // --- ETAPA 1: O EXTRATOR ---
-        sendUpdate("ETAPA 1: A extrair a lista de tópicos do PDF...");
+        sendUpdate("ETAPA 1: A extrair a lista de tópicos do PDF");
         // =========================================================================
         // ✨ PROMPT DO EXTRATOR FINAL: COM AGRUPAMENTO HIERÁRQUICO ✨
         // =========================================================================
-         const extractorPrompt = `
+        const extractorPrompt = `
         Você é um especialista em análise de documentos pedagógicos.
         ${userInstructionsContext} // <<-- INSTRUÇÕES INJETADAS AQUI
             Você é um especialista em análise de documentos pedagógicos. Sua tarefa é analisar o Plano de Curso em PDF e extrair a lista de "Conhecimentos" de forma estruturada.
@@ -116,7 +115,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
 
         // --- ETAPA 2.1: ANÁLISE DA MATRIZ (SE O FICHEIRO EXISTIR) ---
         if (matrixFile) {
-            sendUpdate("ETAPA 2.1: A analisar a Matriz SAEP para a Unidade Curricular...");
+            sendUpdate("ETAPA 2.1: A analisar a Matriz SAEP para a Unidade Curricular");
             console.log("--- ETAPA 2.1: Analisando a Matriz SAEP... ---");
 
             // O seu código de pré-processamento do XLSX permanece aqui
@@ -126,13 +125,13 @@ app.post('/gerar-plano', upload, async (req, res) => {
             const csvDetalhamento = XLSX.utils.sheet_to_csv(sheetDetalhamento);
             const csvRelacionamento = XLSX.utils.sheet_to_csv(sheetRelacionamento);
             const dossieMatriz = `
---- DADOS DA PLANILHA 'DETALHAMENTO' ---
-${csvDetalhamento}
---- FIM DOS DADOS DA PLANILHA 'DETALHAMENTO' ---
+                --- DADOS DA PLANILHA 'DETALHAMENTO' ---
+                ${csvDetalhamento}
+                --- FIM DOS DADOS DA PLANILHA 'DETALHAMENTO' ---
 
---- DADOS DA PLANILHA 'RELACIONAMENTO' ---
-${csvRelacionamento}
---- FIM DOS DADOS DA PLANILHA 'RELACIONAMENTO' ---
+                --- DADOS DA PLANILHA 'RELACIONAMENTO' ---
+                ${csvRelacionamento}
+                --- FIM DOS DADOS DA PLANILHA 'RELACIONAMENTO' ---
             `;
 
             const saepAnalysisPrompt = `
@@ -164,15 +163,15 @@ ${csvRelacionamento}
         }
 
         // --- ETAPA 2.2: ELABORAÇÃO DO CONTEÚDO DE CADA TÓPICO ---
-      
+
         // (Esta parte do código permanece exatamente a mesma, pois já usa a variável saepMatrixString)
-        sendUpdate("ETAPA 2.2: A elaborar o conteúdo de cada tópico do PDF...");
+        sendUpdate("ETAPA 2.2: A elaborar o conteúdo de cada tópico do PDF");
         console.log("--- ETAPA 2.2: Elaborando conteúdo de cada tópico... ---");
         const conteudoDetalhado = [];
 
         for (const [index, title] of topicTitles.entries()) {
             sendUpdate(`   - A processar tópico ${index + 1} de ${topicTitles.length}: "${title}"`);
-            
+
             // =========================================================================
             // ✨ PROMPT DO ELABORADOR FINAL (COM METODOLOGIA SENAI INTEGRADA) ✨
             // =========================================================================
@@ -234,7 +233,7 @@ ${csvRelacionamento}
         // ✨ NOVA ETAPA 2.3: GERADOR INTELIGENTE DE AVALIAÇÃO FINAL ✨
         // =========================================================================
         if (conteudoDetalhado.length > 0) {
-            sendUpdate("ETAPA 2.3: A gerar uma avaliação final contextualizada...");
+            sendUpdate("ETAPA 2.3: A gerar uma avaliação final contextualizada");
             console.log("--- ETAPA 2.3: Gerando avaliação final contextualizada... ---");
 
             const todosOsTopicos = topicTitles.join('; ');
@@ -278,7 +277,7 @@ ${csvRelacionamento}
             if (vacationStartDate && vacationEndDate && date >= vacationStartDate && date <= vacationEndDate) return true;
             return false;
         };
-        
+
         let validClassDays = [];
 
         if (classDates && classDates.trim() !== '') {
@@ -292,7 +291,7 @@ ${csvRelacionamento}
             let selectedWeekdays = (Array.isArray(weekdays) ? weekdays : (weekdays ? [weekdays] : [])).map(Number);
             let currentDate = new Date(startDate + 'T00:00:00');
             const endDateObj = new Date(endDate + 'T00:00:00');
-            
+
             while (validClassDays.length < totalAulasNecessarias && currentDate <= endDateObj) {
                 const dayOfWeek = currentDate.getDay();
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) {
@@ -343,10 +342,10 @@ ${csvRelacionamento}
             item.cargaHoraria = Array(duracaoEmDias).fill(cargaDiaria).join(', ');
             classDayIndex += duracaoEmDias;
         }
-        
+
         const dataFimCalculada = classDayIndex > 0 ? validClassDays[classDayIndex - 1].toLocaleDateString('pt-BR') : endDate;
         sendUpdate("Cronograma distribuído com sucesso");
-        // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
+       // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
         const payloadParaAppsScript = {
             nomeCurso: courseName,
             nomeUC: ucName,
@@ -355,11 +354,12 @@ ${csvRelacionamento}
             cargaHorariaTotal: totalHours,
             conteudoDetalhado: conteudoDetalhado,
             imageUrl: LOGOTIPO_URL,
-            // ✨ ✨ ✨ AQUI ESTÁ A ALTERAÇÃO CRUCIAL ✨ ✨ ✨
-            diasDeAulaValidos: validClassDays.map(date => date.toLocaleDateString('pt-BR')) // Envia a lista de datas formatada
+            diasDeAulaValidos: validClassDays.map(date => date.toLocaleDateString('pt-BR')),
+            // ✨ ADICIONE ESTA LINHA ✨
+            shift: shift 
         };
 
-        sendUpdate("ETAPA 3: A comunicar com o Google e a criar a sua planilha...");
+        sendUpdate("ETAPA 3: A comunicar com o Google e a criar a sua planilha");
         const appsScriptResponse = await axios.post(APPS_SCRIPT_URL, payloadParaAppsScript);
         sendUpdate(`DONE:${JSON.stringify(appsScriptResponse.data)}`);
         res.end();

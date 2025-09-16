@@ -536,10 +536,6 @@ input[type="file"]:hover {
 .weekdays-selector label {
     margin-left: 2px;
 }
-.ferias-linha{display: block;}
-.ferias-linha .form-group{display: flex;
-justify-content: space-between;}
-.ferias-linha .form-group input{width: 100%;}
 /* Responsividade */
 @media (max-width: 768px) {
     .header-content {
