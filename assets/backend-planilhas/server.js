@@ -56,7 +56,12 @@ app.post('/gerar-plano', upload, async (req, res) => {
     };
 
     try {
-        let { courseName, ucName, startDate, endDate, totalHours, shift, capacidades, topicos, classDates, weekdays, holidays, vacationStart, vacationEnd, observacoes } = req.body;
+        let { courseName, ucName, instructorName, classCode, modality, startDate, endDate, totalHours, shift, capacidades, topicos, classDates, weekdays, holidays, vacationStart, vacationEnd, observacoes } = req.body;
+        courseName = courseName ? courseName.toUpperCase() : '';
+        ucName = ucName ? ucName.toUpperCase() : '';
+        instructorName = instructorName ? instructorName.toUpperCase() : '';
+        classCode = classCode ? classCode.toUpperCase() : '';
+        modality = modality ? modality.toUpperCase() : '';
         const pdfFile = req.files.pdfFile[0];
         const matrixFile = req.files.matrixFile ? req.files.matrixFile[0] : null;
         // Prepara o contexto das instruções do utilizador, se existirem
@@ -203,11 +208,12 @@ app.post('/gerar-plano', upload, async (req, res) => {
                     * A descrição deve ser bem resumida e com exemplos práticos.
 
                 3.  **PARA AS CHAVES "instrumentos" e "criterios":**
-                    * **MATRIZ DE DECISÃO PARA "instrumentos":** Sua escolha DEVE seguir estritamente estas regras:
-                        * Se a estratégia for "Atividade prática": ESCOLHA entre "Ficha de Observação", "Relatório" ou "Portfólio".
-                        * Se a estratégia for "Exposição dialogada": ESCOLHA entre "Prova de Resposta Construída" ou "Autoavaliação".
-                        * Se a estratégia for "Trabalho em grupo": ESCOLHA entre "Relatório" ou "Portfólio".
-                    * **REGRA DE FIM DE CURSO:** Se este for o último ou penúltimo conhecimento, você PODE escolher "Prova Prática" ou "Prova Objetiva" se for lógico. Fora isso, EVITE-OS.
+                    * **DIRETRIZES PEDAGÓGICAS PARA "instrumentos":** Em vez de uma regra fixa, a sua escolha deve ser uma decisão pedagógica baseada em TRÊS fatores:
+                        a. **A Estratégia em "como":** O instrumento deve ser coerente com a estratégia (ex: uma "Ficha de Observação" faz sentido para uma "Atividade prática").
+                        b. **O Conteúdo em "${title}":** O instrumento deve ser adequado para avaliar aquele conhecimento específico (ex: um "Relatório" para um tópico de análise, uma "Lista de Exercícios" para um tópico de cálculo).
+                        c. **A Variedade:** **REGRA MAIS IMPORTANTE:** Esforce-se para variar os instrumentos ao longo do plano. EVITE repetir o mesmo instrumento de avaliação para conhecimentos seguidos, a menos que seja pedagogicamente essencial.
+                    * **LISTA DE OPÇÕES DISPONÍVEIS:** "Lista de Exercícios", "Ficha de Observação", "Relatório", "Portfólio", "Prova de Resposta Construída", "Autoavaliação".
+                    * **REGRA DE FIM DE CURSO:** Se este for o último ou penúltimo conhecimento, você PODE escolher "Prova Prática", "Prova Objetiva" ou "Trabalho em Grupo" se for lógico.
                     * **"criterios":** Defina UM critério de avaliação claro, direto e no passado, no formato "O aluno...", que se relacione DIRETAMENTE com o instrumento escolhido.
 
                 4.  **PARA AS OUTRAS CHAVES ("onde", "recursos", "situacaoAprendizagem"):**
@@ -349,13 +355,15 @@ app.post('/gerar-plano', upload, async (req, res) => {
         const payloadParaAppsScript = {
             nomeCurso: courseName,
             nomeUC: ucName,
+            instrutor: instructorName,
+            codigoTurma: classCode,
+            modalidade: modality,
             dataInicioCurso: new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR'),
             dataFimCurso: dataFimCalculada,
             cargaHorariaTotal: totalHours,
             conteudoDetalhado: conteudoDetalhado,
             imageUrl: LOGOTIPO_URL,
             diasDeAulaValidos: validClassDays.map(date => date.toLocaleDateString('pt-BR')),
-            // ✨ ADICIONE ESTA LINHA ✨
             shift: shift 
         };
 

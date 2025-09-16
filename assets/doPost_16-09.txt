@@ -9,14 +9,14 @@
  */
 function criarCabecalho(sheet, dados) {
   sheet.setHiddenGridlines(true);
-  
+
   if (dados.imageUrl && dados.imageUrl.startsWith("http")) {
     try {
       var imagem = sheet.insertImage(dados.imageUrl, 2, 1);
       imagem.setWidth(300).setHeight(130);
     } catch (e) { Logger.log("Falha ao inserir imagem: " + e); }
   }
-  
+
   // Título Principal
   sheet.getRange("A2").setValue("PLANEJAMENTO DOCENTE");
   sheet.getRange("A2:T2").merge().setHorizontalAlignment("center").setVerticalAlignment("middle").setFontWeight("bold").setFontSize(35);
@@ -29,16 +29,18 @@ function criarCabecalho(sheet, dados) {
   sheet.getRange("B6").setValue("Curso:");
   sheet.getRange("C6:H6").merge().setValue(dados.nomeCurso);
   sheet.getRange("J6:K6").merge().setValue("Modalidade:");
-  sheet.getRange("L6:T6").merge().setValue("HABILITAÇÃO TÉCNICA");
+  sheet.getRange("L6:T6").merge().setValue(dados.modalidade || "N/A");
+
   sheet.getRange("B7").setValue("Código da Turma:");
-  sheet.getRange("C7:H7").merge().setValue("TEC.2024.2.247");
+  sheet.getRange("C7:H7").merge().setValue(dados.codigoTurma || "N/A"); // Usa o dado do formulário
+
   sheet.getRange("J7:K7").merge().setValue("Carga Horária da U.C:");
   sheet.getRange("L7:T7").merge().setValue(dados.cargaHorariaTotal).setHorizontalAlignment("left");
   sheet.getRange("B8").setValue("Unidade Curricular:");
   sheet.getRange("C8:H8").merge().setValue(dados.nomeUC);
   sheet.getRange("J8:K8").merge().setValue("Instrutor:");
-  sheet.getRange("L8:T8").merge().setValue("SAMUEL TELES DOS SANTOS");
-  
+  sheet.getRange("L8:T8").merge().setValue(dados.instrutor || "N/A");
+
   // Formatação do Bloco de Informações
   sheet.getRange("A5:B8").setFontWeight("bold");
   sheet.getRange("J5:K8").setFontWeight("bold");
@@ -72,7 +74,7 @@ function criarCabecalho(sheet, dados) {
   sheet.getRange("N10:T12").setBackground("#dbe5f1");
   sheet.setRowHeight(11, 60);
   sheet.setRowHeight(12, 40);
-  
+
   // Borda externa geral
   sheet.getRange("A10:T12").setBorder(true, true, true, true, true, true, '#000000', SpreadsheetApp.BorderStyle.SOLID);
 }
@@ -84,23 +86,23 @@ function doPost(e) {
     spreadsheet.setSpreadsheetTimeZone('America/Sao_Paulo');
 
     var limiteHorasPorPagina = 60;
-    
+
     var paginaIndex = 1;
     var sheetAtual = spreadsheet.getSheets()[0];
     sheetAtual.setName("Plano (Parte " + paginaIndex + ")");
     criarCabecalho(sheetAtual, dados);
-    
+
     var currentRow = 13;
     var horasNaPaginaAtual = 0;
     var diaDeAulaIndex = 0;
-    
+
     var courseContent = dados.conteudoDetalhado;
     var diasDeAula = dados.diasDeAulaValidos || [];
 
     if (courseContent && courseContent.length > 0) {
       courseContent.forEach(function (topic) {
-        var horasArray = topic.cargaHoraria.split(',').map(function(h) { return parseInt(h.trim(), 10) || 0; });
-        
+        var horasArray = topic.cargaHoraria.split(',').map(function (h) { return parseInt(h.trim(), 10) || 0; });
+
         var startRowForTopicOnThisPage = currentRow;
         var rowsForTopicOnThisPage = 0;
         var topicInfoWrittenOnThisPage = false;
@@ -131,7 +133,7 @@ function doPost(e) {
             criarCabecalho(sheetAtual, dados);
             currentRow = 13;
             horasNaPaginaAtual = 0;
-            
+
             // 3. Reinicia os contadores para a nova página
             startRowForTopicOnThisPage = currentRow;
             rowsForTopicOnThisPage = 0;
@@ -151,13 +153,13 @@ function doPost(e) {
             sheetAtual.getRange(currentRow, 18).setValue(topic.situacaoAprendizagem);
             topicInfoWrittenOnThisPage = true;
           }
-          
+
           // Escreve os dados do dia de aula
           var dataCorreta = diasDeAula[diaDeAulaIndex];
           sheetAtual.getRange(currentRow, 13).setValue(horasDoDia);
           sheetAtual.getRange(currentRow, 19).setValue(dataCorreta);
           sheetAtual.getRange(currentRow, 20).setValue(dataCorreta);
-          
+
           // Formata a linha individualmente antes da mesclagem
           var rangeDaLinhaIndividual = sheetAtual.getRange(currentRow, 1, 1, 20);
           rangeDaLinhaIndividual.setBorder(true, true, true, true, true, true, '#000000', SpreadsheetApp.BorderStyle.SOLID);
@@ -170,7 +172,7 @@ function doPost(e) {
           currentRow++;
           diaDeAulaIndex++;
         }
-        
+
         // Mescla a parte final do tópico na última página em que ele apareceu
         if (rowsForTopicOnThisPage > 0) {
           sheetAtual.getRange(startRowForTopicOnThisPage, 1, rowsForTopicOnThisPage, 3).merge();
@@ -184,7 +186,7 @@ function doPost(e) {
         }
       });
     }
-    
+
     // --- Bloco de Partilha e Resposta ---
     var file = DriveApp.getFileById(spreadsheet.getId());
     file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT);
