@@ -1,8 +1,8 @@
 # 🎓 Plano Generator
 
-![Logo](assets/Images/Logo%20Plano%20Generator.png)
+![Logo](PG.png)
 
-**Plano Generator** é uma aplicação web de automação inteligente projetada para criar Planos de Ensino Docente completos e estruturados, seguindo a Metodologia SENAI. Utilizando a IA Generativa do Google (Gemini 1.5 Pro), a ferramenta analisa a documentação de uma Unidade Curricular e gera uma planilha Google Sheets detalhada em questão de minutos.
+**Plano Generator** é uma aplicação web projetada para automatizar a criação de Planos de Ensino Docente, seguindo a Metodologia SENAI. A solução integra uma interface de usuário web, um backend inteligente que utiliza a IA Generativa do Google (Gemini 1.5) e a plataforma Google Workspace para transformar a documentação de uma Unidade Curricular (UC) numa planilha Google Sheets completa, formatada e pronta para uso em minutos.
 
 ---
 
@@ -23,7 +23,7 @@
 
 ## Sobre o Projeto
 
-O objetivo do **Plano Generator** é otimizar o tempo e o esforço de instrutores e coordenadores pedagógicos na elaboração de planejamentos docentes. A aplicação automatiza tarefas repetitivas e complexas, como a extração de conhecimentos, a associação com capacidades técnicas e o cálculo de cronogramas, garantindo consistência, qualidade e aderência à Metodologia SENAI.
+O objetivo do **Plano Generator** é otimizar o tempo e o esforço de instrutores na elaboração de planejamentos docentes. A aplicação automatiza tarefas repetitivas e complexas, como a extração de conhecimentos, a associação com capacidades técnicas e o cálculo de cronogramas, garantindo consistência, qualidade e aderência à Metodologia SENAI.
 
 ---
 
@@ -45,7 +45,7 @@ O objetivo do **Plano Generator** é otimizar o tempo e o esforço de instrutore
 
 - **Frontend:** HTML5, CSS3, JavaScript
 - **Backend:** Node.js, Express.js
-- **IA Generativa:** Google Gemini 1.5 Pro
+- **IA Generativa:** Google Gemini 1.5
 - **Geração de Planilhas:** Google Apps Script
 - **Dependências Principais:** `axios`, `cors`, `dotenv`, `multer`, `xlsx`, `@google/generative-ai`
 
@@ -141,3 +141,4 @@ PlanoGenerator/
 Este projeto foi idealizado e desenvolvido por **Samuel Teles dos Santos**.
 
 - **LinkedIn:** [linkedin.com/in/samuel-teles-dos-santos-662003237](https://linkedin.com/in/samuel-teles-dos-santos-662003237)
+
