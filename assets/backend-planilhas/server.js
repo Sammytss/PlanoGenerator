@@ -110,7 +110,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
         const topicListJson = JSON.parse(extractorResult.response.text());
         const topicTitles = topicListJson.topicos;
         if (!topicTitles || topicTitles.length === 0) throw new Error("A Etapa 1 não conseguiu encontrar tópicos no PDF.");
-        sendUpdate(`Extração concluída. Encontrados ${topicTitles.length} tópicos.`);
+        sendUpdate(`Extração concluída. Encontrados ${topicTitles.length} tópicos`);
 
         // =========================================================================
         // ✨ ETAPA 2 FINAL: LÓGICA CONDICIONAL DA MATRIZ SAEP ✨
@@ -157,14 +157,14 @@ app.post('/gerar-plano', upload, async (req, res) => {
             if (analysisResult.trim() !== "NAO_ENCONTRADO") {
                 saepMatrixString = analysisResult; // Atualiza com o resultado real
                 console.log("Análise da Matriz concluída com sucesso.");
-                sendUpdate("Análise da Matriz concluída com sucesso.");
+                sendUpdate("Análise da Matriz concluída com sucesso");
             } else {
                 console.log(`A UC "${ucName}" não foi encontrada na Matriz SAEP.`);
-                sendUpdate(`Aviso: A UC "${ucName}" não foi encontrada na Matriz SAEP.`);
+                sendUpdate(`Aviso: A UC "${ucName}" não foi encontrada na Matriz SAEP`);
             }
         } else {
             console.log("Nenhum ficheiro de Matriz SAEP foi enviado. A usar valor padrão.");
-            sendUpdate("Aviso: Nenhum ficheiro de Matriz SAEP foi enviado. A prosseguir sem cruzamento.");
+            sendUpdate("Aviso: Nenhum ficheiro de Matriz SAEP foi enviado. A prosseguir sem cruzamento");
         }
 
         // --- ETAPA 2.2: ELABORAÇÃO DO CONTEÚDO DE CADA TÓPICO ---
@@ -233,7 +233,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             conteudoDetalhado.push(topicDetailJson);
         }
         console.log("Elaboração de todos os tópicos concluída.");
-        sendUpdate("Elaboração de todos os tópicos concluída.");
+        sendUpdate("Elaboração de todos os tópicos concluída");
 
         // =========================================================================
         // ✨ NOVA ETAPA 2.3: GERADOR INTELIGENTE DE AVALIAÇÃO FINAL ✨
@@ -267,7 +267,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             ultimoTopico.criterios = assessmentJson.criterios || "O aluno demonstrou as competências da UC.";
 
             console.log(`Avaliação final definida como: "${ultimoTopico.instrumentos}".`);
-            sendUpdate(`Avaliação final definida como: "${ultimoTopico.instrumentos}".`);
+            sendUpdate(`Avaliação final definida como: "${ultimoTopico.instrumentos}"`);
         }
 
         // =========================================================================
