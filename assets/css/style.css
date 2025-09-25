@@ -13,12 +13,15 @@ body {
     min-height: 100vh;
     line-height: 1.6;
 }
-.laranja{
+
+.laranja {
     color: #e1452a;
 }
-.azul{
+
+.azul {
     color: #02287a;
 }
+
 /* Cabeçalho institucional */
 .institutional-header {
     background: rgba(255, 255, 255, 0.95);
@@ -207,7 +210,8 @@ label {
 input[type="text"],
 input[type="date"],
 input[type="file"],
-select, textarea {
+select,
+textarea {
     width: 100%;
     padding: 1rem;
     border: 2px solid #e2e8f0;
@@ -529,13 +533,420 @@ input[type="file"]:hover {
     color: #2d3748;
     ;
 }
+
+/* Estilos para seletor de dias da semana */
 .weekdays-selector {
     display: flex;
-    gap: 10px;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
 }
+
+.weekdays-selector input[type="checkbox"] {
+    display: none;
+}
+
 .weekdays-selector label {
-    margin-left: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 40px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f7fafc;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    margin-bottom: 0;
+    margin: 0%;
 }
+
+.weekdays-selector label:hover {
+    border-color: #02287a;
+    background: rgba(2, 40, 122, 0.05);
+}
+
+.weekdays-selector input[type="checkbox"]:checked+label {
+    background: linear-gradient(135deg, #02287a, #2f7a56);
+    border-color: #02287a;
+    color: white;
+}
+
+/* ========================================
+           ESTILOS DO GUIA INTERATIVO
+   ======================================== */
+
+/* Container principal do guia - overlay que cobre toda a tela */
+.interactive-guide {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+    /* Z-index alto para ficar acima de tudo */
+    animation: fadeIn 0.5s ease-out;
+    /* Animação suave de entrada */
+}
+
+/* Animação de fade-in para entrada suave do guia */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Tooltip/balão que aparece próximo aos campos */
+.guide-tooltip {
+    position: absolute;
+    /* Posicionamento absoluto para controle preciso */
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    /* Sombra pronunciada */
+    max-width: 350px;
+    /* Largura máxima para não ocupar muito espaço */
+    z-index: 2001;
+    /* Acima do overlay do guia */
+    animation: slideIn 0.3s ease-out;
+    /* Animação de entrada */
+}
+
+/* Animação de slide-in para o tooltip */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+        /* Começa menor e acima */
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        /* Termina no tamanho normal */
+    }
+}
+
+/* Base para as setas do tooltip (triângulos CSS) */
+.guide-tooltip::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+
+/* Seta apontando para baixo (tooltip acima do campo) */
+.guide-tooltip.bottom::before {
+    top: -10px;
+    /* Posiciona acima do tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Centraliza horizontalmente */
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid white;
+    /* Cria triângulo apontando para baixo */
+}
+
+/* Seta apontando para cima (tooltip abaixo do campo) */
+.guide-tooltip.top::before {
+    bottom: -10px;
+    /* Posiciona abaixo do tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid white;
+    /* Cria triângulo apontando para cima */
+}
+
+/* Seta apontando para esquerda (tooltip à direita do campo) */
+.guide-tooltip.left::before {
+    right: -10px;
+    /* Posiciona à direita do tooltip */
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 10px solid white;
+    /* Cria triângulo apontando para esquerda */
+}
+
+/* Seta apontando para direita (tooltip à esquerda do campo) */
+.guide-tooltip.right::before {
+    left: -10px;
+    /* Posiciona à esquerda do tooltip */
+    top: 50%;
+    transform: translateY(-50%);
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid white;
+    /* Cria triângulo apontando para direita */
+}
+
+/* Cabeçalho do tooltip com número do passo e título */
+.guide-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+/* Círculo com o número do passo atual */
+.guide-step-number {
+    background: linear-gradient(135deg, #02287a, #2f7a56);
+    /* Gradiente da marca */
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    /* Torna circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    /* Não encolhe quando há pouco espaço */
+}
+
+/* Título do passo atual */
+.guide-title {
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Descrição explicativa do campo */
+.guide-description {
+    color: #4a5568;
+    line-height: 1.6;
+    /* Espaçamento entre linhas para melhor leitura */
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+/* Container dos botões de ação */
+.guide-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    /* Alinha botões à direita */
+}
+
+/* Estilo base para botões do guia */
+.guide-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* Transições suaves */
+    border: none;
+    font-size: 0.9rem;
+}
+
+/* Botão primário (Próximo/Finalizar) */
+.guide-btn-primary {
+    background: linear-gradient(135deg, #02287a, #2f7a56);
+    color: white;
+}
+
+/* Efeito hover do botão primário */
+.guide-btn-primary:hover {
+    transform: translateY(-1px);
+    /* Levanta ligeiramente */
+    box-shadow: 0 4px 12px rgba(2, 40, 122, 0.3);
+}
+
+/* Botão secundário (Pular) */
+.guide-btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+/* Efeito hover do botão secundário */
+.guide-btn-secondary:hover {
+    background: #cbd5e0;
+}
+
+/* Container da barra de progresso */
+.guide-progress {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: #718096;
+}
+
+/* Barra de progresso (fundo) */
+.guide-progress-bar {
+    flex: 1;
+    /* Ocupa todo espaço disponível */
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+    /* Esconde overflow do preenchimento */
+}
+
+/* Preenchimento da barra de progresso */
+.guide-progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #02287a, #2f7a56);
+    transition: width 0.3s ease;
+    /* Animação suave da largura */
+}
+
+/* Classe aplicada ao campo que está sendo destacado */
+.field-highlight {
+    position: relative;
+    z-index: 1999;
+    /* Fica acima do overlay mas abaixo do tooltip */
+}
+
+/* Efeito visual de destaque ao redor do campo */
+.field-highlight::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    /* Margem ao redor do campo */
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    background: rgba(2, 40, 122, 0.2);
+    /* Fundo semi-transparente */
+    border-radius: 16px;
+    border: 3px solid #02287a;
+    /* Borda colorida */
+    animation: pulse 2s infinite;
+    /* Animação pulsante */
+    z-index: -1;
+    /* Fica atrás do campo */
+}
+
+/* Animação de pulso para chamar atenção */
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(2, 40, 122, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 10px rgba(2, 40, 122, 0);
+        /* Expande e desaparece */
+    }
+}
+
+/* Modal de boas-vindas do guia */
+.guide-welcome {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* Centraliza perfeitamente */
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    /* Responsivo em telas pequenas */
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    z-index: 2001;
+    /* Acima do overlay */
+}
+
+/* Título do modal de boas-vindas */
+.guide-welcome h2 {
+    color: #2d3748;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+/* Texto explicativo do modal */
+.guide-welcome p {
+    color: #4a5568;
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+/* Container do checkbox no modal de boas-vindas */
+.guide-welcome-checkbox {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+/* Container personalizado do checkbox */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #4a5568;
+    user-select: none;
+}
+
+/* Esconde o checkbox padrão */
+.checkbox-container input[type="checkbox"] {
+    display: none;
+}
+
+/* Estilo personalizado do checkbox */
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #cbd5e0;
+    border-radius: 4px;
+    background: white;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+/* Efeito hover no checkbox */
+.checkbox-container:hover .checkmark {
+    border-color: #02287a;
+    background: rgba(2, 40, 122, 0.05);
+}
+
+/* Estilo quando checkbox está marcado */
+.checkbox-container input[type="checkbox"]:checked+.checkmark {
+    background: linear-gradient(135deg, #02287a, #2f7a56);
+    border-color: #02287a;
+}
+
+/* Ícone de check dentro do checkbox */
+.checkbox-container input[type="checkbox"]:checked+.checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Container dos botões do modal de boas-vindas */
+.guide-welcome-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
     .header-content {
@@ -566,4 +977,6 @@ input[type="file"]:hover {
     .user-info {
         display: none;
     }
+
+
 }

@@ -26,7 +26,7 @@
                         <azul class="azul">Plano</azul>
                         <laranja class="laranja">Generator</laranja>
                     </h1>
-                    <p>Gerador de Planejamento Docente</p>
+                    <p>Planejamento Docente Inteligente</p>
                 </div>
             </div>
 
@@ -53,6 +53,68 @@
         </div>
     </div>
 
+    <!-- ========================================
+                    GUIA INTERATIVO
+         ======================================== -->
+
+    <!-- Container principal do guia interativo (overlay de fundo) -->
+    <div id="interactiveGuide" class="interactive-guide hidden">
+
+        <!-- Modal de boas-vindas - primeira tela que o usuário vê -->
+        <div id="guideWelcome" class="guide-welcome">
+            <h2>🎯 Bem-vindo ao Plano Generator!</h2>
+            <p>Vamos te guiar passo a passo pelo preenchimento do formulário. Cada campo será explicado para que você
+                possa criar seu plano de curso com facilidade.</p>
+
+            <!-- Checkbox para não mostrar o guia novamente -->
+            <div class="guide-welcome-checkbox">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="dontShowAgain">
+                    <span class="checkmark"></span>
+                    Não mostrar este guia novamente.
+                </label>
+            </div>
+
+            <!-- Botões de ação do modal de boas-vindas -->
+            <div class="guide-welcome-actions">
+                <!-- Botão para pular o tutorial completamente -->
+                <button class="guide-btn guide-btn-secondary">Pular Tutorial</button>
+                <button class="guide-btn guide-btn-primary">Começar Guia</button>
+            </div>
+        </div>
+
+        <!-- Tooltip/balão que aparece próximo aos campos durante o guia -->
+        <div id="guideTooltip" class="guide-tooltip hidden">
+
+            <!-- Barra de progresso do guia -->
+            <div class="guide-progress">
+                <!-- Texto indicando passo atual -->
+                <span id="guideProgressText"></span>
+                <!-- Barra visual de progresso -->
+                <div class="guide-progress-bar">
+                    <!-- Preenchimento da barra (largura controlada via JavaScript) -->
+                    <div id="guideProgressFill" class="guide-progress-fill" style="width: 11.11%"></div>
+                </div>
+            </div>
+
+            <!-- Cabeçalho do tooltip com número e título -->
+            <div class="guide-header">
+                <!-- Círculo com número do passo atual -->
+                <div id="guideStepNumber" class="guide-step-number">1</div>
+                <!-- Título do campo sendo explicado -->
+                <h3 id="guideTitle" class="guide-title">Título do Campo</h3>
+            </div>
+
+            <!-- Descrição explicativa do campo (conteúdo dinâmico) -->
+            <p id="guideDescription" class="guide-description">Descrição do campo</p>
+
+            <div class="guide-actions">
+                <button class="guide-btn guide-btn-secondary" type="button">Pular</button>
+                <button id="guideNextBtn" class="guide-btn guide-btn-primary" type="button">Próximo</button>
+            </div>
+        </div>
+    </div>
+
     <div id="helpCard" class="help-card hidden">
         <div class="help-card-content">
             <div class="help-card-header">
@@ -70,22 +132,32 @@
                 </div>
                 <div class="help-section">
                     <h4>📚 Como Usar</h4>
-                    <p><strong>1. Informações do Curso:</strong> Preencha todos os campos obrigatórios (*), como Nome do Curso, UC, Instrutor, etc.</p>
-                    <p><strong>2. Cronograma:</strong> Defina o período (início e fim) e a carga horária total da UC.</p>
-                    <p><strong>3. Definição das Aulas:</strong> Escolha UMA das opções para agendar as aulas (o calendário tem prioridade).</p>
-                    <p><strong>4. Documentação:</strong> Anexe o PDF da Unidade Curricular. A Matriz SAEP é opcional.</p>
+                    <p><strong>1. Informações do Curso:</strong> Preencha todos os campos obrigatórios (*), como Nome do
+                        Curso, UC, Instrutor, etc.</p>
+                    <p><strong>2. Cronograma:</strong> Defina o período (início e fim) e a carga horária total da UC.
+                    </p>
+                    <p><strong>3. Definição das Aulas:</strong> Escolha UMA das opções para agendar as aulas (o
+                        calendário tem prioridade).</p>
+                    <p><strong>4. Documentação:</strong> Anexe o PDF da Unidade Curricular. A Matriz SAEP é opcional.
+                    </p>
                     <p><strong>5. Gerar Plano:</strong> Clique em "Gerar Plano de Curso" e aguarde o processamento.</p>
                 </div>
                 <div class="help-section">
                     <h4>✨ Funcionalidades Avançadas</h4>
-                    <p><strong>• Agendamento Flexível:</strong> Use o calendário para selecionar datas de aula específicas e não sequenciais, ideal para workshops ou cursos com cronogramas irregulares.</p>
-                    <p><strong>• Aulas Recorrentes:</strong> Use as caixas de seleção "Dias da Semana" para cursos longos com um padrão fixo de aulas (ex: todas as segundas e quartas).</p>
-                    <p><strong>• Feriados e Férias:</strong> Use os campos de data para indicar os dias não letivos. O sistema irá ignorá-los automaticamente no cálculo do cronograma.</p>
-                    <p><strong>• Instruções para a IA:</strong> Use o campo "Observações" para guiar a IA. Você pode dar instruções como "A avaliação final deve ser um projeto prático" ou "Para este tópico, foque mais nos aspetos de segurança".</p>
+                    <p><strong>• Agendamento Flexível:</strong> Use o calendário para selecionar datas de aula
+                        específicas e não sequenciais, ideal para workshops ou cursos com cronogramas irregulares.</p>
+                    <p><strong>• Aulas Recorrentes:</strong> Use as caixas de seleção "Dias da Semana" para cursos
+                        longos com um padrão fixo de aulas (ex: todas as segundas e quartas).</p>
+                    <p><strong>• Feriados e Férias:</strong> Use os campos de data para indicar os dias não letivos. O
+                        sistema irá ignorá-los automaticamente no cálculo do cronograma.</p>
+                    <p><strong>• Instruções para a IA:</strong> Use o campo "Observações" para guiar a IA. Você pode dar
+                        instruções como "A avaliação final deve ser um projeto prático" ou "Para este tópico, foque mais
+                        nos aspetos de segurança".</p>
                 </div>
                 <div class="help-section">
                     <h4>⚠️ Requisitos</h4>
-                    <p>• O arquivo PDF deve conter apenas as páginas referentes à UC e incluir as seções de Capacidades Técnicas e Conhecimentos.</p>
+                    <p>• O arquivo PDF deve conter apenas as páginas referentes à UC e incluir as seções de Capacidades
+                        Técnicas e Conhecimentos.</p>
                     <p>• A Matriz SAEP (opcional) deve estar no formato .xls ou .xlsx.</p>
                     <p>• Formatos aceitos: PDF, .xls, .xlsx.</p>
                 </div>
@@ -94,7 +166,7 @@
     </div>
     <div class="main-content">
         <!-- <div class="page-header">
-            <h1 class="page-title">Gerador de Planos de Curso</h1>
+            <h1 class="page-title">Gerador de Plejamento docente inteligente</h1>
             <p class="page-subtitle">
                 Ferramenta automatizada para criação de planos de ensino. 
                 Preencha as informações do curso e anexe a documentação da UC para gerar 
@@ -189,7 +261,7 @@
                     <div class="form-group-row">
                         <div class="form-group">
                             <label for="weekdays">Dias da Semana (se aplicável):</label>
-                            <div class="weekdays-selector">
+                            <div class="weekdays-selector" id="weekdays">
                                 <input type="checkbox" id="mon" name="weekdays" value="1"><label for="mon">Seg</label>
                                 <input type="checkbox" id="tue" name="weekdays" value="2"><label for="tue">Ter</label>
                                 <input type="checkbox" id="wed" name="weekdays" value="3"><label for="wed">Qua</label>
