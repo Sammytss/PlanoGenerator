@@ -44,7 +44,7 @@ const generationConfig = {
     maxOutputTokens: 8192,
     responseMimeType: "application/json",
 };
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest", generationConfig });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05", generationConfig });
 
 
 app.post('/gerar-plano', upload, async (req, res) => {
@@ -149,7 +149,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
             `;
 
-            const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
+            const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
             const saepResult = await modelTextOnly.generateContent([saepAnalysisPrompt, dossieMatriz]);
             const analysisResult = saepResult.response.text();
 
@@ -271,7 +271,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
         }
 
         // =========================================================================
-        // ✨ LÓGICA DE DATAS REESCRITA E CORRIGIDA ✨
+        // ✨ LÓGICA DE DATAS ATUALIZADA PARA SER MAIS FLEXÍVEL ✨
         // =========================================================================
         const cargaDiaria = shift === 'noturno' ? 3 : 4;
         const parsedHolidays = (holidays || '').split(',').map(h => h.trim()).filter(h => h).map(h => new Date(h.split('/').reverse().join('-') + 'T00:00:00').getTime());
@@ -287,27 +287,38 @@ app.post('/gerar-plano', upload, async (req, res) => {
         let validClassDays = [];
 
         if (classDates && classDates.trim() !== '') {
+            // No modo de datas específicas, o comportamento não muda. A lista é fixa.
             console.log("MODO DE AGENDAMENTO: Datas Específicas (Calendário).");
             validClassDays = classDates.split(', ')
                 .map(d => new Date(d.split('/').reverse().join('-') + 'T00:00:00'))
                 .filter(date => !isExceptionDay(date))
                 .sort((a, b) => a - b);
         } else {
+            // No modo de agendamento recorrente, a lógica é agora mais flexível.
+            console.log("MODO DE AGENDAMENTO: Recorrente (Dias da Semana).");
             let totalAulasNecessarias = Math.ceil(parseInt(totalHours, 10) / cargaDiaria);
             let selectedWeekdays = (Array.isArray(weekdays) ? weekdays : (weekdays ? [weekdays] : [])).map(Number);
             let currentDate = new Date(startDate + 'T00:00:00');
-            const endDateObj = new Date(endDate + 'T00:00:00');
 
-            while (validClassDays.length < totalAulasNecessarias && currentDate <= endDateObj) {
-                const dayOfWeek = currentDate.getDay();
+            // ✨ ALTERAÇÃO PRINCIPAL: O loop agora continua até a carga horária ser cumprida, ignorando a data final. ✨
+            while (validClassDays.length < totalAulasNecessarias) {
+                const dayOfWeek = currentDate.getDay(); // 0=Domingo, 6=Sábado
+                // Verifica se é um dia útil (não é Sábado nem Domingo)
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    // Verifica se o dia da semana foi selecionado pelo utilizador ou se nenhum foi (padrão Seg-Sex)
                     if ((selectedWeekdays.length > 0 && selectedWeekdays.includes(dayOfWeek)) || selectedWeekdays.length === 0) {
+                        // Verifica se não é feriado nem férias
                         if (!isExceptionDay(currentDate)) {
                             validClassDays.push(new Date(currentDate));
                         }
                     }
                 }
                 currentDate.setDate(currentDate.getDate() + 1);
+
+                // Mecanismo de segurança para evitar loops infinitos
+                if (currentDate.getFullYear() > new Date(startDate).getFullYear() + 5) {
+                    throw new Error("O cálculo de datas excedeu o limite de 5 anos. Verifique a Carga Horária e as datas de início.");
+                }
             }
         }
 
