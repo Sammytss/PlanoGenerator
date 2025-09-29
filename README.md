@@ -2,7 +2,7 @@
 
 ![Logo](assets/Images/PG.png)
 
-**Plano Generator** é uma aplicação web projetada para automatizar a criação de Planos de Ensino Docente, seguindo a Metodologia SENAI. A solução integra uma interface de utilizador web, um backend inteligente que utiliza a IA Generativa do Google (Gemini 1.5 Pro) e a plataforma Google Workspace para transformar a documentação de uma Unidade Curricular (UC) numa planilha Google Sheets completa, formatada e pronta para uso em minutos.
+**Plano Generator** é uma aplicação web projetada para automatizar a criação de Planos de Ensino Docente, seguindo a Metodologia SENAI. A solução integra uma interface de utilizador web, um backend inteligente que utiliza a IA Generativa do Google (Gemini 2.5 Pro) e a plataforma Google Workspace para transformar a documentação de uma Unidade Curricular (UC) numa planilha Google Sheets completa, formatada e pronta para uso em minutos.
 
 ---
 
@@ -48,7 +48,7 @@ O objetivo do **Plano Generator** é otimizar o tempo e o esforço de instrutore
 - **Frontend:** HTML5, CSS3, JavaScript
 - **Backend:** Node.js, Express.js
 - **Gestor de Processos:** PM2
-- **IA Generativa:** Google Gemini 1.5 Pro
+- **IA Generativa:** Google Gemini 2.5 Pro Preview 06-05
 - **Geração de Planilhas:** Google Apps Script
 - **Dependências Principais:** `axios`, `cors`, `dotenv`, `multer`, `xlsx`, `@google/generative-ai`
 
