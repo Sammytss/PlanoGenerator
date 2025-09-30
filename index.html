@@ -46,7 +46,7 @@
                     <a class='criador' href="https://linkedin.com/in/samuel-teles-dos-santos-662003237"> <span>Samuel
                             Teles</span></a>
                 </div>
-                <div class="help-icon" onclick="toggleHelpCard()">
+                <div class="help-icon">
                     <span>?</span>
                 </div>
             </div>
@@ -118,52 +118,53 @@
     <div id="helpCard" class="help-card hidden">
         <div class="help-card-content">
             <div class="help-card-header">
-                <h3>Informações do Sistema</h3>
-                <button class="close-btn" onclick="toggleHelpCard()">×</button>
+                <h3>🎯 Central de Ajuda</h3>
+                <button class="help-close-btn">✕</button>
             </div>
             <div class="help-card-body">
-                <div class="help-section">
-                    <h4>📧 Contato</h4>
-                    <p><strong>Email:</strong> samuelsantos@sistemafieto.com.br</p>
-                </div>
-                <div class="help-section">
-                    <h4>🔧 Suporte Técnico</h4>
-                    <p>Para sugestões ou feedbacks, entre em contato através do e-mail acima.</p>
-                </div>
-                <div class="help-section">
-                    <h4>📚 Como Usar</h4>
-                    <p><strong>1. Informações do Curso:</strong> Preencha todos os campos obrigatórios (*), como Nome do
-                        Curso, UC, Instrutor, etc.</p>
-                    <p><strong>2. Cronograma:</strong> Defina o período (início e fim) e a carga horária total da UC.
-                    </p>
-                    <p><strong>3. Definição das Aulas:</strong> Escolha UMA das opções para agendar as aulas (o
-                        calendário tem prioridade).</p>
-                    <p><strong>4. Documentação:</strong> Anexe o PDF da Unidade Curricular. A Matriz SAEP é opcional.
-                    </p>
-                    <p><strong>5. Gerar Plano:</strong> Clique em "Gerar Plano de Curso" e aguarde o processamento.</p>
-                </div>
-                <div class="help-section">
-                    <h4>✨ Funcionalidades Avançadas</h4>
-                    <p><strong>• Agendamento Flexível:</strong> Use o calendário para selecionar datas de aula
-                        específicas e não sequenciais, ideal para workshops ou cursos com cronogramas irregulares.</p>
-                    <p><strong>• Aulas Recorrentes:</strong> Use as caixas de seleção "Dias da Semana" para cursos
-                        longos com um padrão fixo de aulas (ex: todas as segundas e quartas).</p>
-                    <p><strong>• Feriados e Férias:</strong> Use os campos de data para indicar os dias não letivos. O
-                        sistema irá ignorá-los automaticamente no cálculo do cronograma.</p>
-                    <p><strong>• Instruções para a IA:</strong> Use o campo "Observações" para guiar a IA. Você pode dar
-                        instruções como "A avaliação final deve ser um projeto prático" ou "Para este tópico, foque mais
-                        nos aspetos de segurança".</p>
-                </div>
-                <div class="help-section">
-                    <h4>⚠️ Requisitos</h4>
-                    <p>• O arquivo PDF deve conter apenas as páginas referentes à UC e incluir as seções de Capacidades
-                        Técnicas e Conhecimentos.</p>
-                    <p>• A Matriz SAEP (opcional) deve estar no formato .xls ou .xlsx.</p>
-                    <p>• Formatos aceitos: PDF, .xls, .xlsx.</p>
+                <p>Escolha como vai aprender a usar o sistema:</p>
+
+                <div class="help-options">
+                    <div id="startGuideOption" class="help-option">
+                        <div class="help-option-icon">🚀</div>
+                        <div class="help-option-content">
+                            <h4>Guia Interativo</h4>
+                            <p>Tutorial passo a passo que te guia pelo formulário explicando cada campo</p>
+                        </div>
+                    </div>
+
+                    <div id="showVideoOption" class="help-option">
+                        <div class="help-option-icon">🎥</div>
+                        <div class="help-option-content">
+                            <h4>Vídeo Tutorial</h4>
+                            <p>Assista a um vídeo completo mostrando como usar todas as funcionalidades</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    <div id="videoModal" class="video-modal hidden">
+    <div class="video-modal-content">
+        <div class="video-modal-header">
+            <h3>📹 Tutorial em Vídeo</h3>
+            <button id="closeVideoBtn" class="video-close-btn">✕</button>
+        </div>
+        <div id="videoContainer" class="video-container">
+            <div class="video-placeholder">
+                <div class="video-icon">🎬</div>
+                <h4>Tutorial: Como Usar o Plano Generator</h4>
+                <p>Este vídeo mostra passo a passo como preencher o formulário e gerar seu planejamento docente.</p>
+                <div class="video-info">
+                    <span>⏱️ Duração: 3:19 minutos</span>
+                </div>
+                <button id="playVideoBtn" class="video-play-btn">
+                    ▶️ Reproduzir Tutorial
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
     <div class="main-content">
         <!-- <div class="page-header">
             <h1 class="page-title">Gerador de Plejamento docente inteligente</h1>
