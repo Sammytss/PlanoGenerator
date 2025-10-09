@@ -1,5 +1,6 @@
 # 🎓 Plano Generator
-
+![Versão](https://img.shields.io/badge/versão-1.0.2-blue)
+![Status](https://img.shields.io/badge/status-Funcional-success)
 ![Logo](assets/Images/PG.png)
 
 **Plano Generator** é uma aplicação web projetada para automatizar a criação de Planos de Ensino Docente, seguindo a Metodologia SENAI. A solução integra uma interface de utilizador web, um backend inteligente que utiliza a IA Generativa do Google (Gemini 2.5 Pro) e a plataforma Google Workspace para transformar a documentação de uma Unidade Curricular (UC) numa planilha Google Sheets completa, formatada e pronta para uso em minutos.
@@ -169,6 +170,7 @@ PlanoGenerator/
 
 ## 👤 Criador
 
-Este projeto foi idealizado e desenvolvido por **Samuel Teles dos Santos**.
+Este projeto foi idealizado e desenvolvido por **Samuel Teles**.
 
 - **LinkedIn:** [linkedin.com/in/samuel-teles-dos-santos-662003237](https://linkedin.com/in/samuel-teles-dos-santos-662003237)
+
