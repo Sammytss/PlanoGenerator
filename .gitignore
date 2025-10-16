@@ -5,10 +5,10 @@ node_modules/
 .env
 
 # Ignorar ficheiros antigo de geração de planilhas
-/DoPost18
+doPost18/
 
 # Ignorar arquivo antigo de geração de planilhas
-DoPost.txt
+doPost.txt
 
 # Ignorar arquivo antigo de geração de planilhas
 doPost_16-09.txt
