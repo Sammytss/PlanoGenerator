@@ -1,66 +1,61 @@
-// --- Novo script.js ---
-
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('courseForm');
     const submitBtn = document.getElementById('submitBtn');
     const resultArea = document.getElementById('resultArea');
 
-    // URL do seu novo servidor backend
+    // URL do servidor backend
     const backendUrl = 'http://localhost:3000/gerar-plano';
 
-    // --- VERSÃO FINAL DO SCRIPT.JS ---
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
 
-    // --- script.js ATUALIZADO PARA EXIBIR MENSAGENS NO MESMO LUGAR ---
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processando...';
+        resultArea.classList.remove('hidden');
 
-form.addEventListener('submit', async (event) => {
-    event.preventDefault();
+        // Prepara uma única área de texto para as atualizações
+        resultArea.innerHTML = `<div class="loader" id="progress-text">Aguarde</div>`;
+        const progressTextElement = document.getElementById('progress-text');
 
-    submitBtn.disabled = true;
-    submitBtn.textContent = 'Processando...';
-    resultArea.classList.remove('hidden');
-    
-    // ✨ ALTERAÇÃO 1: Prepara uma única área de texto para as atualizações ✨
-    resultArea.innerHTML = `<div class="loader" id="progress-text">Aguarde</div>`;
-    const progressTextElement = document.getElementById('progress-text');
+        const formData = new FormData(form);
+        // Endereço do servidor local do sistema
+        const backendUrl = 'http://10.25.0.60:3000/gerar-plano';
 
-    const formData = new FormData(form);
-    const backendUrl = 'http://10.251.92.148:3000/gerar-plano';
+        try {
+            const response = await fetch(backendUrl, {
+                method: 'POST',
+                body: formData,
+            });
 
-    try {
-        const response = await fetch(backendUrl, {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error('A resposta do servidor não foi bem-sucedida.');
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = '';
-
-        if (progressTextElement) {
-            progressTextElement.textContent = 'Conexão estabelecida. A iniciar o processo...';
-        }
-
-        while (true) {
-            const { value, done } = await reader.read();
-            if (done) {
-                break;
+            if (!response.ok) {
+                throw new Error('A resposta do servidor não foi bem-sucedida.');
             }
-            
-            buffer += decoder.decode(value, { stream: true });
 
-            while (buffer.includes('\n')) {
-                const messageEnd = buffer.indexOf('\n');
-                const message = buffer.substring(0, messageEnd);
-                buffer = buffer.substring(messageEnd + 1);
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
 
-                if (message.startsWith('DONE:')) {
-                    // ✨ ALTERAÇÃO 2: A mensagem final substitui tudo na área de resultado ✨
-                    const finalData = JSON.parse(message.substring(5));
-                    resultArea.innerHTML = `
+            if (progressTextElement) {
+                progressTextElement.textContent = 'Conexão estabelecida. A iniciar o processo...';
+            }
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) {
+                    break;
+                }
+
+                buffer += decoder.decode(value, { stream: true });
+
+                while (buffer.includes('\n')) {
+                    const messageEnd = buffer.indexOf('\n');
+                    const message = buffer.substring(0, messageEnd);
+                    buffer = buffer.substring(messageEnd + 1);
+
+                    if (message.startsWith('DONE:')) {
+                        // A mensagem final substitui tudo na área de resultado
+                        const finalData = JSON.parse(message.substring(5));
+                        resultArea.innerHTML = `
                         <div style="text-align: center;">
                             <h2 style="color: #1e8e3e;">✅ Planilha Gerada com Sucesso!</h2>
                             <p>O seu plano de curso "<strong>${finalData.spreadsheetName}</strong>" está pronto.</p>
@@ -68,20 +63,20 @@ form.addEventListener('submit', async (event) => {
                                 Clique aqui para abrir a planilha
                             </a>
                         </div>`;
-                } else if (progressTextElement) {
-                    // ✨ ALTERAÇÃO 3: Atualiza o texto do elemento em vez de criar um novo ✨
-                    progressTextElement.textContent = message;
+                    } else if (progressTextElement) {
+                        // Atualiza o texto do elemento em vez de criar um novo
+                        progressTextElement.textContent = message;
+                    }
                 }
             }
-        }
 
-    } catch (error) {
-        console.error('Ocorreu um erro:', error);
-        // Em caso de erro, também atualiza a área de resultado
-        resultArea.innerHTML = `<p style="color: red;">❌ Erro: ${error.message}</p>`;
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Gerar Plano de Curso';
-    }
-});
+        } catch (error) {
+            console.error('Ocorreu um erro:', error);
+            // Em caso de erro, também atualiza a área de resultado
+            resultArea.innerHTML = `<p style="color: red;">❌ Erro: ${error.message}</p>`;
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Gerar Plano de Curso';
+        }
+    });
 });

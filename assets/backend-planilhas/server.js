@@ -36,7 +36,7 @@ const upload = multer({ storage: multer.memoryStorage() }).fields([
 app.use(cors());
 app.use(express.json());
 
-// // PREENCHA AS SUAS CHAVES AQUI
+// Link do Apps Script para criar a planilha
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMD3VdA6awCyL8KBoOcc7e0qN-gyh9aOxRnByBFYxN8mmpOk79562lJqGUGVsK1ynr/exec";
 const LOGOTIPO_URL = "https://www.imagemhost.com.br/images/2024/11/22/Logo-novo-SENAI_-sem-slogan_755X325.png";
 const generationConfig = {
@@ -48,7 +48,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05", 
 
 
 app.post('/gerar-plano', upload, async (req, res) => {
-    // A configuração de streaming e a função sendUpdate permanecem as mesmas
+
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Transfer-Encoding', 'chunked');
     const sendUpdate = (message) => {
@@ -123,7 +123,6 @@ app.post('/gerar-plano', upload, async (req, res) => {
             sendUpdate("ETAPA 2.1: A analisar a Matriz SAEP para a Unidade Curricular");
             console.log("--- ETAPA 2.1: Analisando a Matriz SAEP... ---");
 
-            // O seu código de pré-processamento do XLSX permanece aqui
             const workbook = XLSX.read(matrixFile.buffer, { type: 'buffer' });
             const sheetDetalhamento = workbook.Sheets['Detalhamento'];
             const sheetRelacionamento = workbook.Sheets['Relacionamento'];
@@ -169,7 +168,6 @@ app.post('/gerar-plano', upload, async (req, res) => {
 
         // --- ETAPA 2.2: ELABORAÇÃO DO CONTEÚDO DE CADA TÓPICO ---
 
-        // (Esta parte do código permanece exatamente a mesma, pois já usa a variável saepMatrixString)
         sendUpdate("ETAPA 2.2: A elaborar o conteúdo de cada tópico do PDF");
         console.log("--- ETAPA 2.2: Elaborando conteúdo de cada tópico... ---");
         const conteudoDetalhado = [];
@@ -227,7 +225,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
             const topicDetailJson = JSON.parse(elaboratorResult.response.text());
 
-            // Adiciona o resultado da análise (ou o texto padrão) ao JSON
+            // Adiciona o resultado da análise ao JSON
             topicDetailJson.saep = saepMatrixString;
 
             conteudoDetalhado.push(topicDetailJson);
@@ -287,25 +285,25 @@ app.post('/gerar-plano', upload, async (req, res) => {
         let validClassDays = [];
 
         if (classDates && classDates.trim() !== '') {
-            // No modo de datas específicas, o comportamento não muda. A lista é fixa.
+            // Modo de datas específicas.
             console.log("MODO DE AGENDAMENTO: Datas Específicas (Calendário).");
             validClassDays = classDates.split(', ')
                 .map(d => new Date(d.split('/').reverse().join('-') + 'T00:00:00'))
                 .filter(date => !isExceptionDay(date))
                 .sort((a, b) => a - b);
         } else {
-            // No modo de agendamento recorrente, a lógica é agora mais flexível.
+            // Modo de agendamento recorrente.
             console.log("MODO DE AGENDAMENTO: Recorrente (Dias da Semana).");
             let totalAulasNecessarias = Math.ceil(parseInt(totalHours, 10) / cargaDiaria);
             let selectedWeekdays = (Array.isArray(weekdays) ? weekdays : (weekdays ? [weekdays] : [])).map(Number);
             let currentDate = new Date(startDate + 'T00:00:00');
 
-            // ✨ ALTERAÇÃO PRINCIPAL: O loop agora continua até a carga horária ser cumprida, ignorando a data final. ✨
+            // O loop continua até a carga horária ser cumprida, ignorando a data final caso as horas incluídas pelo usuário não condizem. ✨
             while (validClassDays.length < totalAulasNecessarias) {
                 const dayOfWeek = currentDate.getDay(); // 0=Domingo, 6=Sábado
                 // Verifica se é um dia útil (não é Sábado nem Domingo)
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                    // Verifica se o dia da semana foi selecionado pelo utilizador ou se nenhum foi (padrão Seg-Sex)
+                    // Verifica se o dia da semana foi selecionado pelo usuário ou se nenhum foi (padrão Seg-Sex)
                     if ((selectedWeekdays.length > 0 && selectedWeekdays.includes(dayOfWeek)) || selectedWeekdays.length === 0) {
                         // Verifica se não é feriado nem férias
                         if (!isExceptionDay(currentDate)) {
@@ -316,8 +314,8 @@ app.post('/gerar-plano', upload, async (req, res) => {
                 currentDate.setDate(currentDate.getDate() + 1);
 
                 // Mecanismo de segurança para evitar loops infinitos
-                if (currentDate.getFullYear() > new Date(startDate).getFullYear() + 5) {
-                    throw new Error("O cálculo de datas excedeu o limite de 5 anos. Verifique a Carga Horária e as datas de início.");
+                if (currentDate.getFullYear() > new Date(startDate).getFullYear() + 3) {
+                    throw new Error("O cálculo de datas excedeu o limite de 3 anos. Verifique a Carga Horária e as datas de início.");
                 }
             }
         }
@@ -362,7 +360,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
 
         const dataFimCalculada = classDayIndex > 0 ? validClassDays[classDayIndex - 1].toLocaleDateString('pt-BR') : endDate;
         sendUpdate("Cronograma distribuído com sucesso");
-       // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
+        // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
         const payloadParaAppsScript = {
             nomeCurso: courseName,
             nomeUC: ucName,
@@ -375,7 +373,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             conteudoDetalhado: conteudoDetalhado,
             imageUrl: LOGOTIPO_URL,
             diasDeAulaValidos: validClassDays.map(date => date.toLocaleDateString('pt-BR')),
-            shift: shift 
+            shift: shift
         };
 
         sendUpdate("ETAPA 3: A comunicar com o Google e a criar a sua planilha");

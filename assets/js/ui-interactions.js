@@ -1,5 +1,5 @@
 // =========================================================================
-// ✨ ✨ ✨ UI-INTERACTIONS.JS (VERSÃO FINAL E OTIMIZADA) ✨ ✨ ✨
+// ✨ ✨ ✨ UI-INTERACTIONS.JS ✨ ✨ ✨
 // =========================================================================
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -246,9 +246,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (showVideoOption) {
                 if (helpCard) helpCard.classList.add('hidden');
 
-                // ✨ LÓGICA ATUALIZADA: CARREGA O VÍDEO E ABRE O MODAL ✨
+                // ✨ CARREGA O VÍDEO E ABRE O MODAL ✨
                 if (videoContainer && videoModal) {
-                    // Substitua 'SEU_LINK_DO_YOUTUBE_AQUI' pelo seu link de "embed"
                     const videoURL = 'https://www.youtube.com/embed/R1VWZB9lMHw?si=Jhg_PnzFEMPMMl0H';
 
                     videoContainer.innerHTML = `

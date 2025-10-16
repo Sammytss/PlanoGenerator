@@ -1,6 +1,6 @@
 // Espera que todo o conteúdo da página seja carregado
 document.addEventListener('DOMContentLoaded', function () {
-    
+
     // Ativa o calendário no campo de feriados
     flatpickr("#holidays", {
         mode: "multiple",       // Permite selecionar múltiplas datas
