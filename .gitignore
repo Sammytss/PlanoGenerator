@@ -3,3 +3,7 @@ node_modules/
 
 # Ignorar ficheiros de variáveis de ambiente - NUNCA ENVIAR ESTE FICHEIRO!
 .env
+
+/DoPost18
+
+DoPost.txt
