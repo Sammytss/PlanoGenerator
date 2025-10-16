@@ -4,6 +4,11 @@ node_modules/
 # Ignorar ficheiros de variáveis de ambiente - NUNCA ENVIAR ESTE FICHEIRO!
 .env
 
+# Ignorar ficheiros antigo de geração de planilhas
 /DoPost18
 
+# Ignorar arquivo antigo de geração de planilhas
 DoPost.txt
+
+# Ignorar arquivo antigo de geração de planilhas
+doPost_16-09.txt
