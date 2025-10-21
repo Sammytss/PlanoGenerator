@@ -241,10 +241,13 @@
                             <input type="text" id="totalHours" name="totalHours" required placeholder="Ex: 80 horas">
                         </div>
                         <div class="form-group">
-                            <label for="shift">Turno das Aulas <span class="required">*</span></label>
+                            <label for="shift">Carga Horária Diária <span class="required">*</span></label>
                             <select id="shift" name="shift" required>
-                                <option value="diurno" selected>4h aula</option>
-                                <option value="noturno">3h aula</option>
+                                <option value="" disabled selected>Selecione a carga horária por dia</option>
+                                <option value="1">1h Aula</option>
+                                <option value="2">2h Aula</option>
+                                <option value="3">3h Aula</option>
+                                <option value="4">4h Aula</option>
                             </select>
                         </div>
                     </div>

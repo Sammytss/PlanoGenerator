@@ -282,7 +282,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
         // =========================================================================
         // ✨ LÓGICA DE DATAS ATUALIZADA PARA SER MAIS FLEXÍVEL ✨
         // =========================================================================
-        const cargaDiaria = shift === 'noturno' ? 3 : 4;
+        const cargaDiaria = parseInt(shift, 10);
         const parsedHolidays = (holidays || '').split(',').map(h => h.trim()).filter(h => h).map(h => new Date(h.split('/').reverse().join('-') + 'T00:00:00').getTime());
         const vacationStartDate = vacationStart ? new Date(vacationStart + 'T00:00:00') : null;
         const vacationEndDate = vacationEnd ? new Date(vacationEnd + 'T00:00:00') : null;
