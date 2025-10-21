@@ -84,27 +84,33 @@ app.post('/gerar-plano', upload, async (req, res) => {
         // --- ETAPA 1: O EXTRATOR ---
         sendUpdate("ETAPA 1: A extrair a lista de tópicos do PDF");
         // =========================================================================
-        // ✨ PROMPT DO EXTRATOR FINAL: COM AGRUPAMENTO HIERÁRQUICO ✨
+        // ✨ PROMPT DO EXTRATOR ✨
         // =========================================================================
         const extractorPrompt = `
         Você é um especialista em análise de documentos pedagógicos.
         ${userInstructionsContext} // <<-- INSTRUÇÕES INJETADAS AQUI
-            Você é um especialista em análise de documentos pedagógicos. Sua tarefa é analisar o Plano de Curso em PDF e extrair a lista de "Conhecimentos" de forma estruturada.
+            Sua tarefa é analisar o Plano de Curso em PDF fornecido e extrair a lista de "Conhecimentos" associada à Unidade Curricular especificada.
 
             1.  **Encontre o Ponto de Início:** Percorra o documento e localize o ponto exato onde a Unidade Curricular "${ucName}" é formalmente introduzida. IGNORE todo o conteúdo que aparecer ANTES deste ponto.
-            2.  **Identifique os Conhecimentos Principais:** Localize a lista de conteúdos a serem ensinados (pode chamar-se "Conhecimentos", "Conteúdo Programático", etc.). Os conhecimentos principais são geralmente numerados (ex: "1. TEMA", "2. TEMA").
-            3.  **Identifique os Subtópicos:** Para cada conhecimento principal, identifique todos os seus subtópicos associados (ex: "1.1. Subtema", "1.2. Subtema").
-            4.  **Agrupe o Conteúdo:** Para cada conhecimento principal, crie uma ÚNICA string de texto. Esta string DEVE começar com o conhecimento principal, seguido por todos os seus subtópicos, cada um numa nova linha.
-            
-            **EXEMPLO DE AGRUPAMENTO CORRETO:**
-            Se o PDF tiver:
-            2. MICROCONTROLADORES
-            2.1. Aplicações
-            2.2. Arduino
-            A sua string de saída para este item deve ser: "2. MICROCONTROLADORES\n2.1. Aplicações\n2.2. Arduino"
+            2.  **Localize a Secção de Conhecimentos:** Após encontrar a UC "${ucName}", procure pela secção que lista os conteúdos a serem ensinados. Esta secção pode chamar-se "Conhecimento", "Conhecimentos", "Conteúdo Programático" ou similar.
+            3.  **Identifique o Formato da Lista:** Verifique se os conhecimentos estão apresentados como:
+                * a) Uma lista numerada (com ou sem subtópicos).
+                * b) Uma única string de texto onde os itens são separados por vírgulas.
+            4.  **Extraia e Formate os Tópicos:**
+                * **Se for uma lista numerada (Formato a):** Para cada item principal, crie uma string contendo o item principal e todos os seus subtópicos, cada um em nova linha (como no exemplo de MICROCONTROLADORES).
+                * **Se for uma string com vírgulas (Formato b):** Identifique a string completa que contém os conhecimentos. Divida esta string usando a vírgula como delimitador. Remova quaisquer espaços em branco extras no início ou fim de cada item resultante.
+            5.  **Defina o Ponto Final:** Pare a sua análise assim que encontrar o início de uma NOVA Unidade Curricular ou uma secção claramente não relacionada aos conhecimentos (como "Habilidades", "Avaliação", etc.). A sua extração deve conter APENAS os conhecimentos da UC "${ucName}".
+            6.  **Formato de Saída:** Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave chamada "topicos". O valor desta chave deve ser um array de strings, onde cada string é um conhecimento individual extraído e formatado conforme o passo 4.
 
-            5.  **Defina o Ponto Final:** Pare a sua análise assim que encontrar o início de uma NOVA Unidade Curricular. A sua extração deve conter APENAS os conhecimentos da UC "${ucName}".
-            6.  **Formato de Saída:** Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave chamada "topicos", que contém um array destas strings agrupadas.
+            **Exemplo de Saída (Formato b):**
+            Se o PDF contiver "Conhecimento: Abstração lógica, álgebra booleana, fluxogramas.", a saída DEVE ser:
+            {
+              "topicos": [
+                "Abstração lógica",
+                "álgebra booleana",
+                "fluxogramas"
+              ]
+            }
         `;
         const extractorResult = await model.generateContent([extractorPrompt, filePart]);
         const topicListJson = JSON.parse(extractorResult.response.text());
@@ -213,11 +219,16 @@ app.post('/gerar-plano', upload, async (req, res) => {
                     * **LISTA DE OPÇÕES DISPONÍVEIS:** "Lista de Exercícios", "Ficha de Observação", "Relatório", "Portfólio", "Prova de Resposta Construída", "Autoavaliação".
                     * **REGRA DE FIM DE CURSO:** Se este for o último ou penúltimo conhecimento, você PODE escolher "Prova Prática", "Prova Objetiva" ou "Trabalho em Grupo" se for lógico.
                     * **"criterios":** Defina UM critério de avaliação claro, direto e no passado, no formato "O aluno...", que se relacione DIRETAMENTE com o instrumento escolhido.
-
+                         
                 4.  **PARA AS OUTRAS CHAVES ("onde", "recursos", "situacaoAprendizagem"):**
                     * Preencha com informações pertinentes para o conhecimento em questão.
                 
-                5.  **CÁLCULOS:**
+                5.  **PARA A CHAVE "recursos" (Formatação Específica):**
+                    * **FORMATAÇÃO OBRIGATÓRIA:** Formate o resultado como uma ÚNICA string de texto onde CADA recurso individual está em uma NOVA LINHA e TERMINA com um PONTO E VÍRGULA (;).
+                    * **EXEMPLO DE FORMATAÇÃO CORRETA:** "Data show;\\nQuadro;\\nPincel;\\nComputadores;"
+                    * NÃO adicione marcadores (como '*') ou numeração. Apenas o recurso seguido de ponto e vírgula e uma quebra de linha.
+                    
+                6.  **CÁLCULOS:**
                     * Estime uma "cargaHoraria" numérica lógica.
                     * Deixe as chaves "inicio" e "fim" como strings vazias.
             `;
