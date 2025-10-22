@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             { field: 'totalHours', title: 'Carga Horária Total', description: 'Informe a carga horária total da UC em horas. Exemplo: "120". Esta informação será usada para distribuir o conteúdo ao longo do período.' },
 
-            { field: 'shift', title: 'Turno das Aulas', description: 'Selecione a duração das aulas. 4 horas de aula por dia ou 3 horas. Isso afeta o cálculo do cronograma.' },
+            { field: 'shift', title: 'Turno das Aulas', description: 'Selecione a duração das aulas. 1, 2, 3 ou 4 horas de aula por dia. Isso afeta o cálculo do cronograma.' },
 
             { field: 'weekdays', title: 'Dias da Semana', description: 'Para cursos que acontecem em alguns dias da semana Ex.: (Terça e Quarta), marque os dias da semana em que haverá aula. Se nenhum dia for selecionado, o sistema considerará todos os dias úteis (Segunda a Sexta-feira).' },
 
