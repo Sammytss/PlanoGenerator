@@ -127,7 +127,12 @@ A aplicação precisa do Node.js v18 ou mais recente. Verifique a sua versão:
 ```bash
 node -v
 ```
+Caso não tenha o Node.js instalado. Instale-o com o seguinte comando:
 
+```bash
+sudo apt install nodejs
+sudo apt install npm
+```
 Se for v18+ (ex: v20.x), instale o PM2:
 
 ```bash
@@ -296,3 +301,4 @@ PlanoGenerator/
 Este projeto foi idealizado e desenvolvido por **Samuel Teles**.
 
 LinkedIn: [linkedin.com/in/samuel-teles-dos-santos-662003237](https://linkedin.com/in/samuel-teles-dos-santos-662003237)
+
