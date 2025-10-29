@@ -134,7 +134,12 @@ sudo apt install nodejs
 sudo apt install npm
 ```
 Se for v18+ (ex: v20.x), instale o PM2:
-
+**Execute isto para conceder as permissões globais do Node.js**
+```bash
+sudo chown -R $(whoami) /usr/local/lib
+sudo chown -R $(whoami) /usr/local/bin
+```
+**Agora podemos instalar o PM2 (sem sudo)**
 ```bash
 npm install pm2 -g
 ```
@@ -301,4 +306,5 @@ PlanoGenerator/
 Este projeto foi idealizado e desenvolvido por **Samuel Teles**.
 
 LinkedIn: [linkedin.com/in/samuel-teles-dos-santos-662003237](https://linkedin.com/in/samuel-teles-dos-santos-662003237)
+
 
