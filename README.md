@@ -187,6 +187,21 @@ nano .env
 **5. Volte para a raiz do projeto e instale as dependências**
 ```bash
 cd /var/www/PlanoGenerator
+```
+**6. Corrija a propriedade da pasta para garantir que as dependências funcionem 100% no servidor:**
+
+```bash
+sudo chown -R $(whoami) .
+```
+**7. Remova a instalação existente:**
+
+```bash
+rm -rf node_modules
+rm -f package-lock.json
+```
+**8. Agora, instale as dependências (sem sudo):**
+
+```bash
 npm install
 ```
 ### 5. Executando o Backend com PM2
@@ -306,5 +321,6 @@ PlanoGenerator/
 Este projeto foi idealizado e desenvolvido por **Samuel Teles**.
 
 LinkedIn: [linkedin.com/in/samuel-teles-dos-santos-662003237](https://linkedin.com/in/samuel-teles-dos-santos-662003237)
+
 
 
