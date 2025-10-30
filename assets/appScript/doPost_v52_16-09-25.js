@@ -1,5 +1,5 @@
 // =========================================================================
-// ✨ VERSÃO FINAL COM DIVISÃO DE TÓPICOS ENTRE PÁGINAS (LÓGICA CORRIGIDA) ✨
+//            VERSÃO FINAL COM DIVISÃO DE TÓPICOS ENTRE PÁGINAS
 // =========================================================================
 
 /**
