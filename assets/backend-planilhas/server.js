@@ -44,7 +44,7 @@ const generationConfig = {
     maxOutputTokens: 8192,
     responseMimeType: "application/json",
 };
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05", generationConfig });
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-pro", generationConfig });
 
 
 app.post('/gerar-plano', upload, async (req, res) => {
@@ -154,7 +154,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
             `;
 
-            const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-2.5-pro-preview-06-05" });
+            const modelTextOnly = genAI.getGenerativeModel({ model: "gemini-2.5-pro" });
             const saepResult = await modelTextOnly.generateContent([saepAnalysisPrompt, dossieMatriz]);
             const analysisResult = saepResult.response.text();
 
