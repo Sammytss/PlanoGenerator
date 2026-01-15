@@ -120,6 +120,29 @@ document.addEventListener('DOMContentLoaded', function () {
             { field: 'observacoes', title: 'Observações para a IA (Opcional)', description: 'Use este campo poderoso para "conversar" com a IA. Dê instruções em linguagem natural para personalizar o conteúdo, a metodologia ou a avaliação. Ex: "A avaliação final deve ser um projeto prático".' }
 
         ];
+        function injectTooltips() {
+            guideSteps.forEach(step => {
+                // Procura o label associado ao campo (input/select)
+                // O seletor procura: um label que tenha o atributo 'for' igual ao ID do campo
+                const label = document.querySelector(`label[for="${step.field}"]`);
+                
+                // Se achou o label e ele ainda não tem um ícone
+                if (label && !label.querySelector('.tooltip-icon')) {
+                    const icon = document.createElement('span');
+                    icon.className = 'tooltip-icon';
+                    icon.textContent = '?';
+                    
+                    // Coloca a descrição do guia dentro do atributo que o CSS vai ler
+                    icon.setAttribute('data-tooltip', step.description);
+                    
+                    // Adiciona o ícone dentro do label
+                    label.appendChild(icon);
+                }
+            });
+        }
+
+        // Chama a função imediatamente para criar os ícones
+        injectTooltips();
 
         let currentGuideStep = 0;
         let guideActive = false;
