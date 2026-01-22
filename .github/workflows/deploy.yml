@@ -21,8 +21,11 @@ jobs:
             # Entra na pasta do projeto
             cd /var/www/html/PlanoGenerator
             
-            # Baixa as atualizações do GitHub
-            git pull origin main
+            # Baixa as informações mais recentes do GitHub sem aplicar
+            git fetch --all
+            
+            # FORÇA o servidor a ficar idêntico ao GitHub descartando alterações locais
+            git reset --hard origin/main
             
             # Instala dependências novas caso o package.json tenha mudado
             npm install
