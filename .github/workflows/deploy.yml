@@ -1,0 +1,33 @@
+name: Deploy Automático Produção
+
+on:
+  push:
+    branches:
+      - main  # Verifique se sua branch principal chama 'main' ou 'master'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Executar atualização via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            # Entra na pasta do projeto conforme seu README
+            cd /var/www/html/PlanoGenerator
+            
+            # Baixa as atualizações do GitHub
+            git pull origin main
+            
+            # Instala dependências novas (caso o package.json tenha mudado)
+            npm install
+            
+            # Reinicia o servidor para aplicar mudanças no backend
+            pm2 restart PlanoGenerator
+            
+            echo "🚀 Deploy realizado com sucesso!"
