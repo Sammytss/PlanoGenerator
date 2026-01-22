@@ -63,10 +63,51 @@
         <!-- Modal de boas-vindas - primeira tela que o usuário vê -->
         <div id="guideWelcome" class="guide-welcome">
             <h2>🎯 Bem-vindo ao Plano Generator!</h2>
-            <p>Vamos te guiar passo a passo pelo preenchimento do formulário. Cada campo será explicado para que você
-                possa criar seu planejamento com facilidade.</p>
+            <p>Vamos te guiar passo a passo pelo preenchimento do formulário para criar seu planejamento com facilidade.
+            </p>
 
-            <!-- Checkbox para não mostrar o guia novamente -->
+            <div class="updates-container">
+                <h3 class="updates-header">✨ Novidades da Versão 2.0</h3>
+                <div class="updates-list">
+
+                    <div class="update-item">
+                        <div class="update-icon-box">🧠</div>
+                        <div class="update-text">
+                            <strong>Gemini 2.5 Pro estável</strong>
+                            <p>Maior tempo de pensamento, maior raciocínio e precisão nos resultados.</p>
+                        </div>
+                        <span class="badge-update">Update</span>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-icon-box">✅</div>
+                        <div class="update-text">
+                            <strong>Correção de erro por aulas insuficientes para a quantidade de conteúdo.</strong>
+                            <p>Uma aula pode trabalhar vários tópicos que estão relacionados.</p>
+                        </div>
+                        <span class="badge-update">Update</span>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-icon-box">🕓</div>
+                        <div class="update-text">
+                            <strong>Carga horária de 8 horas</strong>
+                            <p>Para aulas com 8 horas diárias, atendendo às sugestões da semana pedagógica.</p>
+                        </div>
+                        <span class="badge-new">Novo</span>
+                    </div>
+
+                    <div class="update-item">
+                        <div class="update-icon-box">❓</div>
+                        <div class="update-text">
+                            <strong>Ajuda Contextual</strong>
+                            <p>Passe o mouse nos ícones (?) para dicas de preenchimento.</p>
+                        </div>
+                        <span class="badge-new">Novo</span>
+                    </div>
+
+                </div>
+            </div>
             <div class="guide-welcome-checkbox">
                 <label class="checkbox-container">
                     <input type="checkbox" id="dontShowAgain">
@@ -207,12 +248,14 @@
 
                     <div class="form-group-row">
                         <div class="form-group">
-                            <label for="classCode">Código da Turma: <!--<span class="field-info" style="font-size: 0.8em; color: #666;">Opcional</span>--></label> 
+                            <label for="classCode">Código da Turma:
+                                <!--<span class="field-info" style="font-size: 0.8em; color: #666;">Opcional</span>--></label>
                             <input type="text" id="classCode" name="classCode" placeholder="Ex: TEC.2024.2.247">
                         </div>
                         <div class="form-group">
                             <label for="modality">Modalidade <span class="required">*</span></label>
-                            <input type="text" id="modality" name="modality" required placeholder="Ex: HABILITAÇÃO TÉCNICA">
+                            <input type="text" id="modality" name="modality" required
+                                placeholder="Ex: HABILITAÇÃO TÉCNICA">
                         </div>
                     </div>
                 </div>
@@ -247,6 +290,7 @@
                                 <option value="2">2h Aula</option>
                                 <option value="3">3h Aula</option>
                                 <option value="4">4h Aula</option>
+                                <option value="8">8h Aula</option>
                             </select>
                         </div>
                     </div>

@@ -280,12 +280,13 @@ app.post('/gerar-plano', upload, async (req, res) => {
         }
 
         // =========================================================================
-        // ✨ LÓGICA DE DATAS ATUALIZADA PARA SER MAIS FLEXÍVEL ✨
+        //                     LÓGICA DE DATAS (CENÁRIOS A e B)
         // =========================================================================
         const cargaDiaria = parseInt(shift, 10);
         const parsedHolidays = (holidays || '').split(',').map(h => h.trim()).filter(h => h).map(h => new Date(h.split('/').reverse().join('-') + 'T00:00:00').getTime());
         const vacationStartDate = vacationStart ? new Date(vacationStart + 'T00:00:00') : null;
         const vacationEndDate = vacationEnd ? new Date(vacationEnd + 'T00:00:00') : null;
+
         const isExceptionDay = (date) => {
             const dateTimestamp = date.getTime();
             if (parsedHolidays.includes(dateTimestamp)) return true;
@@ -295,81 +296,126 @@ app.post('/gerar-plano', upload, async (req, res) => {
 
         let validClassDays = [];
 
+        // 1. GERAÇÃO DA LISTA DE DIAS VÁLIDOS
         if (classDates && classDates.trim() !== '') {
-            // Modo de datas específicas.
-            console.log("MODO DE AGENDAMENTO: Datas Específicas (Calendário).");
+            // MODO: Datas Específicas
+            console.log("MODO: Datas Específicas.");
             validClassDays = classDates.split(', ')
                 .map(d => new Date(d.split('/').reverse().join('-') + 'T00:00:00'))
                 .filter(date => !isExceptionDay(date))
                 .sort((a, b) => a - b);
         } else {
-            // Modo de agendamento recorrente.
-            console.log("MODO DE AGENDAMENTO: Recorrente (Dias da Semana).");
+            // MODO: Recorrente
+            console.log("MODO: Recorrente (Dias da Semana).");
             let totalAulasNecessarias = Math.ceil(parseInt(totalHours, 10) / cargaDiaria);
             let selectedWeekdays = (Array.isArray(weekdays) ? weekdays : (weekdays ? [weekdays] : [])).map(Number);
             let currentDate = new Date(startDate + 'T00:00:00');
 
-            // O loop continua até a carga horária ser cumprida, ignorando a data final caso as horas incluídas pelo usuário não condizem. ✨
             while (validClassDays.length < totalAulasNecessarias) {
-                const dayOfWeek = currentDate.getDay(); // 0=Domingo, 6=Sábado
-                // Verifica se é um dia útil (não é Sábado nem Domingo)
+                const dayOfWeek = currentDate.getDay();
                 if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                    // Verifica se o dia da semana foi selecionado pelo usuário ou se nenhum foi (padrão Seg-Sex)
                     if ((selectedWeekdays.length > 0 && selectedWeekdays.includes(dayOfWeek)) || selectedWeekdays.length === 0) {
-                        // Verifica se não é feriado nem férias
                         if (!isExceptionDay(currentDate)) {
                             validClassDays.push(new Date(currentDate));
                         }
                     }
                 }
                 currentDate.setDate(currentDate.getDate() + 1);
-
-                // Mecanismo de segurança para evitar loops infinitos
-                if (currentDate.getFullYear() > new Date(startDate).getFullYear() + 3) {
-                    throw new Error("O cálculo de datas excedeu o limite de 3 anos. Verifique a Carga Horária e as datas de início.");
-                }
+                if (currentDate.getFullYear() > new Date(startDate).getFullYear() + 3) break;
             }
         }
 
         if (validClassDays.length === 0) throw new Error("Nenhuma data de aula válida foi encontrada.");
-        console.log(`DIAGNÓSTICO FINAL: ${validClassDays.length} dias de aula válidos foram processados para o agendamento.`);
+        console.log(`DIAS VÁLIDOS ENCONTRADOS: ${validClassDays.length}`);
 
+
+        // 2. DISTRIBUIÇÃO INTELIGENTE
         const totalAulasDisponiveis = validClassDays.length;
-        let estimativaAulas = conteudoDetalhado.map(item => Math.max(1, Math.round((parseInt(item.cargaHoraria, 10) || 0) / cargaDiaria)));
-        let somaAulasEstimadas = estimativaAulas.reduce((acc, val) => acc + val, 0);
-        let diferencaAulas = totalAulasDisponiveis - somaAulasEstimadas;
-        while (diferencaAulas !== 0) {
-            if (diferencaAulas > 0) {
-                let indexParaAumentar = estimativaAulas.indexOf(Math.min(...estimativaAulas));
-                estimativaAulas[indexParaAumentar]++;
-                diferencaAulas--;
-            } else {
-                let indexParaDiminuir = estimativaAulas.indexOf(Math.max(...estimativaAulas));
-                if (estimativaAulas[indexParaDiminuir] > 1) {
-                    estimativaAulas[indexParaDiminuir]--;
-                    diferencaAulas++;
-                } else {
-                    break;
-                }
+        const totalTopicos = conteudoDetalhado.length;
+        let planoFinal = [];
+
+        if (totalAulasDisponiveis >= totalTopicos) {
+            // --- CENÁRIO A: EXPANSÃO. Quando há mais dias que tópicos) ---
+            console.log("Cenário A: Expansão");
+
+            let estimativaAulas = conteudoDetalhado.map(() => 1);
+            let diasAlocados = totalTopicos;
+            let diasRestantes = totalAulasDisponiveis - diasAlocados;
+
+            let i = 0;
+            while (diasRestantes > 0) {
+                estimativaAulas[i]++;
+                diasRestantes--;
+                i = (i + 1) % totalTopicos;
             }
-        }
-        conteudoDetalhado.forEach((item, index) => {
-            item.cargaHoraria = estimativaAulas[index] * cargaDiaria;
-        });
 
-        let classDayIndex = 0;
-        for (let i = 0; i < conteudoDetalhado.length; i++) {
-            let item = conteudoDetalhado[i];
-            let duracaoEmDias = item.cargaHoraria / cargaDiaria;
-            if (duracaoEmDias === 0) continue;
-            if (classDayIndex + duracaoEmDias > validClassDays.length) throw new Error(`As datas de aula (${validClassDays.length}) são insuficientes.`);
-            item.inicio = validClassDays[classDayIndex].toLocaleDateString('pt-BR');
-            item.fim = validClassDays[classDayIndex + duracaoEmDias - 1].toLocaleDateString('pt-BR');
-            item.cargaHoraria = Array(duracaoEmDias).fill(cargaDiaria).join(', ');
-            classDayIndex += duracaoEmDias;
+            conteudoDetalhado.forEach((item, index) => {
+                const duracaoEmDias = estimativaAulas[index];
+
+                // Gera carga horária separada por vírgulas para o Apps Script criar linhas
+                const arrayCarga = Array(duracaoEmDias).fill(cargaDiaria);
+                item.cargaHoraria = arrayCarga.join(', ');
+
+                planoFinal.push(item);
+            });
+
+        } else {
+            // --- CENÁRIO B: COMPACTAÇÃO. Quando há mais tópicos que dias ---
+            console.log("Cenário B: Compactação");
+
+            // Inicializa os slots dos dias (AGORA COM 'onde')
+            planoFinal = validClassDays.map(() => ({
+                oque: [], como: [], recursos: [], instrumentos: [], criterios: [], situacaoAprendizagem: [],
+                onde: [], // <--- CORREÇÃO AQUI: Array para acumular locais
+                saep: "",
+                cargaHoraria: cargaDiaria.toString()
+            }));
+
+            // Distribui os tópicos nos slots disponíveis
+            conteudoDetalhado.forEach((item, index) => {
+                const dayIndex = Math.floor((index * totalAulasDisponiveis) / totalTopicos);
+                const safeDayIndex = Math.min(dayIndex, totalAulasDisponiveis - 1);
+
+                const diaAlvo = planoFinal[safeDayIndex];
+
+                if (item.oque) diaAlvo.oque.push(item.oque);
+                if (item.como) diaAlvo.como.push(item.como);
+                if (item.recursos) diaAlvo.recursos.push(item.recursos);
+
+                // CORREÇÃO AQUI: Acumula o local (onde)
+                if (item.onde) diaAlvo.onde.push(item.onde);
+
+                // Evita duplicatas em instrumentos
+                if (item.instrumentos && !diaAlvo.instrumentos.includes(item.instrumentos)) {
+                    diaAlvo.instrumentos.push(item.instrumentos);
+                }
+
+                if (item.criterios) diaAlvo.criterios.push(item.criterios);
+                if (item.situacaoAprendizagem) diaAlvo.situacaoAprendizagem.push(item.situacaoAprendizagem);
+
+                if (!diaAlvo.saep) diaAlvo.saep = item.saep;
+            });
+
+            // Converte os arrays de volta para strings formatadas
+            planoFinal = planoFinal.map(dia => ({
+                oque: dia.oque.join('\n\n---\n\n'),
+                como: dia.como.join('\n\n'),
+                recursos: dia.recursos.join('\n'),
+                instrumentos: dia.instrumentos.join(' / '),
+                criterios: dia.criterios.join('\n'),
+                situacaoAprendizagem: dia.situacaoAprendizagem.join('\n\n'),
+                // CORREÇÃO AQUI: Junta os locais removendo duplicatas (ex: Lab Info / Sala Aula)
+                onde: [...new Set(dia.onde)].join(' / '),
+                saep: dia.saep,
+                cargaHoraria: dia.cargaHoraria
+            }));
         }
 
-        const dataFimCalculada = classDayIndex > 0 ? validClassDays[classDayIndex - 1].toLocaleDateString('pt-BR') : endDate;
+        // Substitui o array original pelo processado
+        conteudoDetalhado.length = 0;
+        planoFinal.forEach(item => conteudoDetalhado.push(item));
+
+        const dataFimCalculada = validClassDays[validClassDays.length - 1].toLocaleDateString('pt-BR');
         sendUpdate("Cronograma distribuído com sucesso");
         // --- ETAPA 3: ENVIAR PARA A PLANILHA ---
         const payloadParaAppsScript = {

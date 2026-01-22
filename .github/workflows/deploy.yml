@@ -3,7 +3,7 @@ name: Deploy Automático Produção
 on:
   push:
     branches:
-      - main  # Verifique se sua branch principal chama 'main' ou 'master'
+      - main
 
 jobs:
   deploy:
@@ -18,16 +18,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            # Entra na pasta do projeto conforme seu README
+            # Entra na pasta do projeto
             cd /var/www/html/PlanoGenerator
             
             # Baixa as atualizações do GitHub
             git pull origin main
             
-            # Instala dependências novas (caso o package.json tenha mudado)
+            # Instala dependências novas caso o package.json tenha mudado
             npm install
             
             # Reinicia o servidor para aplicar mudanças no backend
             pm2 restart PlanoGenerator
             
-            echo "🚀 Deploy realizado com sucesso!"
+            echo "Deploy realizado com sucesso!"
