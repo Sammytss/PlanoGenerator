@@ -1,4 +1,4 @@
-// --- server.js VERSÃO FINAL E COMPLETA ---
+// --- server.js ---
 const express = require('express');
 const path = require('path');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
@@ -7,21 +7,21 @@ const multer = require('multer');
 const cors = require('cors');
 const XLSX = require('xlsx');
 
-// 1. Diz ao dotenv para encontrar o ficheiro .env no diretório atual
+// Diz ao dotenv para encontrar o ficheiro .env no diretório atual
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 
-// 2. Atribui o valor do .env a uma constante
+// Atribui o valor do .env a uma constante
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// ✨ Diagnóstico para confirmar (pode remover depois) ✨
+// Diagnóstico para confirmar
 console.log("Chave de API atribuída à constante:", GEMINI_API_KEY ? "SUCESSO" : "FALHA - undefined");
 
-// 3. Verifica se a chave foi carregada antes de continuar
+// Verifica se a chave foi carregada
 if (!GEMINI_API_KEY) {
     throw new Error("A chave GEMINI_API_KEY não foi encontrada no ficheiro .env. Verifique o ficheiro e reinicie o servidor.");
 }
 
-// 4. Agora, inicializa o cliente do Google AI com a constante que sabemos que existe
+// Inicializa o Google AI com a constante
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 const app = express();
@@ -64,7 +64,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
         modality = modality ? modality.toUpperCase() : '';
         const pdfFile = req.files.pdfFile[0];
         const matrixFile = req.files.matrixFile ? req.files.matrixFile[0] : null;
-        // Prepara o contexto das instruções do utilizador, se existirem
+        // Prepara o contexto das instruções do usuário, se existirem
         let userInstructionsContext = "";
         if (observacoes && observacoes.trim() !== '') {
             userInstructionsContext = `
@@ -84,7 +84,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
         // --- ETAPA 1: O EXTRATOR ---
         sendUpdate("ETAPA 1: A extrair a lista de tópicos do PDF");
         // =========================================================================
-        // ✨ PROMPT DO EXTRATOR ✨
+        //                          PROMPT DO EXTRATOR
         // =========================================================================
         const extractorPrompt = `
         Você é um especialista em análise de documentos pedagógicos.
@@ -119,12 +119,12 @@ app.post('/gerar-plano', upload, async (req, res) => {
         sendUpdate(`Extração concluída. Encontrados ${topicTitles.length} tópicos`);
 
         // =========================================================================
-        // ✨ ETAPA 2 FINAL: LÓGICA CONDICIONAL DA MATRIZ SAEP ✨
+        //          ETAPA 2 FINAL: LÓGICA CONDICIONAL DA MATRIZ SAEP 
         // =========================================================================
 
         let saepMatrixString = "Não possui cruzamento de MATRIZ"; // Valor padrão
 
-        // --- ETAPA 2.1: ANÁLISE DA MATRIZ (SE O FICHEIRO EXISTIR) ---
+        //         --- ETAPA 2.1: ANÁLISE DA MATRIZ SE EXISTIR ---
         if (matrixFile) {
             sendUpdate("ETAPA 2.1: A analisar a Matriz SAEP para a Unidade Curricular");
             console.log("--- ETAPA 2.1: Analisando a Matriz SAEP... ---");
@@ -182,7 +182,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             sendUpdate(`   - A processar tópico ${index + 1} de ${topicTitles.length}: "${title}"`);
 
             // =========================================================================
-            // ✨ PROMPT DO ELABORADOR FINAL (COM METODOLOGIA SENAI INTEGRADA) ✨
+            //         PROMPT DO ELABORADOR FINAL COM METODOLOGIA SENAI INTEGRADA
             // =========================================================================
             const elaboratorPrompt = `
                 Você é um especialista em Design Instrucional do SENAI. Sua tarefa é elaborar o conteúdo detalhado para um único Conhecimento, seguindo estritamente a Metodologia SENAI.
@@ -245,7 +245,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
         sendUpdate("Elaboração de todos os tópicos concluída");
 
         // =========================================================================
-        // ✨ NOVA ETAPA 2.3: GERADOR INTELIGENTE DE AVALIAÇÃO FINAL ✨
+        //          ETAPA 2.3: GERADOR INTELIGENTE DE AVALIAÇÃO FINAL 
         // =========================================================================
         if (conteudoDetalhado.length > 0) {
             sendUpdate("ETAPA 2.3: A gerar uma avaliação final contextualizada");
@@ -270,7 +270,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             const assessmentResult = await model.generateContent([finalAssessmentPrompt, filePart]);
             const assessmentJson = JSON.parse(assessmentResult.response.text());
 
-            // Substituímos os valores do último tópico pelos valores gerados
+            // Substituição dos valores do último tópico pelos valores gerados
             ultimoTopico.instrumentos = assessmentJson.instrumentos || "Prova Prática";
             ultimoTopico.como = assessmentJson.como || "Atividade avaliativa final.";
             ultimoTopico.criterios = assessmentJson.criterios || "O aluno demonstrou as competências da UC.";
@@ -280,7 +280,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
         }
 
         // =========================================================================
-        //                     LÓGICA DE DATAS (CENÁRIOS A e B)
+        //                     LÓGICA DE DATAS CENÁRIOS A e B
         // =========================================================================
         const cargaDiaria = parseInt(shift, 10);
         const parsedHolidays = (holidays || '').split(',').map(h => h.trim()).filter(h => h).map(h => new Date(h.split('/').reverse().join('-') + 'T00:00:00').getTime());
@@ -296,16 +296,16 @@ app.post('/gerar-plano', upload, async (req, res) => {
 
         let validClassDays = [];
 
-        // 1. GERAÇÃO DA LISTA DE DIAS VÁLIDOS
+        //  GERAÇÃO DA LISTA DE DIAS VÁLIDOS
         if (classDates && classDates.trim() !== '') {
-            // MODO: Datas Específicas
+            // Datas Específicas
             console.log("MODO: Datas Específicas.");
             validClassDays = classDates.split(', ')
                 .map(d => new Date(d.split('/').reverse().join('-') + 'T00:00:00'))
                 .filter(date => !isExceptionDay(date))
                 .sort((a, b) => a - b);
         } else {
-            // MODO: Recorrente
+            // Recorrente
             console.log("MODO: Recorrente (Dias da Semana).");
             let totalAulasNecessarias = Math.ceil(parseInt(totalHours, 10) / cargaDiaria);
             let selectedWeekdays = (Array.isArray(weekdays) ? weekdays : (weekdays ? [weekdays] : [])).map(Number);
@@ -329,13 +329,13 @@ app.post('/gerar-plano', upload, async (req, res) => {
         console.log(`DIAS VÁLIDOS ENCONTRADOS: ${validClassDays.length}`);
 
 
-        // 2. DISTRIBUIÇÃO INTELIGENTE
+        // DISTRIBUIÇÃO INTELIGENTE
         const totalAulasDisponiveis = validClassDays.length;
         const totalTopicos = conteudoDetalhado.length;
         let planoFinal = [];
 
         if (totalAulasDisponiveis >= totalTopicos) {
-            // --- CENÁRIO A: EXPANSÃO. Quando há mais dias que tópicos) ---
+            // --- CENÁRIO A: EXPANSÃO. Quando há mais dias que tópicos ---
             console.log("Cenário A: Expansão");
 
             let estimativaAulas = conteudoDetalhado.map(() => 1);
@@ -363,10 +363,10 @@ app.post('/gerar-plano', upload, async (req, res) => {
             // --- CENÁRIO B: COMPACTAÇÃO. Quando há mais tópicos que dias ---
             console.log("Cenário B: Compactação");
 
-            // Inicializa os slots dos dias (AGORA COM 'onde')
+            // Inicializa os slots dos dias
             planoFinal = validClassDays.map(() => ({
                 oque: [], como: [], recursos: [], instrumentos: [], criterios: [], situacaoAprendizagem: [],
-                onde: [], // <--- CORREÇÃO AQUI: Array para acumular locais
+                onde: [], 
                 saep: "",
                 cargaHoraria: cargaDiaria.toString()
             }));
@@ -382,7 +382,6 @@ app.post('/gerar-plano', upload, async (req, res) => {
                 if (item.como) diaAlvo.como.push(item.como);
                 if (item.recursos) diaAlvo.recursos.push(item.recursos);
 
-                // CORREÇÃO AQUI: Acumula o local (onde)
                 if (item.onde) diaAlvo.onde.push(item.onde);
 
                 // Evita duplicatas em instrumentos
@@ -404,7 +403,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
                 instrumentos: dia.instrumentos.join(' / '),
                 criterios: dia.criterios.join('\n'),
                 situacaoAprendizagem: dia.situacaoAprendizagem.join('\n\n'),
-                // CORREÇÃO AQUI: Junta os locais removendo duplicatas (ex: Lab Info / Sala Aula)
+                // Junta os locais removendo duplicatas (ex: Lab Info / Sala Aula)
                 onde: [...new Set(dia.onde)].join(' / '),
                 saep: dia.saep,
                 cargaHoraria: dia.cargaHoraria
