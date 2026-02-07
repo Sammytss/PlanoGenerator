@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const formData = new FormData(form);
         // Endereço do servidor local do sistema
-        const backendUrl = 'http://10.25.0.33:3000/gerar-plano';
+        const backendUrl = '/gerar-plano';
 
         try {
             const response = await fetch(backendUrl, {
