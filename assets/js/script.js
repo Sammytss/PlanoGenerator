@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultArea = document.getElementById('resultArea');
 
     // URL do servidor backend
-    const backendUrl = 'http://localhost:3000/gerar-plano';
+    // const backendUrl = 'http://localhost:3000/gerar-plano';
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();

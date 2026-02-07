@@ -243,20 +243,10 @@ sudo nano /etc/apache2/sites-available/000-default.conf
 ```bash
 <VirtualHost *:80>
     
-    # APONTA O APACHE PARA A PASTA DO SEU PROJETO
-    DocumentRoot /var/www/PlanoGenerator
-    
-    # Configura o diretório do projeto para permitir o acesso
-    <Directory /var/www/PlanoGenerator>
-        Options Indexes FollowSymLinks
-        AllowOverride None
-        Require all granted
-    </Directory>
-
-    # Configura o Proxy Reverso para a API Node.js
+    # Redireciona TODO o tráfego para a aplicação Node.js segura
     ProxyPreserveHost On
-    ProxyPass /gerar-plano http://localhost:3000/gerar-plano
-    ProxyPassReverse /gerar-plano http://localhost:3000/gerar-plano
+    ProxyPass / http://localhost:3000/
+    ProxyPassReverse / http://localhost:3000/
 
     # Configuração de logs (padrão)
     ErrorLog ${APACHE_LOG_DIR}/error.log
