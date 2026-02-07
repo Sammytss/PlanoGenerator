@@ -36,6 +36,17 @@ const upload = multer({ storage: multer.memoryStorage() }).fields([
 app.use(cors());
 app.use(express.json());
 
+// --- SEGURANÇA: Servir apenas arquivos estáticos específicos ---
+// Serve apenas as pastas seguras dentro de 'assets', ignorando 'backend-planilhas' e 'appScript'
+app.use('/assets/css', express.static(path.join(__dirname, '../css')));
+app.use('/assets/js', express.static(path.join(__dirname, '../js')));
+app.use('/assets/Images', express.static(path.join(__dirname, '../Images')));
+
+// Rota principal para servir o index.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../index.html'));
+});
+
 // Link do Apps Script para criar a planilha
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwMD3VdA6awCyL8KBoOcc7e0qN-gyh9aOxRnByBFYxN8mmpOk79562lJqGUGVsK1ynr/exec";
 const LOGOTIPO_URL = "https://www.imagemhost.com.br/images/2024/11/22/Logo-novo-SENAI_-sem-slogan_755X325.png";
@@ -366,7 +377,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
             // Inicializa os slots dos dias
             planoFinal = validClassDays.map(() => ({
                 oque: [], como: [], recursos: [], instrumentos: [], criterios: [], situacaoAprendizagem: [],
-                onde: [], 
+                onde: [],
                 saep: "",
                 cargaHoraria: cargaDiaria.toString()
             }));
