@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressTextElement = document.getElementById('progress-text');
 
         const formData = new FormData(form);
-        // Endereço do servidor local do sistema
+        // Usa caminho relativo para funcionar em qualquer host/porta
         const backendUrl = '/gerar-plano';
 
         try {
@@ -63,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 Clique aqui para abrir a planilha
                             </a>
                         </div>`;
+                    } else if (message.startsWith('ERRO:')) {
+                        const userMessage = message.substring(5).trim() || 'Ocorreu um erro ao gerar o plano. Tente novamente em alguns instantes.';
+                        resultArea.innerHTML = `<p style="color: red; text-align: center;">❌ ${userMessage}</p>`;
                     } else if (progressTextElement) {
                         // Atualiza o texto do elemento em vez de criar um novo
                         progressTextElement.textContent = message;
@@ -71,9 +74,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } catch (error) {
-            console.error('Ocorreu um erro:', error);
-            // Em caso de erro, também atualiza a área de resultado
-            resultArea.innerHTML = `<p style="color: red;">❌ Erro: ${error.message}</p>`;
+            console.error('Ocorreu um erro ao comunicar com o servidor:', error);
+
+            const isNetworkError = error && error.name === 'TypeError';
+            const userMessage = isNetworkError
+                ? 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.'
+                : 'Ocorreu um erro ao processar sua solicitação. Tente novamente em alguns instantes.';
+
+            resultArea.innerHTML = `<p style="color: red; text-align: center;">❌ ${userMessage}</p>`;
         } finally {
             submitBtn.disabled = false;
             submitBtn.textContent = 'Gerar Plano de Curso';

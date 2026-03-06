@@ -1,4 +1,11 @@
 {
+  "name": "plano-generator",
+  "version": "1.0.0",
+  "description": "Aplicação para geração automática de planejamento docente com Gemini e Google Sheets.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "@google/genai": "^1.17.0",
     "@google/generative-ai": "^0.24.1",

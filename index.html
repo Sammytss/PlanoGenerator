@@ -254,8 +254,18 @@
                         </div>
                         <div class="form-group">
                             <label for="modality">Modalidade <span class="required">*</span></label>
-                            <input type="text" id="modality" name="modality" required
-                                placeholder="Ex: HABILITAÇÃO TÉCNICA">
+                            <select id="modality" name="modality" required>
+                                <option value="" disabled selected>Selecione a modalidade</option>
+                                <option value="Doutorado">Doutorado</option>
+                                <option value="Mestrado">Mestrado</option>
+                                <option value="Pós Graduação">Pós Graduação</option>
+                                <option value="Graduação">Graduação</option>
+                                <option value="Habilitação técnica">Habilitação técnica</option>
+                                <option value="Aprendizagem">Aprendizagem</option>
+                                <option value="Qualificação">Qualificação</option>
+                                <option value="Aperfeiçoamento">Aperfeiçoamento</option>
+                                <option value="Cursos Livres">Cursos Livres</option>
+                            </select>
                         </div>
                     </div>
                 </div>
