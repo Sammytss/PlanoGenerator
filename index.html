@@ -67,41 +67,23 @@
             </p>
 
             <div class="updates-container">
-                <h3 class="updates-header">✨ Novidades da Versão 2.0</h3>
+                <h3 class="updates-header">✨ Novidades da Versão 2.0.1</h3>
                 <div class="updates-list">
 
                     <div class="update-item">
-                        <div class="update-icon-box">🧠</div>
+                        <div class="update-icon-box">🏫</div>
                         <div class="update-text">
-                            <strong>Gemini 2.5 Pro estável</strong>
-                            <p>Maior tempo de pensamento, maior raciocínio e precisão nos resultados.</p>
-                        </div>
-                        <span class="badge-update">Update</span>
-                    </div>
-
-                    <div class="update-item">
-                        <div class="update-icon-box">✅</div>
-                        <div class="update-text">
-                            <strong>Correção de erro por aulas insuficientes para a quantidade de conteúdo.</strong>
-                            <p>Uma aula pode trabalhar vários tópicos que estão relacionados.</p>
-                        </div>
-                        <span class="badge-update">Update</span>
-                    </div>
-
-                    <div class="update-item">
-                        <div class="update-icon-box">🕓</div>
-                        <div class="update-text">
-                            <strong>Carga horária de 8 horas</strong>
-                            <p>Para aulas com 8 horas diárias, atendendo às sugestões da semana pedagógica.</p>
+                            <strong>Seleção de Unidade Escolar</strong>
+                            <p>Selecione primeiro o <strong>Estado</strong>, depois o <strong>Município</strong> e por fim a <strong>Unidade Escolar</strong> onde o curso será ministrado. A lista segue as unidades SENAI do Portal da Indústria.</p>
                         </div>
                         <span class="badge-new">Novo</span>
                     </div>
 
                     <div class="update-item">
-                        <div class="update-icon-box">❓</div>
+                        <div class="update-icon-box">📋</div>
                         <div class="update-text">
-                            <strong>Ajuda Contextual</strong>
-                            <p>Passe o mouse nos ícones (?) para dicas de preenchimento.</p>
+                            <strong>Modalidade em lista</strong>
+                            <p>O campo Modalidade passou a ser uma lista: Doutorado, Mestrado, Pós Graduação, Graduação, Habilitação técnica, Aprendizagem, Qualificação, Aperfeiçoamento e Cursos Livres. Para algumas modalidades, a coluna SAEP não aparece na planilha.</p>
                         </div>
                         <span class="badge-new">Novo</span>
                     </div>
@@ -228,25 +210,31 @@
                         <div class="section-icon">📋</div>
                         Informações Básicas
                     </div>
-
-                    <div class="form-group">
-                        <label for="estadoUnidade">Estado <span class="required">*</span></label>
-                        <select id="estadoUnidade" required>
-                            <option value="" disabled selected>Selecione o estado</option>
-                        </select>
+                    <div class="form-group-row">
+                        <div class="form-group">
+                            <label for="estadoUnidade" title="Selecione o estado onde fica a unidade SENAI">Estado <span class="required">*</span></label>
+                            <select id="estadoUnidade" required aria-describedby="tip-estado">
+                                <option value="" disabled selected>Selecione o estado</option>
+                            </select>
+                            <span id="tip-estado" class="sr-only">Primeiro passo: escolha o estado (UF) em que a unidade SENAI está localizada.</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="municipioUnidade" title="Selecione o município após escolher o estado">Município <span class="required">*</span></label>
+                            <select id="municipioUnidade" required disabled aria-describedby="tip-municipio">
+                                <option value="" disabled selected>Selecione primeiro o estado</option>
+                            </select>
+                            <span id="tip-municipio" class="sr-only">Segundo passo: após selecionar o estado, escolha o município da unidade.</span>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="municipioUnidade">Município <span class="required">*</span></label>
-                        <select id="municipioUnidade" required disabled>
-                            <option value="" disabled selected>Selecione primeiro o estado</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="unidadeEscolar">Unidade Escolar (SENAI) <span class="required">*</span></label>
-                        <select id="unidadeEscolar" name="unidadeEscolar" required disabled>
+                        <label for="unidadeEscolar" title="Selecione a unidade SENAI onde o curso será ministrado">Unidade Escolar (SENAI) <span class="required">*</span></label>
+                        <select id="unidadeEscolar" name="unidadeEscolar" required disabled aria-describedby="tip-unidade">
                             <option value="" disabled selected>Selecione primeiro o município</option>
                         </select>
-                        <p style="font-size: 0.8em; color: #666;">Unidade onde o curso será ministrado. Lista baseada no <a href="https://www.portaldaindustria.com.br/senai/canais/transparencia/unidades-nos-estados/" target="_blank" rel="noopener">Portal da Indústria SENAI</a>.</p>
+                        <span id="tip-unidade" class="sr-only">Terceiro passo: escolha a unidade escolar na lista. Se não encontrar, use a opção &quot;Outra (informar em observações)&quot;.</span>
+                        <p style="font-size: 0.8em; color: #666;">Unidade onde o curso será ministrado. Lista baseada no
+                            <a href="https://www.portaldaindustria.com.br/senai/canais/transparencia/unidades-nos-estados/"
+                                target="_blank" rel="noopener">Portal da Indústria SENAI</a>.</p>
                     </div>
 
                     <div class="form-group">

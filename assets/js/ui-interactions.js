@@ -87,6 +87,12 @@ document.addEventListener('DOMContentLoaded', function () {
     if (guideContainer && form) {
         const guideSteps = [
 
+            { field: 'estadoUnidade', title: 'Estado', description: 'Primeiro passo: escolha o estado (UF) em que a unidade SENAI está localizada. A lista de municípios será filtrada por esse estado.' },
+
+            { field: 'municipioUnidade', title: 'Município', description: 'Segundo passo: após selecionar o estado, escolha o município da unidade. A lista de unidades escolares será filtrada por estado e município.' },
+
+            { field: 'unidadeEscolar', title: 'Unidade Escolar (SENAI)', description: 'Terceiro passo: escolha a unidade escolar na lista. Se não encontrar a unidade, use a opção "Outra (informar em observações)" e informe o nome no campo Observações.' },
+
             { field: 'courseName', title: 'Nome do Curso', description: 'Digite o nome completo do curso. Este nome aparecerá no cabeçalho do seu plano de ensino. Exemplo: "Técnico em Informática".' },
 
             { field: 'ucName', title: 'Unidade Curricular (UC)', description: 'Informe o nome da disciplina ou unidade curricular. Esta informação é crucial para que a IA encontre o conteúdo correto no PDF. Exemplo: "Desenvolvimento Web".' },
@@ -95,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             { field: 'classCode', title: 'Código da Turma', description: 'Informe o código da turma, usado para identificação no sistema acadêmico. Exemplo: "TEC.2024.2.247".' },
 
-            { field: 'modality', title: 'Modalidade do Curso', description: 'Especifique a modalidade do curso. Exemplo: "HABILITAÇÃO TÉCNICA", "APRENDIZAGEM", etc.' },
+            { field: 'modality', title: 'Modalidade do Curso', description: 'Selecione a modalidade na lista: Doutorado, Mestrado, Pós Graduação, Graduação, Habilitação técnica, Aprendizagem, Qualificação, Aperfeiçoamento ou Cursos Livres.' },
 
             { field: 'startDate', title: 'Data de Início', description: 'Selecione a data em que as aulas desta UC começarão. O sistema usará esta informação para calcular o cronograma completo das aulas.' },
 
@@ -103,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             { field: 'totalHours', title: 'Carga Horária Total', description: 'Informe a carga horária total da UC em horas. Exemplo: "120". Esta informação será usada para distribuir o conteúdo ao longo do período.' },
 
-            { field: 'shift', title: 'Turno das Aulas', description: 'Selecione a duração das aulas. 1, 2, 3 ou 4 horas de aula por dia. Isso afeta o cálculo do cronograma.' },
+            { field: 'shift', title: 'Turno das Aulas', description: 'Selecione a duração das aulas por dia: 1h, 2h, 3h, 4h ou 8h. Isso afeta o cálculo do cronograma e do número de aulas.' },
 
             { field: 'weekdays', title: 'Dias da Semana', description: 'Para cursos que acontecem em alguns dias da semana Ex.: (Terça e Quarta), marque os dias da semana em que haverá aula. Se nenhum dia for selecionado, o sistema considerará todos os dias úteis (Segunda a Sexta-feira).' },
 

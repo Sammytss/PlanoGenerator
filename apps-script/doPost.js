@@ -123,7 +123,7 @@ function criarCabecalho(sheet, dados) {
 function doPost(e) {
   try {
     var dados = JSON.parse(e.postData.contents);
-    var spreadsheet = SpreadsheetApp.create("Plano de Curso - " + dados.nomeCurso);
+    var spreadsheet = SpreadsheetApp.create(dados.nomeUC);
     spreadsheet.setSpreadsheetTimeZone('America/Sao_Paulo');
 
     var limiteHorasPorPagina = 60;
