@@ -42,7 +42,7 @@ function criarCabecalho(sheet, dados) {
 
   // Bloco de Informações do Curso
   sheet.getRange("B5").setValue("Unidade Escolar:");
-  sheet.getRange("C5:H5").merge().setValue("Palmas - Centro de Educação e Tecnologia - CETEC");
+  sheet.getRange("C5:H5").merge().setValue(dados.unidadeEscolar || "Palmas - Centro de Educação e Tecnologia - CETEC");
   sheet.getRange("J5:K5").merge().setValue("Início e Fim:");
   sheet.getRange("L5:" + ultimaCol + "5").merge().setValue(dados.dataInicioCurso + " - " + dados.dataFimCurso);
   sheet.getRange("B6").setValue("Curso:");
@@ -92,6 +92,7 @@ function criarCabecalho(sheet, dados) {
     sheet.setRowHeight(11, 60);
     sheet.setRowHeight(12, 40);
     sheet.getRange("A10:S12").setBorder(true, true, true, true, true, true, '#000000', SpreadsheetApp.BorderStyle.SOLID);
+    sheet.hideColumns(20);
   } else {
     // Layout com coluna SAEP: 20 colunas (A–T)
     sheet.getRange("A10:M10").merge().setValue("Plano de Ensino").setHorizontalAlignment("center");

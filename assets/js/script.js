@@ -1,7 +1,61 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const form = document.getElementById('courseForm');
     const submitBtn = document.getElementById('submitBtn');
     const resultArea = document.getElementById('resultArea');
+    const selectEstado = document.getElementById('estadoUnidade');
+    const selectMunicipio = document.getElementById('municipioUnidade');
+    const selectUnidade = document.getElementById('unidadeEscolar');
+
+    let dadosUnidades = { estados: [], opcaoOutra: 'Outra (informar em observações)' };
+
+    // Carrega unidades SENAI por estado/município (assets/data/unidades-senai.json)
+    try {
+        const res = await fetch('/assets/data/unidades-senai.json');
+        if (res.ok) {
+            const data = await res.json();
+            if (data.estados && Array.isArray(data.estados)) dadosUnidades = data;
+        }
+    } catch (e) {
+        console.warn('Lista de unidades não carregada.', e);
+    }
+
+    // Preenche select de estado
+    if (selectEstado) {
+        selectEstado.innerHTML = '<option value="" disabled selected>Selecione o estado</option>' +
+            dadosUnidades.estados.map((e, i) => `<option value="${i}">${e.nome} (${e.sigla})</option>`).join('');
+    }
+
+    function esc(s) {
+        return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+    }
+
+    selectEstado.addEventListener('change', function () {
+        const idx = parseInt(this.value, 10);
+        selectMunicipio.disabled = true;
+        selectMunicipio.innerHTML = '<option value="" disabled selected>Selecione o município</option>';
+        selectUnidade.disabled = true;
+        selectUnidade.innerHTML = '<option value="" disabled selected>Selecione primeiro o município</option>';
+        if (isNaN(idx) || idx < 0 || !dadosUnidades.estados[idx]) return;
+        const municipios = dadosUnidades.estados[idx].municipios || [];
+        selectMunicipio.innerHTML = '<option value="" disabled selected>Selecione o município</option>' +
+            municipios.map((m, i) => `<option value="${i}">${esc(m.nome)}</option>`).join('');
+        selectMunicipio.disabled = false;
+    });
+
+    selectMunicipio.addEventListener('change', function () {
+        const estadoIdx = parseInt(selectEstado.value, 10);
+        const munIdx = parseInt(this.value, 10);
+        selectUnidade.disabled = true;
+        selectUnidade.innerHTML = '<option value="" disabled selected>Selecione a unidade</option>';
+        if (isNaN(estadoIdx) || isNaN(munIdx) || !dadosUnidades.estados[estadoIdx]) return;
+        const municipios = dadosUnidades.estados[estadoIdx].municipios || [];
+        const mun = municipios[munIdx];
+        if (!mun || !mun.unidades) return;
+        const unidades = mun.unidades.concat(dadosUnidades.opcaoOutra || 'Outra (informar em observações)');
+        selectUnidade.innerHTML = '<option value="" disabled selected>Selecione a unidade</option>' +
+            unidades.map(u => `<option value="${esc(u)}">${esc(u)}</option>`).join('');
+        selectUnidade.disabled = false;
+    });
 
     // URL do servidor backend
     // const backendUrl = 'http://localhost:3000/gerar-plano';

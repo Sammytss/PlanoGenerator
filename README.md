@@ -31,10 +31,12 @@ O objetivo do **Plano Generator** é otimizar o tempo e o esforço de instrutore
 - **Interface Web Intuitiva:** Um formulário simples para inserir todas as informações do curso e da Unidade Curricular.
 - **Extração Inteligente de PDF:** A IA analisa o PDF do Plano de Curso e extrai a lista de Conhecimentos, lidando com formatos complexos (listas hierárquicas com subtópicos) e formatos simples (listas de texto separadas por vírgula).
 - **Elaboração Pedagógica:** Para cada Conhecimento, a IA gera um plano detalhado, associando as Capacidades Técnicas corretas e sugerindo estratégias de ensino, instrumentos de avaliação e formatação de recursos didáticos (com ponto e vírgula e novas linhas).
+- **Seleção de Unidade Escolar:** Escolha em cascata (Estado → Município → Unidade) com base na lista de unidades SENAI do [Portal da Indústria](https://www.portaldaindustria.com.br/senai/canais/transparencia/unidades-nos-estados/).
+- **Modalidade do Curso:** Dropdown com categorias (Doutorado, Mestrado, Pós Graduação, Graduação, Habilitação técnica, Aprendizagem, Qualificação, Aperfeiçoamento, Cursos Livres). Para Aprendizagem, Qualificação, Aperfeiçoamento e Cursos Livres, a coluna SAEP é omitida na planilha.
 - **Agendamento Flexível:** Um sistema de cálculo de datas híbrido que permite:
   - Selecionar datas de aula específicas e não sequenciais através de um calendário.
   - Definir um padrão de aulas recorrentes (ex: todas as segundas e quartas).
-  - Suporte a cargas horárias diárias de **1, 2, 3 ou 4 horas**.
+  - Suporte a cargas horárias diárias de **1, 2, 3, 4 ou 8 horas**.
   - Considerar feriados e períodos de férias para um cronograma preciso.
 - **Central de Ajuda Integrada:** Um modal de ajuda que oferece duas formas de aprendizado:
   - **Guia Interativo:** Um tutorial passo a passo que guia o utilizador por cada campo do formulário.
@@ -48,7 +50,7 @@ O objetivo do **Plano Generator** é otimizar o tempo e o esforço de instrutore
 - **Frontend:** HTML5, CSS3, JavaScript
 - **Backend:** Node.js, Express.js
 - **Servidor:** Apache2 (como Proxy Reverso), PM2 (Gestor de Processos)
-- **IA Generativa:** Google Gemini Pro
+- **IA Generativa:** Google Gemini 2.5 Pro
 - **Geração de Planilhas:** Google Apps Script
 - **Dependências Principais:** `axios`, `cors`, `dotenv`, `multer`, `xlsx`, `@google/generative-ai`
 
@@ -78,29 +80,31 @@ Siga estes passos para executar a aplicação na sua máquina local para testes 
     ```
 
 3. **Configure o Backend:**
-    - Navegue até `assets/backend-planilhas/`.
-    - Crie um ficheiro chamado `.env`.
+    - Crie um ficheiro `.env` na **raiz do projeto**.
     - Adicione a sua chave de API:
       ```
       GEMINI_API_KEY=SUA_CHAVE_DE_API_AQUI
       ```
+    - (Opcional) `APPS_SCRIPT_URL` e `LOGOTIPO_URL` podem ser definidos no `.env` se precisar sobrescrever os valores padrão.
 
 4. **Configure o Google Apps Script:**
     - Crie um novo projeto em [script.google.com](https://script.google.com).
-    - Cole o conteúdo do seu ficheiro Apps Script (ex: `assets/AppScript/doPost_v52_16-09-25.js`) no editor.
+    - Cole o conteúdo do ficheiro `apps-script/doPost.js` no editor.
     - Clique em **Implantar > Nova implantação** (Tipo: "App da Web", Acesso: "Qualquer pessoa").
     - Copie a **URL do app da Web** gerada.
-    - Cole esta URL na constante `APPS_SCRIPT_URL` dentro do ficheiro `assets/backend-planilhas/server.js`.
+    - Adicione ao `.env`: `APPS_SCRIPT_URL=https://script.google.com/.../exec` (ou edite `src/config/index.js` se preferir).
 
-5. **Execute o Servidor Backend:**
+5. **Execute o Servidor:**
     A partir da pasta raiz do projeto:
     ```bash
-    node assets/backend-planilhas/server.js
+    npm start
     ```
-    O backend estará a rodar em `http://localhost:3000`.
+    Ou: `node server.js`
+    O servidor estará a rodar em `http://localhost:3000`.
 
-6. **Execute o Frontend:**
-    Basta abrir o ficheiro `index.html` diretamente no seu navegador.
+6. **Acesse a Aplicação:**
+    Abra o navegador em `http://localhost:3000`.
+
 
 ---
 
@@ -165,9 +169,9 @@ sudo chmod -R 755 .
 
 ### 4. Configuração do Backend
 
- **1. Navegue para a pasta do backend**
+ **1. Navegue para a raiz do projeto**
  ```bash
-cd assets/backend-planilhas/
+cd /var/www/PlanoGenerator
 ```
 
 **2. Crie o ficheiro .env para as suas chaves secretas**
@@ -177,41 +181,29 @@ nano .env
 
 **3. Adicione sua Chave de API do Google AI ao ficheiro:**
 ```bash
-    GEMINI_API_KEY=SUA_CHAVE_DE_API_AQUI
+GEMINI_API_KEY=SUA_CHAVE_DE_API_AQUI
+APPS_SCRIPT_URL=https://script.google.com/macros/s/.../exec
 ```
 
 **4. (IMPORTANTE) Configure o Apps Script:**
-   ***Certifique-se de que a constante APPS_SCRIPT_URL em server.js***
-    **contém o URL de implantação do seu Google Apps Script.**
+   - Cole o conteúdo de `apps-script/doPost.js` no Google Apps Script.
+   - Certifique-se de que `APPS_SCRIPT_URL` no `.env` contém o URL de implantação do seu App da Web.
 
-**5. Volte para a raiz do projeto e instale as dependências**
-```bash
-cd /var/www/PlanoGenerator
-```
-**6. Corrija a propriedade da pasta para garantir que as dependências funcionem 100% no servidor:**
-
+**5. Corrija a propriedade e instale as dependências:**
 ```bash
 sudo chown -R $(whoami) .
-```
-**7. Remova a instalação existente:**
-
-```bash
 rm -rf node_modules
 rm -f package-lock.json
-```
-**8. Agora, instale as dependências (sem sudo):**
-
-```bash
 npm install
 ```
-### 5. Executando o Backend com PM2
+### 5. Executando o Servidor com PM2
 
-Inicie o servidor backend com PM2:
+Inicie o servidor com PM2:
 
 **1. A partir da raiz do projeto (/var/www/PlanoGenerator)**
    **Inicie o servidor com PM2 (sem sudo!)**
 ```bash
-pm2 start assets/backend-planilhas/server.js --name PlanoGenerator
+pm2 start server.js --name PlanoGenerator
 ```
 **2. Verifique se o processo está online**
 ```bash
@@ -283,26 +275,33 @@ pm2 restart PlanoGenerator
 ## 📁 Estrutura do Projeto
 ```
 PlanoGenerator/
+├── apps-script/
+│   └── doPost.js              # Código Google Apps Script (planilha)
 ├── assets/
-│   ├── AppScript/
-│   │   └── doPost_v52_16-09-25.js
-│   ├── backend-planilhas/
-│   │   ├── .env
-│   │   └── server.js
 │   ├── css/
 │   │   └── style.css
+│   ├── data/
+│   │   └── unidades-senai.json # Unidades SENAI por estado/município
 │   ├── Images/
-│   │   └── (várias imagens .png, .svg)
+│   │   └── (imagens .png, .svg)
 │   └── js/
 │       ├── calendar-init.js
 │       ├── script.js
 │       └── ui-interactions.js
-├── node_modules/
+├── src/
+│   ├── config/
+│   │   ├── ai.js               # Configuração Gemini
+│   │   ├── index.js            # Variáveis de ambiente, CORS, URLs
+│   │   └── upload.js           # Configuração Multer
+│   └── services/
+│       └── planGenerator.js   # Lógica de geração do plano
+├── .env                        # Chaves (GEMINI_API_KEY, APPS_SCRIPT_URL)
 ├── .gitignore
 ├── index.html
-├── package-lock.json
 ├── package.json
-└── README.md
+├── package-lock.json
+├── README.md
+└── server.js                   # Entrypoint Express (servidor + rotas)
 ```
 ---
 

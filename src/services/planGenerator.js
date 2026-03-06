@@ -21,6 +21,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
     instructorName,
     classCode,
     modality,
+    unidadeEscolar,
     startDate,
     endDate,
     totalHours,
@@ -465,6 +466,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
     instrutor: instructorName,
     codigoTurma: classCode,
     modalidade: modality,
+    unidadeEscolar: unidadeEscolar || 'Palmas - Centro de Educação e Tecnologia - CETEC',
     dataInicioCurso: new Date(startDate + 'T00:00:00').toLocaleDateString(
       'pt-BR'
     ),

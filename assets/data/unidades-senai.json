@@ -1,0 +1,2680 @@
+{
+  "descricao": "Unidades SENAI por estado e município. Fonte: Portal da Indústria (https://www.portaldaindustria.com.br/senai/canais/transparencia/unidades-nos-estados/). Estrutura: estado → município → unidades. Atualize conforme necessário.",
+  "estados": [
+    {
+      "sigla": "AC",
+      "nome": "Acre",
+      "municipios": [
+        {
+          "nome": "Cruzeiro do Sul",
+          "unidades": [
+            "Cruzeiro do Sul - Unidade Integrada do Juruá"
+          ]
+        },
+        {
+          "nome": "Rio Branco",
+          "unidades": [
+            "Rio Branco - Escola SENAI",
+            "Rio Branco - HUB SENAI de Inovação e Tecnologia Carlos Takashi Sasai"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "AL",
+      "nome": "Alagoas",
+      "municipios": [
+        {
+          "nome": "Arapiraca",
+          "unidades": [
+            "Arapiraca - Unidade SESI/SENAI Arapiraca"
+          ]
+        },
+        {
+          "nome": "Maceió",
+          "unidades": [
+            "Maceió - Unidade SENAI Poço",
+            "Maceió - Unidade SESI/SENAI Benedito Bentes"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "AM",
+      "nome": "Amazonas",
+      "municipios": [
+        {
+          "nome": "Iranduba",
+          "unidades": [
+            "Iranduba - Agência SENAI Elias Jacob Benzecry"
+          ]
+        },
+        {
+          "nome": "Itacoatiara",
+          "unidades": [
+            "Itacoatiara - Agência SENAI Ernesto Jorge Talheimer"
+          ]
+        },
+        {
+          "nome": "Manaus",
+          "unidades": [
+            "Manaus - Escola SENAI Antônio Simões",
+            "Manaus - Escola SENAI Demóstenes Travessa",
+            "Manaus - Escola SENAI Waldemiro Lustoza",
+            "Manaus - Escola SENAI de Ações Móveis e Comunitárias"
+          ]
+        },
+        {
+          "nome": "Parintins",
+          "unidades": [
+            "Parintins - Escola SENAI Padre Francisco Luppino"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "AP",
+      "nome": "Amapá",
+      "municipios": [
+        {
+          "nome": "Laranjal do Jari",
+          "unidades": [
+            "Laranjal do Jari - Centro de Formação Profissional Vale do Jari"
+          ]
+        },
+        {
+          "nome": "Macapá",
+          "unidades": [
+            "Macapá - Escola Senai Macapá"
+          ]
+        },
+        {
+          "nome": "Santana",
+          "unidades": [
+            "Santana - Centro de Formação Profissional Santana"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "BA",
+      "nome": "Bahia",
+      "municipios": [
+        {
+          "nome": "Alagoinhas",
+          "unidades": [
+            "Alagoinhas - SENAI Alagoinhas"
+          ]
+        },
+        {
+          "nome": "Barreiras",
+          "unidades": [
+            "Barreiras - SENAI Barreiras"
+          ]
+        },
+        {
+          "nome": "Camaçari",
+          "unidades": [
+            "Camaçari - SENAI Camaçari"
+          ]
+        },
+        {
+          "nome": "Candeias",
+          "unidades": [
+            "Candeias - CFP Candeias"
+          ]
+        },
+        {
+          "nome": "Eunápolis",
+          "unidades": [
+            "Eunápolis - CFP Eunápolis"
+          ]
+        },
+        {
+          "nome": "Feira de Santana",
+          "unidades": [
+            "Feira de Santana - SENAI Feira de Santana"
+          ]
+        },
+        {
+          "nome": "Guanambi",
+          "unidades": [
+            "Guanambi - CFP Guanambí"
+          ]
+        },
+        {
+          "nome": "Ilhéus",
+          "unidades": [
+            "Ilhéus - SENAI Ilhéus"
+          ]
+        },
+        {
+          "nome": "Ipirá",
+          "unidades": [
+            "Ipirá - CFP Ipirá"
+          ]
+        },
+        {
+          "nome": "Jacobina",
+          "unidades": [
+            "Jacobina - CFP Jacobina"
+          ]
+        },
+        {
+          "nome": "Jequié",
+          "unidades": [
+            "Jequié - CFP Jequié"
+          ]
+        },
+        {
+          "nome": "Juazeiro",
+          "unidades": [
+            "Juazeiro - SENAI Juazeiro"
+          ]
+        },
+        {
+          "nome": "Lauro de Freitas",
+          "unidades": [
+            "Lauro de Freitas - SENAI - ITED",
+            "Lauro de Freitas - SENAI Lauro de Freitas"
+          ]
+        },
+        {
+          "nome": "Luís Eduardo Magalhães",
+          "unidades": [
+            "Luís Eduardo Magalhães - SENAI Luís Eduardo Magalhães"
+          ]
+        },
+        {
+          "nome": "Salvador",
+          "unidades": [
+            "Salvador - SENAI CIMATEC",
+            "Salvador - SENAI Dendezeiros"
+          ]
+        },
+        {
+          "nome": "Senhor do Bonfim",
+          "unidades": [
+            "Senhor do Bonfim - CFP Senhor do Bonfim"
+          ]
+        },
+        {
+          "nome": "Serrinha",
+          "unidades": [
+            "Serrinha - CFP Serrinha"
+          ]
+        },
+        {
+          "nome": "Simões Filho",
+          "unidades": [
+            "Simões Filho - CFP Simões Filho"
+          ]
+        },
+        {
+          "nome": "Teixeira de Freitas",
+          "unidades": [
+            "Teixeira de Freitas - CFP Teixeira de Freitas"
+          ]
+        },
+        {
+          "nome": "Vitória da Conquista",
+          "unidades": [
+            "Vitória da Conquista - SENAI Vitória da Conquista"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "CE",
+      "nome": "Ceará",
+      "municipios": [
+        {
+          "nome": "Fortaleza",
+          "unidades": [
+            "Fortaleza - SENAI Barra do Ceará",
+            "Fortaleza - SENAI Centro",
+            "Fortaleza - SENAI Parangaba"
+          ]
+        },
+        {
+          "nome": "Juazeiro do Norte",
+          "unidades": [
+            "Juazeiro do Norte - SENAI Juazeiro do Norte"
+          ]
+        },
+        {
+          "nome": "Maracanaú",
+          "unidades": [
+            "Maracanaú - Instituto SENAI de Tecnologia em Energias",
+            "Maracanaú - Instituto Senai de Tecnologia em Eletrometalmecânica (ISTEMM)",
+            "Maracanaú - SENAI Maracanaú"
+          ]
+        },
+        {
+          "nome": "Sobral",
+          "unidades": [
+            "Sobral - SENAI Sobral"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "DF",
+      "nome": "Distrito Federal",
+      "municipios": [
+        {
+          "nome": "Brasília",
+          "unidades": [
+            "Brasília - SENAI Gama",
+            "Brasília - SENAI SIG",
+            "Brasília - SENAI Sobradinho",
+            "Brasília - SENAI Taguatinga"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "ES",
+      "nome": "Espírito Santo",
+      "municipios": [
+        {
+          "nome": "Anchieta",
+          "unidades": [
+            "Anchieta - CEP Lucas Izoton Vieira - SENAI Anchieta"
+          ]
+        },
+        {
+          "nome": "Aracruz",
+          "unidades": [
+            "Aracruz - CEP Sérgio Rogério de Castro - SENAI Aracruz"
+          ]
+        },
+        {
+          "nome": "Cachoeiro de Itapemirim",
+          "unidades": [
+            "Cachoeiro de Itapemirim - CEP Aureo Vianna Mameri - SENAI Cachoeiro"
+          ]
+        },
+        {
+          "nome": "Colatina",
+          "unidades": [
+            "Colatina - CEP Albano Franco - SENAI Colatina"
+          ]
+        },
+        {
+          "nome": "Linhares",
+          "unidades": [
+            "Linhares - CEP Eurico de Aguiar Salles - SENAI Linhares"
+          ]
+        },
+        {
+          "nome": "Serra",
+          "unidades": [
+            "Serra - CEP Jones Santos Neves - SENAI Civit"
+          ]
+        },
+        {
+          "nome": "São Mateus",
+          "unidades": [
+            "São Mateus - CEP de São Mateus - SENAI São Mateus"
+          ]
+        },
+        {
+          "nome": "Vila Velha",
+          "unidades": [
+            "Vila Velha - CEP Hélcio Rezende Dias - SENAI Araçás"
+          ]
+        },
+        {
+          "nome": "Vitória",
+          "unidades": [
+            "Vitória - Centro de Educação e Tecnologia Arivaldo Silveira Fontes - SENAI Vitória",
+            "Vitória - Centro de Inovação Industrial",
+            "Vitória - Instituto SENAI de Tecnologia em Eficiência Operacional",
+            "Vitória - SENAI Porto Vitória"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "GO",
+      "nome": "Goiás",
+      "municipios": [
+        {
+          "nome": "Anápolis",
+          "unidades": [
+            "Anápolis - Faculdade de Tecnologia SENAI Roberto Mange"
+          ]
+        },
+        {
+          "nome": "Aparecida de Goiânia",
+          "unidades": [
+            "Aparecida de Goiânia - Escola SENAI Dr. Celso Charuri",
+            "Aparecida de Goiânia - Unidade Integrada SESI SENAI Aparecida de Goiânia"
+          ]
+        },
+        {
+          "nome": "Barro Alto",
+          "unidades": [
+            "Barro Alto - Unidade Integrada SESI/SENAI Barro Alto"
+          ]
+        },
+        {
+          "nome": "Catalão",
+          "unidades": [
+            "Catalão - Escola SENAI de Catalão"
+          ]
+        },
+        {
+          "nome": "Goiânia",
+          "unidades": [
+            "Goiânia - Escola SENAI  Vila Canaã",
+            "Goiânia - Escola SESI SENAI Jardim Colorado",
+            "Goiânia - Faculdade SENAI Fatesg",
+            "Goiânia - Faculdade de Tecnologia SENAI Ítalo Bologna",
+            "Goiânia - IST Alimentos e Bebidas GO",
+            "Goiânia - IST Automação GO"
+          ]
+        },
+        {
+          "nome": "Itumbiara",
+          "unidades": [
+            "Itumbiara - Escola SENAI de Itumbiara"
+          ]
+        },
+        {
+          "nome": "Jataí",
+          "unidades": [
+            "Jataí - Unidade Integrada SESI SENAI Jataí"
+          ]
+        },
+        {
+          "nome": "Minaçu",
+          "unidades": [
+            "Minaçu - Unidade Integrada SESI SENAI Sama"
+          ]
+        },
+        {
+          "nome": "Mineiros",
+          "unidades": [
+            "Mineiros - Unidade Integrada SESI SENAI Mineiros"
+          ]
+        },
+        {
+          "nome": "Niquelândia",
+          "unidades": [
+            "Niquelândia - Unidade Integrada SESI SENAI Niquelândia"
+          ]
+        },
+        {
+          "nome": "Quirinópolis",
+          "unidades": [
+            "Quirinópolis - Unidade Integrada SESI/SENAI Quirinópolis"
+          ]
+        },
+        {
+          "nome": "Rio Verde",
+          "unidades": [
+            "Rio Verde - Unidade Integrada SESI SENAI Rio Verde"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "MA",
+      "nome": "Maranhão",
+      "municipios": [
+        {
+          "nome": "Açailândia",
+          "unidades": [
+            "Açailândia - Centro de Educação Profissional  e Tecnológica Rafael Esmeraldo Lucchesi Ramacciotti"
+          ]
+        },
+        {
+          "nome": "Bacabal",
+          "unidades": [
+            "Bacabal - Centro de Educação Profissional e Tecnológica Bacabal"
+          ]
+        },
+        {
+          "nome": "Balsas",
+          "unidades": [
+            "Balsas - Centro de Educação Profissional e Tecnológica Emerson Fernandes dos Santos"
+          ]
+        },
+        {
+          "nome": "Caxias",
+          "unidades": [
+            "Caxias - Centro de Educação Profissional e Tecnológica Caxias"
+          ]
+        },
+        {
+          "nome": "Imperatriz",
+          "unidades": [
+            "Imperatriz - Centro de Educação Profissional e Tecnológica Imperatriz"
+          ]
+        },
+        {
+          "nome": "Rosário",
+          "unidades": [
+            "Rosário - Centro de Educação Profissional e Tecnológica - Cristiana Parisi de Andrade"
+          ]
+        },
+        {
+          "nome": "São Luís",
+          "unidades": [
+            "São Luís - Centro de Educação Profissional e Tecnológica Distrito Industrial",
+            "São Luís - Centro de Educação Profissional e Tecnológica Raimundo Franco Teixeira"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "MG",
+      "nome": "Minas Gerais",
+      "municipios": [
+        {
+          "nome": "Araguari",
+          "unidades": [
+            "Araguari - SENAI Araguari CFP Mário Abdalla"
+          ]
+        },
+        {
+          "nome": "Araxá",
+          "unidades": [
+            "Araxá - SENAI Araxá CFP Djalma Guimarães"
+          ]
+        },
+        {
+          "nome": "Arcos",
+          "unidades": [
+            "Arcos - SENAI Arcos CFP Eliezer Vitorino Costa"
+          ]
+        },
+        {
+          "nome": "Barbacena",
+          "unidades": [
+            "Barbacena - SENAI Barbacena CFP Olavo Machado"
+          ]
+        },
+        {
+          "nome": "Barão de Cocais",
+          "unidades": [
+            "Barão de Cocais - SENAI Barão de Cocais CFP Guilherme Caldas Emrich"
+          ]
+        },
+        {
+          "nome": "Belo Horizonte",
+          "unidades": [
+            "Belo Horizonte - Centro de Inovação e Tecnologia SENAI FIEMG",
+            "Belo Horizonte - SENAI Belo Horizonte CFP Américo Renê Giannetti",
+            "Belo Horizonte - SENAI Belo Horizonte CFP Nansen Araújo",
+            "Belo Horizonte - SENAI Belo Horizonte CFP Paulo de Tarso",
+            "Belo Horizonte - SENAI Belo Horizonte Centro de Treinamento da Tecnologia da Informação",
+            "Belo Horizonte - SENAI Belo Horizonte Horto"
+          ]
+        },
+        {
+          "nome": "Betim",
+          "unidades": [
+            "Betim - SENAI Betim CETEM Maria Madalena Nogueira",
+            "Betim - SENAI Betim Centro de Treinamento e Desenvolvimento Maurício Roscoe"
+          ]
+        },
+        {
+          "nome": "Cataguases",
+          "unidades": [
+            "Cataguases - SENAI Cataguases CFP José Ignácio Peixoto"
+          ]
+        },
+        {
+          "nome": "Cláudio",
+          "unidades": [
+            "Cláudio - SENAI Cláudio CFP Risoleta Tolentino Neves"
+          ]
+        },
+        {
+          "nome": "Conceição do Mato Dentro",
+          "unidades": [
+            "Conceição do Mato Dentro - SENAI Conceição do Mato Dentro CFP José Aparecido de Oliveira"
+          ]
+        },
+        {
+          "nome": "Contagem",
+          "unidades": [
+            "Contagem - Centro de Desenvolvimento e Treinamento da Indústria 4.0",
+            "Contagem - SENAI Centro de Treinamento e Desenvolvimento da Indústria 4.0",
+            "Contagem - SENAI Contagem CEDETEM Petronio Machado Zica",
+            "Contagem - SENAI Contagem CFP Alvimar Carneiro Rezende",
+            "Contagem - SENAI Contagem CFP Euvaldo Lodi",
+            "Contagem - SENAI Contagem UI Nenem Scariolli"
+          ]
+        },
+        {
+          "nome": "Divinópolis",
+          "unidades": [
+            "Divinópolis - SENAI Divinópolis CFP Anielo Greco"
+          ]
+        },
+        {
+          "nome": "Extrema",
+          "unidades": [
+            "Extrema - SENAI Extrema CFP Janez Hlebanja"
+          ]
+        },
+        {
+          "nome": "Formiga",
+          "unidades": [
+            "Formiga - SENAI Formiga CT Luiz Rodrigues da Costa"
+          ]
+        },
+        {
+          "nome": "Governador Valadares",
+          "unidades": [
+            "Governador Valadares - SENAI Governador Valadares CFP Luiz Chaves"
+          ]
+        },
+        {
+          "nome": "Ipatinga",
+          "unidades": [
+            "Ipatinga - SENAI Ipatinga CFP Rinaldo Campos Soares"
+          ]
+        },
+        {
+          "nome": "Itabira",
+          "unidades": [
+            "Itabira - SENAI Itabira CFP Pedro Martins Guerra"
+          ]
+        },
+        {
+          "nome": "Itabirito",
+          "unidades": [
+            "Itabirito - SENAI Itabirito CFP Laércio Garcia Nogueira"
+          ]
+        },
+        {
+          "nome": "Itajubá",
+          "unidades": [
+            "Itajubá - SENAI Itajubá CFP Aureliano Chaves"
+          ]
+        },
+        {
+          "nome": "Itaúna",
+          "unidades": [
+            "Itaúna - SENAI Itaúna CETEF Marcelino Corradi"
+          ]
+        },
+        {
+          "nome": "Ituiutaba",
+          "unidades": [
+            "Ituiutaba - SENAI Ituiutaba CFP Bebé Martins"
+          ]
+        },
+        {
+          "nome": "João Monlevade",
+          "unidades": [
+            "João Monlevade - SENAI João Monlevade CFP Nansen Araújo"
+          ]
+        },
+        {
+          "nome": "Juiz de Fora",
+          "unidades": [
+            "Juiz de Fora - SENAI Juiz de Fora CFP José Fagundes Netto",
+            "Juiz de Fora - SENAI Juiz de Fora UI Luiz Adelar Scheuer"
+          ]
+        },
+        {
+          "nome": "Mariana",
+          "unidades": [
+            "Mariana - SENAI Mariana CFP Dr. José Luciano Duarte Penido"
+          ]
+        },
+        {
+          "nome": "Montes Claros",
+          "unidades": [
+            "Montes Claros - SENAI Montes Claros CFP Luiz de Paula"
+          ]
+        },
+        {
+          "nome": "Muriaé",
+          "unidades": [
+            "Muriaé - SENAI Muriaé CFP Cézar Augusto Bianchi Botaro"
+          ]
+        },
+        {
+          "nome": "Nova Lima",
+          "unidades": [
+            "Nova Lima - SENAI Nova Lima CFP Afonso Greco"
+          ]
+        },
+        {
+          "nome": "Nova Serrana",
+          "unidades": [
+            "Nova Serrana - SENAI Nova Serrana CFP Geny José Ferreira"
+          ]
+        },
+        {
+          "nome": "Ouro Branco",
+          "unidades": [
+            "Ouro Branco - SENAI Ouro Branco Centro de Formação Profissional"
+          ]
+        },
+        {
+          "nome": "Paracatu",
+          "unidades": [
+            "Paracatu - SENAI Paracatu CFP Epitácio Cardoso Naves"
+          ]
+        },
+        {
+          "nome": "Pará de Minas",
+          "unidades": [
+            "Pará de Minas - SENAI Pará de Minas CFP Dr. Celso Charurí"
+          ]
+        },
+        {
+          "nome": "Patos de Minas",
+          "unidades": [
+            "Patos de Minas - SENAI Patos de Minas CFP Anávio Braz de Queiroz"
+          ]
+        },
+        {
+          "nome": "Pedro Leopoldo",
+          "unidades": [
+            "Pedro Leopoldo - SENAI Pedro Leopoldo CFP Gerson Dias"
+          ]
+        },
+        {
+          "nome": "Pirapora",
+          "unidades": [
+            "Pirapora - SENAI Pirapora Centro de Treinamento"
+          ]
+        },
+        {
+          "nome": "Ponte Nova",
+          "unidades": [
+            "Ponte Nova - SENAI Ponte Nova CFP São Vicente de Paulo"
+          ]
+        },
+        {
+          "nome": "Pouso Alegre",
+          "unidades": [
+            "Pouso Alegre - SENAI Pouso Alegre CFP Orlando Chiarini"
+          ]
+        },
+        {
+          "nome": "Poços de Caldas",
+          "unidades": [
+            "Poços de Caldas - SENAI Poços de Caldas CFP João Moreira Salles"
+          ]
+        },
+        {
+          "nome": "Santa Luzia de Caratinga",
+          "unidades": [
+            "Santa Luzia de Caratinga - SENAI Santa Luzia CFP João Carlos Giovannini"
+          ]
+        },
+        {
+          "nome": "Santa Rita do Sapucaí",
+          "unidades": [
+            "Santa Rita do Sapucaí - SENAI Santa Rita do Sapucaí CDTSVE Stefan Bogdan Salej"
+          ]
+        },
+        {
+          "nome": "Santo Antônio do Monte",
+          "unidades": [
+            "Santo Antônio do Monte - SENAI Santo Antônio do Monte CTP Oscar José do Nascimento"
+          ]
+        },
+        {
+          "nome": "Sete Lagoas",
+          "unidades": [
+            "Sete Lagoas - SENAI Sete Lagoas Fundação Zerrenner"
+          ]
+        },
+        {
+          "nome": "São Gonçalo do Pará",
+          "unidades": [
+            "São Gonçalo do Pará - SENAI São Gonçalo do Pará CT Luiz Nogueira da Silva"
+          ]
+        },
+        {
+          "nome": "São Gonçalo do Rio Abaixo",
+          "unidades": [
+            "São Gonçalo do Rio Abaixo - SENAI São Gonçalo do Rio Abaixo CFP José Fernando Coura"
+          ]
+        },
+        {
+          "nome": "São João Del Rei",
+          "unidades": [
+            "São João Del Rei - SENAI São João Del Rei CFP Sílvio Assunção Teixeira"
+          ]
+        },
+        {
+          "nome": "São João Nepomuceno",
+          "unidades": [
+            "São João Nepomuceno - SENAI São João Nepomuceno UI Robson Braga de Andrade"
+          ]
+        },
+        {
+          "nome": "São Sebastião do Paraíso",
+          "unidades": [
+            "São Sebastião do Paraíso - SENAI São Sebastião do Paraíso CFP Monsenhor Jerônimo Mancini"
+          ]
+        },
+        {
+          "nome": "Timóteo",
+          "unidades": [
+            "Timóteo - SENAI Timóteo CFP Luciano José de Araújo"
+          ]
+        },
+        {
+          "nome": "Três Marias",
+          "unidades": [
+            "Três Marias - SENAI Três Marias CFP Ademar Marra"
+          ]
+        },
+        {
+          "nome": "Turmalina",
+          "unidades": [
+            "Turmalina - SENAI Turmalina Centro de Formação Profissional"
+          ]
+        },
+        {
+          "nome": "Uberaba",
+          "unidades": [
+            "Uberaba - SENAI Uberaba CFP Fidélis Reis"
+          ]
+        },
+        {
+          "nome": "Uberlândia",
+          "unidades": [
+            "Uberlândia - SENAI Uberlândia CETAL Fábio de Araújo Motta",
+            "Uberlândia - SENAI Uberlândia CFP Dr. Celso Charuri",
+            "Uberlândia - SENAI Uberlândia CFP Fábio de Araújo Motta"
+          ]
+        },
+        {
+          "nome": "Ubá",
+          "unidades": [
+            "Ubá - SENAI Ubá CFP José Alencar Gomes da Silva"
+          ]
+        },
+        {
+          "nome": "Varginha",
+          "unidades": [
+            "Varginha - SENAI Varginha CFP Aloysio Ribeiro de Almeida"
+          ]
+        },
+        {
+          "nome": "Vazante",
+          "unidades": [
+            "Vazante - SENAI Vazante CFP Marcelo Ianhez"
+          ]
+        },
+        {
+          "nome": "Vespasiano",
+          "unidades": [
+            "Vespasiano - SENAI Vespasiano CFP Luiz César Albertini"
+          ]
+        },
+        {
+          "nome": "Visconde do Rio Branco",
+          "unidades": [
+            "Visconde do Rio Branco - SENAI Visconde do Rio Branco CFP Silvio Benatti"
+          ]
+        },
+        {
+          "nome": "Várzea da Palma",
+          "unidades": [
+            "Várzea da Palma - SENAI Várzea da Palma CFP Joaquim de Paula Ferreira"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "MS",
+      "nome": "Mato Grosso do Sul",
+      "municipios": [
+        {
+          "nome": "Aparecida do Taboado",
+          "unidades": [
+            "Aparecida do Taboado - Centro Integrado SESI/SENAI Aparecida do Taboado"
+          ]
+        },
+        {
+          "nome": "Campo Grande",
+          "unidades": [
+            "Campo Grande - Faculdade SENAI de Construção",
+            "Campo Grande - Faculdade de Tecnologia SENAI Campo Grande",
+            "Campo Grande - Instituto SENAI de Tecnologia em Eficiência  Operacional"
+          ]
+        },
+        {
+          "nome": "Corumbá",
+          "unidades": [
+            "Corumbá - SENAI Corumbá"
+          ]
+        },
+        {
+          "nome": "Dourados",
+          "unidades": [
+            "Dourados - Faculdade de Tecnologia SENAI Dourados"
+          ]
+        },
+        {
+          "nome": "Maracaju",
+          "unidades": [
+            "Maracaju - Centro Integrado SESI/SENAI Maracaju"
+          ]
+        },
+        {
+          "nome": "Naviraí",
+          "unidades": [
+            "Naviraí - Centro de Educação e Tecnologia Naviraí"
+          ]
+        },
+        {
+          "nome": "Rio Verde de Mato Grosso",
+          "unidades": [
+            "Rio Verde de Mato Grosso - Agência SENAI Rio Verde de Mato Grosso \"Luiz Cláudio Sabedotti Fornari\""
+          ]
+        },
+        {
+          "nome": "Sidrolândia",
+          "unidades": [
+            "Sidrolândia - Agência SENAI Sidrolândia"
+          ]
+        },
+        {
+          "nome": "Sonora",
+          "unidades": [
+            "Sonora - Agência SENAI Sonora"
+          ]
+        },
+        {
+          "nome": "Três Lagoas",
+          "unidades": [
+            "Três Lagoas - Instituto SENAI de Inovação Biomassa",
+            "Três Lagoas - SENAI Três Lagoas \"José Paulo Rimolí\""
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "MT",
+      "nome": "Mato Grosso",
+      "municipios": [
+        {
+          "nome": "Alta Floresta",
+          "unidades": [
+            "Alta Floresta - SENAI Alta Floresta"
+          ]
+        },
+        {
+          "nome": "Aripuanã",
+          "unidades": [
+            "Aripuanã - SENAI Aripuanã"
+          ]
+        },
+        {
+          "nome": "Barra do Bugres",
+          "unidades": [
+            "Barra do Bugres - SENAI Barra do Bugres"
+          ]
+        },
+        {
+          "nome": "Cuiabá",
+          "unidades": [
+            "Cuiabá - Instituto SENAI de Tecnologia de Mato Grosso",
+            "Cuiabá - SENAI Distrito Industrial de Cuiabá",
+            "Cuiabá - SENAI PORTO"
+          ]
+        },
+        {
+          "nome": "Cáceres",
+          "unidades": [
+            "Cáceres - SENAI Caceres"
+          ]
+        },
+        {
+          "nome": "Juína",
+          "unidades": [
+            "Juína - SENAI Juína"
+          ]
+        },
+        {
+          "nome": "Lucas do Rio Verde",
+          "unidades": [
+            "Lucas do Rio Verde - SENAI Lucas do Rio Verde"
+          ]
+        },
+        {
+          "nome": "Nova Mutum",
+          "unidades": [
+            "Nova Mutum - SENAI Nova Mutum"
+          ]
+        },
+        {
+          "nome": "Querência",
+          "unidades": [
+            "Querência - SENAI QUERÊNCIA",
+            "Querência - SENAI Querência"
+          ]
+        },
+        {
+          "nome": "Rondonópolis",
+          "unidades": [
+            "Rondonópolis - SENAI Rondonópolis"
+          ]
+        },
+        {
+          "nome": "Sinop",
+          "unidades": [
+            "Sinop - SENAI Sinop"
+          ]
+        },
+        {
+          "nome": "Sorriso",
+          "unidades": [
+            "Sorriso - SENAI Sorriso"
+          ]
+        },
+        {
+          "nome": "Várzea Grande",
+          "unidades": [
+            "Várzea Grande - SENAI Várzea-Grande"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "PA",
+      "nome": "Pará",
+      "municipios": [
+        {
+          "nome": "Altamira",
+          "unidades": [
+            "Altamira - SENAI - PA CEP Altamira"
+          ]
+        },
+        {
+          "nome": "Barcarena",
+          "unidades": [
+            "Barcarena - SENAI- PA CEP Barcarena"
+          ]
+        },
+        {
+          "nome": "Belém",
+          "unidades": [
+            "Belém - Escola SENAI DE Panificação e Confeitaria",
+            "Belém - SENAI - PA CEDAM",
+            "Belém - SENAI - PA CEP Getúlio Vargas",
+            "Belém - SENAI - PA ISI - Instituto SENAI de Inovação em Tecnologias Minerais"
+          ]
+        },
+        {
+          "nome": "Bragança",
+          "unidades": [
+            "Bragança - SENAI - PA CEP Bragança"
+          ]
+        },
+        {
+          "nome": "Cametá",
+          "unidades": [
+            "Cametá - SENAI - PA CIEP Cameta"
+          ]
+        },
+        {
+          "nome": "Canaã dos Carajás",
+          "unidades": [
+            "Canaã dos Carajás - SENAI-PA CEP Canaã dos Carajas"
+          ]
+        },
+        {
+          "nome": "Castanhal",
+          "unidades": [
+            "Castanhal - SENAI-PA CEP Gabriel Hermes"
+          ]
+        },
+        {
+          "nome": "Juruti",
+          "unidades": [
+            "Juruti - SENAI - PA CEP Juruti"
+          ]
+        },
+        {
+          "nome": "Marabá",
+          "unidades": [
+            "Marabá - SENAI-PA CEP Marabá"
+          ]
+        },
+        {
+          "nome": "Paragominas",
+          "unidades": [
+            "Paragominas - SENAI-PA CEP Paragominas"
+          ]
+        },
+        {
+          "nome": "Parauapebas",
+          "unidades": [
+            "Parauapebas - SENAI-PA CEP Parauapebas"
+          ]
+        },
+        {
+          "nome": "Santarém",
+          "unidades": [
+            "Santarém - SENAI-PA CEP Santarém"
+          ]
+        },
+        {
+          "nome": "São Miguel do Guamá",
+          "unidades": [
+            "São Miguel do Guamá - SENAI- PA CEP São Miguel do Guama"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "PB",
+      "nome": "Paraíba",
+      "municipios": [
+        {
+          "nome": "Bayeux",
+          "unidades": [
+            "Bayeux - Centro de Formação Prof. Eng. Jose William Lemos Leal"
+          ]
+        },
+        {
+          "nome": "Caaporã",
+          "unidades": [
+            "Caaporã - Centro de Formação Profissional Robson Braga de Andrade"
+          ]
+        },
+        {
+          "nome": "Campina Grande",
+          "unidades": [
+            "Campina Grande - Centro de Ações Móveis - CAM",
+            "Campina Grande - Centro de Formação Profissional Professor Stenio Lopes",
+            "Campina Grande - Centro de Inovação e Tecnologia Industrial - CITI",
+            "Campina Grande - Centro de Tecnologia do Couro e do Calçado Albano Franco",
+            "Campina Grande - Instituto SENAI de Tecnologia em Eficiência Operacional"
+          ]
+        },
+        {
+          "nome": "João Pessoa",
+          "unidades": [
+            "João Pessoa - Centro de Educação Profissional Odilon Ribeiro Coutinho",
+            "João Pessoa - Faculdade SENAI da Paraíba",
+            "João Pessoa - Instituto SENAI de Tecnologia em Têxtil e Confecção"
+          ]
+        },
+        {
+          "nome": "Sousa",
+          "unidades": [
+            "Sousa - Centro de Formação Profissional Miriam Benevides Gadelha"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "PE",
+      "nome": "Pernambuco",
+      "municipios": [
+        {
+          "nome": "Araripina",
+          "unidades": [
+            "Araripina - Escola Técnica SENAI Araripina"
+          ]
+        },
+        {
+          "nome": "Belo Jardim",
+          "unidades": [
+            "Belo Jardim - Escola Técnica SENAI Belo Jardim"
+          ]
+        },
+        {
+          "nome": "Cabo de Santo Agostinho",
+          "unidades": [
+            "Cabo de Santo Agostinho - Escola Técnica SENAI Cabo de Santo Agostinho"
+          ]
+        },
+        {
+          "nome": "Caruaru",
+          "unidades": [
+            "Caruaru - Escola Técnica SENAI Caruaru"
+          ]
+        },
+        {
+          "nome": "Goiana",
+          "unidades": [
+            "Goiana - Escola Técnica SENAI Goiana"
+          ]
+        },
+        {
+          "nome": "Ipojuca",
+          "unidades": [
+            "Ipojuca - Escola Técnica SENAI Ipojuca"
+          ]
+        },
+        {
+          "nome": "Paulista",
+          "unidades": [
+            "Paulista - Escola Técnica SENAI Paulista"
+          ]
+        },
+        {
+          "nome": "Petrolina",
+          "unidades": [
+            "Petrolina - Escola Técnica SENAI Petrolina"
+          ]
+        },
+        {
+          "nome": "Recife",
+          "unidades": [
+            "Recife - Escola Técnica SENAI Areias",
+            "Recife - Escola Técnica SENAI Santo Amaro",
+            "Recife - Escola Técnica SENAI Água Fria"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "PI",
+      "nome": "Piauí",
+      "municipios": [
+        {
+          "nome": "Parnaíba",
+          "unidades": [
+            "Parnaíba - Centro de Formação Profissional José de Moraes Correia"
+          ]
+        },
+        {
+          "nome": "Teresina",
+          "unidades": [
+            "Teresina - Centro de Formação Profissional Cândido Athayde",
+            "Teresina - Centro de Tecnologia da Cerâmica Wildson Gonçalves",
+            "Teresina - Centro de Tecnologia em Alimentos"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "PR",
+      "nome": "Paraná",
+      "municipios": [
+        {
+          "nome": "Ampére",
+          "unidades": [
+            "Ampére - SENAI - Ampére"
+          ]
+        },
+        {
+          "nome": "Apucarana",
+          "unidades": [
+            "Apucarana - SENAI - Apucarana II"
+          ]
+        },
+        {
+          "nome": "Arapongas",
+          "unidades": [
+            "Arapongas - SENAI - Arapongas"
+          ]
+        },
+        {
+          "nome": "Campo Largo",
+          "unidades": [
+            "Campo Largo - SENAI - Campo Largo"
+          ]
+        },
+        {
+          "nome": "Campo Mourão",
+          "unidades": [
+            "Campo Mourão - SENAI - Campo Mourão"
+          ]
+        },
+        {
+          "nome": "Capanema",
+          "unidades": [
+            "Capanema - SENAI - Capanema"
+          ]
+        },
+        {
+          "nome": "Cascavel",
+          "unidades": [
+            "Cascavel - SENAI - Cascavel"
+          ]
+        },
+        {
+          "nome": "Cianorte",
+          "unidades": [
+            "Cianorte - SENAI - Cianorte"
+          ]
+        },
+        {
+          "nome": "Colombo",
+          "unidades": [
+            "Colombo - SENAI - Colombo"
+          ]
+        },
+        {
+          "nome": "Curitiba",
+          "unidades": [
+            "Curitiba - SENAI - Boqueirão",
+            "Curitiba - SENAI - CIC",
+            "Curitiba - SENAI - Campus da Indústria",
+            "Curitiba - SENAI - Dr. Celso Charuri",
+            "Curitiba - SENAI - Portão",
+            "Curitiba - SENAI PAROLIN"
+          ]
+        },
+        {
+          "nome": "Dois Vizinhos",
+          "unidades": [
+            "Dois Vizinhos - SENAI - Dois Vizinhos"
+          ]
+        },
+        {
+          "nome": "Foz do Iguaçu",
+          "unidades": [
+            "Foz do Iguaçu - SENAI - Foz do Iguaçu"
+          ]
+        },
+        {
+          "nome": "Francisco Beltrão",
+          "unidades": [
+            "Francisco Beltrão - SENAI - Francisco Beltrão"
+          ]
+        },
+        {
+          "nome": "Guarapuava",
+          "unidades": [
+            "Guarapuava - SENAI - Guarapuava"
+          ]
+        },
+        {
+          "nome": "Irati",
+          "unidades": [
+            "Irati - SENAI - Irati"
+          ]
+        },
+        {
+          "nome": "Jaguariaíva",
+          "unidades": [
+            "Jaguariaíva - SENAI - Jaguariaíva"
+          ]
+        },
+        {
+          "nome": "Londrina",
+          "unidades": [
+            "Londrina - SENAI - Londrina",
+            "Londrina - SENAI DR. CELSO CHARURI LONDRINA"
+          ]
+        },
+        {
+          "nome": "Marechal Cândido Rondon",
+          "unidades": [
+            "Marechal Cândido Rondon - SENAI - Marechal Cândido Rondon"
+          ]
+        },
+        {
+          "nome": "Maringá",
+          "unidades": [
+            "Maringá - SENAI - Maringá",
+            "Maringá - SENAI - Maringá CTM"
+          ]
+        },
+        {
+          "nome": "Medianeira",
+          "unidades": [
+            "Medianeira - SENAI MEDIANEIRA"
+          ]
+        },
+        {
+          "nome": "Palmas",
+          "unidades": [
+            "Palmas - SENAI - Palmas"
+          ]
+        },
+        {
+          "nome": "Paranaguá",
+          "unidades": [
+            "Paranaguá - SENAI - Paranaguá"
+          ]
+        },
+        {
+          "nome": "Paranavaí",
+          "unidades": [
+            "Paranavaí - SENAI - Paranavaí"
+          ]
+        },
+        {
+          "nome": "Pato Branco",
+          "unidades": [
+            "Pato Branco - SENAI - Pato Branco"
+          ]
+        },
+        {
+          "nome": "Pinhais",
+          "unidades": [
+            "Pinhais - SENAI - Pinhais"
+          ]
+        },
+        {
+          "nome": "Ponta Grossa",
+          "unidades": [
+            "Ponta Grossa - SENAI - Ponta Grossa"
+          ]
+        },
+        {
+          "nome": "Rio Negro",
+          "unidades": [
+            "Rio Negro - SENAI - Rio Negro"
+          ]
+        },
+        {
+          "nome": "Santo Antônio da Platina",
+          "unidades": [
+            "Santo Antônio da Platina - SENAI - Santo Antonio da Platina"
+          ]
+        },
+        {
+          "nome": "São José dos Pinhais",
+          "unidades": [
+            "São José dos Pinhais - SENAI - São José dos Pinhais Afonso Pena"
+          ]
+        },
+        {
+          "nome": "São Mateus do Sul",
+          "unidades": [
+            "São Mateus do Sul - SENAI - São Mateus do Sul"
+          ]
+        },
+        {
+          "nome": "Telêmaco Borba",
+          "unidades": [
+            "Telêmaco Borba - SENAI - Telêmaco Borba"
+          ]
+        },
+        {
+          "nome": "Toledo",
+          "unidades": [
+            "Toledo - SENAI - Toledo"
+          ]
+        },
+        {
+          "nome": "Umuarama",
+          "unidades": [
+            "Umuarama - SENAI - Umuarama"
+          ]
+        },
+        {
+          "nome": "União da Vitória",
+          "unidades": [
+            "União da Vitória - SENAI - União da Vitória"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "RJ",
+      "nome": "Rio de Janeiro",
+      "municipios": [
+        {
+          "nome": "Angra dos Reis",
+          "unidades": [
+            "Angra dos Reis - SENAI Angra Dos Reis"
+          ]
+        },
+        {
+          "nome": "Barra Mansa",
+          "unidades": [
+            "Barra Mansa - SENAI Barra Mansa"
+          ]
+        },
+        {
+          "nome": "Barra do Piraí",
+          "unidades": [
+            "Barra do Piraí - SENAI Barra Do Piraí"
+          ]
+        },
+        {
+          "nome": "Campos dos Goytacazes",
+          "unidades": [
+            "Campos dos Goytacazes - SENAI Campos"
+          ]
+        },
+        {
+          "nome": "Duque de Caxias",
+          "unidades": [
+            "Duque de Caxias - SENAI Caxias"
+          ]
+        },
+        {
+          "nome": "Itaguaí",
+          "unidades": [
+            "Itaguaí - SENAI Itaguaí"
+          ]
+        },
+        {
+          "nome": "Itaperuna",
+          "unidades": [
+            "Itaperuna - SENAI Itaperuna"
+          ]
+        },
+        {
+          "nome": "Macaé",
+          "unidades": [
+            "Macaé - SENAI Macaé",
+            "Macaé - SENAI Macaé (Riviera)"
+          ]
+        },
+        {
+          "nome": "Niterói",
+          "unidades": [
+            "Niterói - SENAI Niterói"
+          ]
+        },
+        {
+          "nome": "Nova Friburgo",
+          "unidades": [
+            "Nova Friburgo - SENAI Espaço da Moda Nova Friburgo",
+            "Nova Friburgo - SENAI Nova Friburgo"
+          ]
+        },
+        {
+          "nome": "Nova Iguaçu",
+          "unidades": [
+            "Nova Iguaçu - SENAI Nova Iguaçu"
+          ]
+        },
+        {
+          "nome": "Petrópolis",
+          "unidades": [
+            "Petrópolis - SENAI Bingen"
+          ]
+        },
+        {
+          "nome": "Resende",
+          "unidades": [
+            "Resende - SENAI Resende"
+          ]
+        },
+        {
+          "nome": "Rio de Janeiro",
+          "unidades": [
+            "Rio de Janeiro - Instituto SENAI de Inovação em Biossintéticos e Fibras",
+            "Rio de Janeiro - Instituto SENAI de Tecnologia Engenharia e Design Industrial",
+            "Rio de Janeiro - Instituto SENAI de Tecnologia Solda",
+            "Rio de Janeiro - Instituto Senai de Tecnologia Automação Industrial",
+            "Rio de Janeiro - SENAI Benfica",
+            "Rio de Janeiro - SENAI Botafogo",
+            "Rio de Janeiro - SENAI Jacarepaguá (Freguesia)",
+            "Rio de Janeiro - SENAI Laranjeiras",
+            "Rio de Janeiro - SENAI Maracanã",
+            "Rio de Janeiro - SENAI Rodrigues Alves",
+            "Rio de Janeiro - SENAI Santa Cruz",
+            "Rio de Janeiro - SENAI Tijuca",
+            "Rio de Janeiro - SENAI Vicente de Carvalho"
+          ]
+        },
+        {
+          "nome": "Santo Antônio de Pádua",
+          "unidades": [
+            "Santo Antônio de Pádua - SENAI Pádua"
+          ]
+        },
+        {
+          "nome": "São Gonçalo",
+          "unidades": [
+            "São Gonçalo - SENAI São Gonçalo"
+          ]
+        },
+        {
+          "nome": "São Pedro da Aldeia",
+          "unidades": [
+            "São Pedro da Aldeia - SENAI São Pedro da Aldeia"
+          ]
+        },
+        {
+          "nome": "Três Rios",
+          "unidades": [
+            "Três Rios - SENAI Três Rios",
+            "Três Rios - SENAI Três Rios (NOVO)"
+          ]
+        },
+        {
+          "nome": "Valença",
+          "unidades": [
+            "Valença - SENAI Valença"
+          ]
+        },
+        {
+          "nome": "Volta Redonda",
+          "unidades": [
+            "Volta Redonda - SENAI Volta Redonda"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "RN",
+      "nome": "Rio Grande do Norte",
+      "municipios": [
+        {
+          "nome": "Mossoró",
+          "unidades": [
+            "Mossoró - Centro de Educação e Tecnologias Ítalo Bologna",
+            "Mossoró - IST Petróleo e Gás RN"
+          ]
+        },
+        {
+          "nome": "Natal",
+          "unidades": [
+            "Natal - CET - Flávio José Cavalcanti de Azevedo",
+            "Natal - Centro de Educação e Tecnologias Clovis Motta",
+            "Natal - Centro de Tecnologias do Gás e Energia Renováveis - CTGAS-ER",
+            "Natal - ISI Energias Renováveis RN"
+          ]
+        },
+        {
+          "nome": "Santa Cruz",
+          "unidades": [
+            "Santa Cruz - Centro de Educação e Tecnologias Aluísio Bezerra"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "RO",
+      "nome": "Rondônia",
+      "municipios": [
+        {
+          "nome": "Ariquemes",
+          "unidades": [
+            "Ariquemes - Centro de Excelência em Educação e Tecnologia SENAI - Jose Fernandes de Moura"
+          ]
+        },
+        {
+          "nome": "Cacoal",
+          "unidades": [
+            "Cacoal - Centro de Excelência em Educação e Tecnologia CEET SENAI/Cacoal"
+          ]
+        },
+        {
+          "nome": "Jaru",
+          "unidades": [
+            "Jaru - Centro de Excelência em Educação eTec. CEET SENAI Jaru"
+          ]
+        },
+        {
+          "nome": "Ji-Paraná",
+          "unidades": [
+            "Ji-Paraná - Escola SENAI JI-Paraná"
+          ]
+        },
+        {
+          "nome": "Porto Velho",
+          "unidades": [
+            "Porto Velho - Centro Tecnológico de Mecatrônica  SENAI ?  Prof. Dr. Volkmar Schuler",
+            "Porto Velho - Centro de Excelência em Educação e Tecnologia SENAI - Sebastião Camargo",
+            "Porto Velho - Escola SENAI Marechal Rondon"
+          ]
+        },
+        {
+          "nome": "Rolim de Moura",
+          "unidades": [
+            "Rolim de Moura - Centro de Excelência em Educ. eTec. CEET SENAI Rolim de Moura"
+          ]
+        },
+        {
+          "nome": "Vilhena",
+          "unidades": [
+            "Vilhena - Escola  SENAI Bonifácio Almodóvar"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "RR",
+      "nome": "Roraima",
+      "municipios": [
+        {
+          "nome": "Boa Vista",
+          "unidades": [
+            "Boa Vista - CFP Carlos Salustiano de Sousa Coêlho",
+            "Boa Vista - Centro de Formação Profissional Prof. Alexandre Figueira Rodrigues"
+          ]
+        },
+        {
+          "nome": "Rorainópolis",
+          "unidades": [
+            "Rorainópolis - Serviço Nacional de Aprendizagem Industrial - Rorainópolis"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "RS",
+      "nome": "Rio Grande do Sul",
+      "municipios": [
+        {
+          "nome": "Antônio Prado",
+          "unidades": [
+            "Antônio Prado - SENAI Antônio Prado"
+          ]
+        },
+        {
+          "nome": "Bagé",
+          "unidades": [
+            "Bagé - Centro de Formação Profissional Dona Júlia Garrastazu Médici"
+          ]
+        },
+        {
+          "nome": "Bento Gonçalves",
+          "unidades": [
+            "Bento Gonçalves - Centro de Formação Profissional SENAI em Madeira e Mobiliário"
+          ]
+        },
+        {
+          "nome": "Cachoeira do Sul",
+          "unidades": [
+            "Cachoeira do Sul - Centro de Formação Profissional SENAI Arthêmio Maximiliano de Franceschi"
+          ]
+        },
+        {
+          "nome": "Cachoeirinha",
+          "unidades": [
+            "Cachoeirinha - Centro de Formação Profissional SENAI Comendador Clemente Cifali"
+          ]
+        },
+        {
+          "nome": "Canoas",
+          "unidades": [
+            "Canoas - Centro de Formação Profissional SENAI de Soldagem Cypriano Micheletto"
+          ]
+        },
+        {
+          "nome": "Carazinho",
+          "unidades": [
+            "Carazinho - Centro de Formação Profissional SENAI João Wallig"
+          ]
+        },
+        {
+          "nome": "Caxias do Sul",
+          "unidades": [
+            "Caxias do Sul - Centro de Formação Profissional SENAI Nilo Peçanha",
+            "Caxias do Sul - Centro de Formação Profissional SENAI em Mecatrônica"
+          ]
+        },
+        {
+          "nome": "Erechim",
+          "unidades": [
+            "Erechim - Centro de Formação Profissional SENAI José Oscar Salazar"
+          ]
+        },
+        {
+          "nome": "Esteio",
+          "unidades": [
+            "Esteio - Centro de Formação Profissional SENAI Nilo Bettanin",
+            "Esteio - Instituto SENAI de Tecnologia em Petróleo, Gás e Energia"
+          ]
+        },
+        {
+          "nome": "Estância Velha",
+          "unidades": [
+            "Estância Velha - Centro de Formação Profissional SENAI em Couro e Meio Ambiente"
+          ]
+        },
+        {
+          "nome": "Farroupilha",
+          "unidades": [
+            "Farroupilha - Centro de Formação Profissional SENAI Adelino Miotti"
+          ]
+        },
+        {
+          "nome": "Garibaldi",
+          "unidades": [
+            "Garibaldi - Centro de Formação Profissional SENAI de Garibaldi"
+          ]
+        },
+        {
+          "nome": "Gravataí",
+          "unidades": [
+            "Gravataí - Centro de Formação Profissional SENAI Ney Damasceno Ferreira"
+          ]
+        },
+        {
+          "nome": "Guaporé",
+          "unidades": [
+            "Guaporé - Centro de Formação Profissional SENAI de Guaporé"
+          ]
+        },
+        {
+          "nome": "Horizontina",
+          "unidades": [
+            "Horizontina - Centro de Formação Profissional SENAI Horizontina"
+          ]
+        },
+        {
+          "nome": "Ibirubá",
+          "unidades": [
+            "Ibirubá - Centro de Formação Profissional SENAI Ibirubá"
+          ]
+        },
+        {
+          "nome": "Igrejinha",
+          "unidades": [
+            "Igrejinha - Centro de Formação Profissional SENAI Nelson Heidrich"
+          ]
+        },
+        {
+          "nome": "Lajeado",
+          "unidades": [
+            "Lajeado - Centro de Formação Profissional SENAI de Lajeado"
+          ]
+        },
+        {
+          "nome": "Marau",
+          "unidades": [
+            "Marau - Centro de Formação Profissional SENAI Nicandro Oltramari"
+          ]
+        },
+        {
+          "nome": "Montenegro",
+          "unidades": [
+            "Montenegro - Centro de Formação Profissional SENAI de Montenegro"
+          ]
+        },
+        {
+          "nome": "Nova Prata",
+          "unidades": [
+            "Nova Prata - Centro de Formação Profissional SENAI de Nova Prata"
+          ]
+        },
+        {
+          "nome": "Novo Hamburgo",
+          "unidades": [
+            "Novo Hamburgo - Centro de Formação Profissional SENAI Gustavo Copé",
+            "Novo Hamburgo - Centro de Formação Profissional SENAI em Calçado e Logística Industrial"
+          ]
+        },
+        {
+          "nome": "Não-Me-Toque",
+          "unidades": [
+            "Não-Me-Toque - Centro de Formação Profissional SENAI Não Me Toque"
+          ]
+        },
+        {
+          "nome": "Panambi",
+          "unidades": [
+            "Panambi - Centro de Formação Profissional SENAI Ingomar Brune"
+          ]
+        },
+        {
+          "nome": "Passo Fundo",
+          "unidades": [
+            "Passo Fundo - Centro de Formação Profissional SENAI Jorge Barbieux"
+          ]
+        },
+        {
+          "nome": "Pelotas",
+          "unidades": [
+            "Pelotas - Centro de Formação Profissional SENAI Eraldo Giacobbe"
+          ]
+        },
+        {
+          "nome": "Porto Alegre",
+          "unidades": [
+            "Porto Alegre - Centro de Formação Profissional SENAI Automotivo - Porto Alegre",
+            "Porto Alegre - Centro de Formação Profissional SENAI Digital",
+            "Porto Alegre - Centro de Formação Profissional SENAI Visconde de Mauá",
+            "Porto Alegre - Faculdade de Tecnologia SENAI Porto Alegre - FATEC"
+          ]
+        },
+        {
+          "nome": "Rio Grande",
+          "unidades": [
+            "Rio Grande - Centro de Formação Profissional SENAI João Simplício"
+          ]
+        },
+        {
+          "nome": "Santa Cruz do Sul",
+          "unidades": [
+            "Santa Cruz do Sul - Centro de Formação Profissional SENAI Carlos Tannhauser"
+          ]
+        },
+        {
+          "nome": "Santa Maria",
+          "unidades": [
+            "Santa Maria - Centro de Formação Profissional SENAI Roberto Barbosa Ribas"
+          ]
+        },
+        {
+          "nome": "Santa Rosa",
+          "unidades": [
+            "Santa Rosa - Centro de Formação Profissional SENAI Vergílio Lunardi"
+          ]
+        },
+        {
+          "nome": "Sapiranga",
+          "unidades": [
+            "Sapiranga - Centro de Formação Profissional SENAI Waldemar Strassburger"
+          ]
+        },
+        {
+          "nome": "Sapucaia do Sul",
+          "unidades": [
+            "Sapucaia do Sul - Centro de Formação Profissional SENAI de Eletromecânica"
+          ]
+        },
+        {
+          "nome": "São Leopoldo",
+          "unidades": [
+            "São Leopoldo - Centro de Formação Profissional SENAI Plínio Gilberto Kröeff",
+            "São Leopoldo - Instituto SENAI de Inovação em Engenharia de Polímeros",
+            "São Leopoldo - Instituto SENAI de Tecnologia em Química e Meio Ambiente"
+          ]
+        },
+        {
+          "nome": "São Marcos",
+          "unidades": [
+            "São Marcos - Centro de Formação Profissional SENAI João Flávio Rech"
+          ]
+        },
+        {
+          "nome": "São Sebastião do Caí",
+          "unidades": [
+            "São Sebastião do Caí - Centro de Formação Profissional SENAI Elisabetha Augusta Müller Oderich"
+          ]
+        },
+        {
+          "nome": "Venâncio Aires",
+          "unidades": [
+            "Venâncio Aires - Centro de Formação Profissional SENAI Frederico Closs"
+          ]
+        },
+        {
+          "nome": "Veranópolis",
+          "unidades": [
+            "Veranópolis - Centro de Formação Profissional SENAI de Veranópolis"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "SC",
+      "nome": "Santa Catarina",
+      "municipios": [
+        {
+          "nome": "Balneário Camboriú",
+          "unidades": [
+            "Balneário Camboriú - SENAI/SC - Balneário Camboriú"
+          ]
+        },
+        {
+          "nome": "Blumenau",
+          "unidades": [
+            "Blumenau - Instituto SENAI de Tecnologia Ambiental",
+            "Blumenau - Instituto SENAI de Tecnologia Têxtil, Vestuário e Design",
+            "Blumenau - SENAI/SC - Blumenau"
+          ]
+        },
+        {
+          "nome": "Braço do Norte",
+          "unidades": [
+            "Braço do Norte - SENAI/SC - Braço do Norte"
+          ]
+        },
+        {
+          "nome": "Brusque",
+          "unidades": [
+            "Brusque - SENAI/SC - Brusque"
+          ]
+        },
+        {
+          "nome": "Campos Novos",
+          "unidades": [
+            "Campos Novos - SENAI/SC - Campos Novos"
+          ]
+        },
+        {
+          "nome": "Canoinhas",
+          "unidades": [
+            "Canoinhas - SENAI/SC - Canoinhas"
+          ]
+        },
+        {
+          "nome": "Capinzal",
+          "unidades": [
+            "Capinzal - SENAI/SC - Capinzal"
+          ]
+        },
+        {
+          "nome": "Capivari de Baixo",
+          "unidades": [
+            "Capivari de Baixo - SENAI/SC - Capivari de Baixo"
+          ]
+        },
+        {
+          "nome": "Caçador",
+          "unidades": [
+            "Caçador - SENAI/SC - Caçador"
+          ]
+        },
+        {
+          "nome": "Chapecó",
+          "unidades": [
+            "Chapecó - SENAI/SC - Chapecó"
+          ]
+        },
+        {
+          "nome": "Concórdia",
+          "unidades": [
+            "Concórdia - SENAI/SC - Concórdia"
+          ]
+        },
+        {
+          "nome": "Correia Pinto",
+          "unidades": [
+            "Correia Pinto - SENAI/SC - Correia Pinto"
+          ]
+        },
+        {
+          "nome": "Criciúma",
+          "unidades": [
+            "Criciúma - SENAI/SC - Criciúma",
+            "Criciúma - SENAI/SC - Criciúma I"
+          ]
+        },
+        {
+          "nome": "Curitibanos",
+          "unidades": [
+            "Curitibanos - SENAI/SC - Curitibanos"
+          ]
+        },
+        {
+          "nome": "Florianópolis",
+          "unidades": [
+            "Florianópolis - Instituto SENAI de Inovação em Sistemas Embarcados",
+            "Florianópolis - SENAI/SC - Florianópolis"
+          ]
+        },
+        {
+          "nome": "Fraiburgo",
+          "unidades": [
+            "Fraiburgo - SENAI/SC - Fraiburgo"
+          ]
+        },
+        {
+          "nome": "Guaramirim",
+          "unidades": [
+            "Guaramirim - SENAI/SC - Guaramirim"
+          ]
+        },
+        {
+          "nome": "Indaial",
+          "unidades": [
+            "Indaial - SENAI/SC - Indaial"
+          ]
+        },
+        {
+          "nome": "Itajaí",
+          "unidades": [
+            "Itajaí - SENAI/SC - Itajaí",
+            "Itajaí - SENAI/SC - Itajaí II"
+          ]
+        },
+        {
+          "nome": "Itapiranga",
+          "unidades": [
+            "Itapiranga - SENAI/SC - Itapiranga"
+          ]
+        },
+        {
+          "nome": "Jaraguá do Sul",
+          "unidades": [
+            "Jaraguá do Sul - SENAI/SC - Jaraguá do Sul",
+            "Jaraguá do Sul - SENAI/SC - Jaraguá do Sul II"
+          ]
+        },
+        {
+          "nome": "Joaçaba",
+          "unidades": [
+            "Joaçaba - SENAI/SC - Joaçaba"
+          ]
+        },
+        {
+          "nome": "Joinville",
+          "unidades": [
+            "Joinville - SENAI/SC - Joinville Moinho",
+            "Joinville - SENAI/SC - Joinville Norte I",
+            "Joinville - SENAI/SC - Joinville Sul"
+          ]
+        },
+        {
+          "nome": "Lages",
+          "unidades": [
+            "Lages - SENAI/SC - Lages"
+          ]
+        },
+        {
+          "nome": "Luzerna",
+          "unidades": [
+            "Luzerna - SENAI/SC - Luzerna"
+          ]
+        },
+        {
+          "nome": "Mafra",
+          "unidades": [
+            "Mafra - SENAI/SC - Mafra"
+          ]
+        },
+        {
+          "nome": "Maravilha",
+          "unidades": [
+            "Maravilha - SENAI/SC - Maravilha"
+          ]
+        },
+        {
+          "nome": "Otacílio Costa",
+          "unidades": [
+            "Otacílio Costa - SENAI/SC - Otacílio Costa"
+          ]
+        },
+        {
+          "nome": "Palhoça",
+          "unidades": [
+            "Palhoça - SENAI/SC - Palhoça"
+          ]
+        },
+        {
+          "nome": "Pinhalzinho",
+          "unidades": [
+            "Pinhalzinho - SENAI/SC - Pinhalzinho"
+          ]
+        },
+        {
+          "nome": "Pomerode",
+          "unidades": [
+            "Pomerode - SENAI/SC - Pomerode"
+          ]
+        },
+        {
+          "nome": "Porto União",
+          "unidades": [
+            "Porto União - SENAI/SC - Porto União"
+          ]
+        },
+        {
+          "nome": "Rio Negrinho",
+          "unidades": [
+            "Rio Negrinho - SENAI/SC - Rio Negrinho"
+          ]
+        },
+        {
+          "nome": "Rio do Sul",
+          "unidades": [
+            "Rio do Sul - SENAI/SC - Rio do Sul"
+          ]
+        },
+        {
+          "nome": "Seara",
+          "unidades": [
+            "Seara - SENAI/SC - Seara"
+          ]
+        },
+        {
+          "nome": "São Bento do Sul",
+          "unidades": [
+            "São Bento do Sul - SENAI/SC - São Bento do Sul",
+            "São Bento do Sul - SENAI/SC - São Bento do Sul III"
+          ]
+        },
+        {
+          "nome": "São Francisco do Sul",
+          "unidades": [
+            "São Francisco do Sul - SENAI/SC - São Francisco do Sul"
+          ]
+        },
+        {
+          "nome": "São José",
+          "unidades": [
+            "São José - SENAI/SC - São José"
+          ]
+        },
+        {
+          "nome": "São João Batista",
+          "unidades": [
+            "São João Batista - SENAI/SC - São João Batista"
+          ]
+        },
+        {
+          "nome": "São Lourenço do Oeste",
+          "unidades": [
+            "São Lourenço do Oeste - SENAI/SC - São Lourenço do Oeste"
+          ]
+        },
+        {
+          "nome": "São Miguel do Oeste",
+          "unidades": [
+            "São Miguel do Oeste - SENAI/SC - São Miguel do Oeste"
+          ]
+        },
+        {
+          "nome": "Taió",
+          "unidades": [
+            "Taió - SENAI/SC - Taió"
+          ]
+        },
+        {
+          "nome": "Tijucas",
+          "unidades": [
+            "Tijucas - SENAI/SC - Tijucas"
+          ]
+        },
+        {
+          "nome": "Timbó",
+          "unidades": [
+            "Timbó - SENAI/SC - Timbó"
+          ]
+        },
+        {
+          "nome": "Tubarão",
+          "unidades": [
+            "Tubarão - SENAI/SC - Tubarão"
+          ]
+        },
+        {
+          "nome": "Videira",
+          "unidades": [
+            "Videira - SENAI/SC - Videira"
+          ]
+        },
+        {
+          "nome": "Xanxerê",
+          "unidades": [
+            "Xanxerê - SENAI/SC - Xanxerê"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "SE",
+      "nome": "Sergipe",
+      "municipios": [
+        {
+          "nome": "Aracaju",
+          "unidades": [
+            "Aracaju - Centro de Educ. e Tecnol. Integrado da Constr. Civil Albano Franco - CETICC",
+            "Aracaju - Centro de Educação e Tecnologia Albano Franco - CETAF-AJU",
+            "Aracaju - Centro de Educação e Tecnologia Coelho e Campos - CETCC"
+          ]
+        },
+        {
+          "nome": "Estância",
+          "unidades": [
+            "Estância - Centro de Educ. e Tecnol. Albano Franco - CETAF-EST"
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "SP",
+      "nome": "São Paulo",
+      "municipios": [
+        {
+          "nome": "Alumínio",
+          "unidades": [
+            "Alumínio - Escola SENAI \"Antônio Ermírio de Moraes\""
+          ]
+        },
+        {
+          "nome": "Americana",
+          "unidades": [
+            "Americana - Escola SENAI \"Prof. João Baptista Salles da Silva\""
+          ]
+        },
+        {
+          "nome": "Araraquara",
+          "unidades": [
+            "Araraquara - Escola SENAI \"Henrique Lupo\""
+          ]
+        },
+        {
+          "nome": "Araras",
+          "unidades": [
+            "Araras - Escola SENAI \"Ivan Fabio Zurita\""
+          ]
+        },
+        {
+          "nome": "Araçatuba",
+          "unidades": [
+            "Araçatuba - Escola SENAI \"Duque de Caxias\""
+          ]
+        },
+        {
+          "nome": "Barueri",
+          "unidades": [
+            "Barueri - Escola SENAI \"José  Ephim Mindlin\""
+          ]
+        },
+        {
+          "nome": "Bauru",
+          "unidades": [
+            "Bauru - Escola SENAI \"João Martins Coube\""
+          ]
+        },
+        {
+          "nome": "Birigüi",
+          "unidades": [
+            "Birigüi - Escola SENAI \"Avak Bedouian\""
+          ]
+        },
+        {
+          "nome": "Botucatu",
+          "unidades": [
+            "Botucatu - Escola SENAI \"Luiz Massa\""
+          ]
+        },
+        {
+          "nome": "Bragança Paulista",
+          "unidades": [
+            "Bragança Paulista - Escola SENAI de Bragança Paulista"
+          ]
+        },
+        {
+          "nome": "Campinas",
+          "unidades": [
+            "Campinas - Escola SENAI \"Prof. Dr. Euryclides de Jesus Zerbini\"",
+            "Campinas - Escola SENAI \"Roberto Mange\""
+          ]
+        },
+        {
+          "nome": "Campo Limpo Paulista",
+          "unidades": [
+            "Campo Limpo Paulista - Escola SENAI \"Alfried Krupp\""
+          ]
+        },
+        {
+          "nome": "Cotia",
+          "unidades": [
+            "Cotia - Escola SENAI \"RICARDO LERNER\""
+          ]
+        },
+        {
+          "nome": "Cruzeiro",
+          "unidades": [
+            "Cruzeiro - Escola SENAI Cruzeiro"
+          ]
+        },
+        {
+          "nome": "Cubatão",
+          "unidades": [
+            "Cubatão - Escola SENAI \"Hessel Horácio Cherkassky\""
+          ]
+        },
+        {
+          "nome": "Diadema",
+          "unidades": [
+            "Diadema - Escola SENAI \"Manuel Garcia Filho\""
+          ]
+        },
+        {
+          "nome": "Franca",
+          "unidades": [
+            "Franca - Escola SENAI \"Márcio Bagueira Leal\""
+          ]
+        },
+        {
+          "nome": "Guarulhos",
+          "unidades": [
+            "Guarulhos - Escola SENAI \"Celso Charuri\" - Unidade Guarulhos",
+            "Guarulhos - Escola SENAI \"Hermenegildo Campos de Almeida\""
+          ]
+        },
+        {
+          "nome": "Indaiatuba",
+          "unidades": [
+            "Indaiatuba - Escola SENAI \"Comendador Santoro Mirone\""
+          ]
+        },
+        {
+          "nome": "Iracemápolis",
+          "unidades": [
+            "Iracemápolis - Escola SENAI \"João Guilherme Sabino Ometto\""
+          ]
+        },
+        {
+          "nome": "Itatiba",
+          "unidades": [
+            "Itatiba - Escola SENAI \"Luiz Scavone\""
+          ]
+        },
+        {
+          "nome": "Itu",
+          "unidades": [
+            "Itu - Escola SENAI \"Ítalo Bologna\""
+          ]
+        },
+        {
+          "nome": "Jacareí",
+          "unidades": [
+            "Jacareí - Escola SENAI \"Elias Miguel Haddad\"",
+            "Jacareí - Escola SENAI \"Luiz Simon\""
+          ]
+        },
+        {
+          "nome": "Jaguariúna",
+          "unidades": [
+            "Jaguariúna - Escola SENAI Jaguariúna"
+          ]
+        },
+        {
+          "nome": "Jandira",
+          "unidades": [
+            "Jandira - Escola SENAI \"Prof. Vicente Amato\""
+          ]
+        },
+        {
+          "nome": "Jaú",
+          "unidades": [
+            "Jaú - Centro de Treinamento SENAI \"Edward Sávio\""
+          ]
+        },
+        {
+          "nome": "Jundiaí",
+          "unidades": [
+            "Jundiaí - Escola SENAI \"Conde Alexandre Siciliano\""
+          ]
+        },
+        {
+          "nome": "Lençóis Paulista",
+          "unidades": [
+            "Lençóis Paulista - Escola SENAI de Lençóis Paulista",
+            "Lençóis Paulista - Unidade de Produção Didática"
+          ]
+        },
+        {
+          "nome": "Limeira",
+          "unidades": [
+            "Limeira - Escola SENAI \"Luiz Varga\""
+          ]
+        },
+        {
+          "nome": "Mairinque",
+          "unidades": [
+            "Mairinque - Centro de Treinamento SENAI Mairinque"
+          ]
+        },
+        {
+          "nome": "Marília",
+          "unidades": [
+            "Marília - Escola SENAI \"José Polizotto\""
+          ]
+        },
+        {
+          "nome": "Matão",
+          "unidades": [
+            "Matão - Escola SENAI \"Oscar Lúcio Baldan\""
+          ]
+        },
+        {
+          "nome": "Mauá",
+          "unidades": [
+            "Mauá - Escola SENAI \"Jairo Candido\""
+          ]
+        },
+        {
+          "nome": "Mirassol",
+          "unidades": [
+            "Mirassol - Centro de Treinamento SENAI Mirassol"
+          ]
+        },
+        {
+          "nome": "Mogi Guaçu",
+          "unidades": [
+            "Mogi Guaçu - Escola SENAI de Mogi Guaçu"
+          ]
+        },
+        {
+          "nome": "Mogi das Cruzes",
+          "unidades": [
+            "Mogi das Cruzes - Escola SENAI \"Nami Jafet\""
+          ]
+        },
+        {
+          "nome": "Osasco",
+          "unidades": [
+            "Osasco - Escola SENAI \"Nadir Dias de Figueiredo\""
+          ]
+        },
+        {
+          "nome": "Ourinhos",
+          "unidades": [
+            "Ourinhos - Escola SENAI de Ourinhos"
+          ]
+        },
+        {
+          "nome": "Paulínia",
+          "unidades": [
+            "Paulínia - Escola SENAI \"Ricardo Figueiredo Terra\""
+          ]
+        },
+        {
+          "nome": "Pindamonhangaba",
+          "unidades": [
+            "Pindamonhangaba - Escola SENAI \"Geraldo Alckmin\""
+          ]
+        },
+        {
+          "nome": "Piracicaba",
+          "unidades": [
+            "Piracicaba - Escola SENAI \"Mário Dedini\"",
+            "Piracicaba - Escola SENAI \"Mário Henrique Simonsen\""
+          ]
+        },
+        {
+          "nome": "Pompéia",
+          "unidades": [
+            "Pompéia - Escola SENAI \"Shunji Nishimura\""
+          ]
+        },
+        {
+          "nome": "Presidente Prudente",
+          "unidades": [
+            "Presidente Prudente - Escola SENAI \"Santo Paschoal Crepaldi\""
+          ]
+        },
+        {
+          "nome": "Rafard",
+          "unidades": [
+            "Rafard - Escola SENAI \"Celso Charuri\" - Unidade Rafard"
+          ]
+        },
+        {
+          "nome": "Registro",
+          "unidades": [
+            "Registro - Escola SENAI de Registro"
+          ]
+        },
+        {
+          "nome": "Ribeirão Preto",
+          "unidades": [
+            "Ribeirão Preto - Escola SENAI \"Engº Octávio Marcondes Ferraz\""
+          ]
+        },
+        {
+          "nome": "Rio Claro",
+          "unidades": [
+            "Rio Claro - Escola SENAI \"Manoel José Ferreira\""
+          ]
+        },
+        {
+          "nome": "Santa Bárbara D'Oeste",
+          "unidades": [
+            "Santa Bárbara D'Oeste - Escola SENAI \"Alvares Romi\""
+          ]
+        },
+        {
+          "nome": "Santana de Parnaíba",
+          "unidades": [
+            "Santana de Parnaíba - Escola SENAI \"Suzana Dias\""
+          ]
+        },
+        {
+          "nome": "Santo André",
+          "unidades": [
+            "Santo André - Escola SENAI \"A. Jacob Lafer\""
+          ]
+        },
+        {
+          "nome": "Santos",
+          "unidades": [
+            "Santos - Escola SENAI \"Antônio Souza Noschese\""
+          ]
+        },
+        {
+          "nome": "Sertãozinho",
+          "unidades": [
+            "Sertãozinho - Escola SENAI \"Ettore Zanni\""
+          ]
+        },
+        {
+          "nome": "Sorocaba",
+          "unidades": [
+            "Sorocaba - Escola SENAI \"Gaspar Ricardo Júnior\"",
+            "Sorocaba - Escola SENAI \"Luiz Pagliato\""
+          ]
+        },
+        {
+          "nome": "Sumaré",
+          "unidades": [
+            "Sumaré - Escola SENAI \"Celso Charuri\" - Unidade Sumaré"
+          ]
+        },
+        {
+          "nome": "Suzano",
+          "unidades": [
+            "Suzano - Escola SENAI \"Luís Eulálio de Bueno Vidigal Filho\""
+          ]
+        },
+        {
+          "nome": "São Bernardo do Campo",
+          "unidades": [
+            "São Bernardo do Campo - Centro de Formação Profissional \"SENAI/Mercedes-Benz\"",
+            "São Bernardo do Campo - Centro de Formação Profissional \"SENAI/Volkswagen\"",
+            "São Bernardo do Campo - Escola SENAI \"Almirante Tamandaré\"",
+            "São Bernardo do Campo - Escola SENAI \"Mário Amato\""
+          ]
+        },
+        {
+          "nome": "São Caetano do Sul",
+          "unidades": [
+            "São Caetano do Sul - Escola SENAI \"Armando de Arruda Pereira\"",
+            "São Caetano do Sul - Escola SENAI \"Paulo Antonio Skaf"
+          ]
+        },
+        {
+          "nome": "São Carlos",
+          "unidades": [
+            "São Carlos - Escola SENAI \"Antônio Adolpho Lobbe\""
+          ]
+        },
+        {
+          "nome": "São José do Rio Preto",
+          "unidades": [
+            "São José do Rio Preto - Escola SENAI \"Antônio Devisate\""
+          ]
+        },
+        {
+          "nome": "São José dos Campos",
+          "unidades": [
+            "São José dos Campos - Escola SENAI \"Santos Dumont\""
+          ]
+        },
+        {
+          "nome": "São João da Boa Vista",
+          "unidades": [
+            "São João da Boa Vista - Centro de Treinamento SENAI S. J. Boa Vista"
+          ]
+        },
+        {
+          "nome": "São Paulo",
+          "unidades": [
+            "São Paulo - 1.33 Escola SENAI \"Fundação Zerrenner\"",
+            "São Paulo - Centro de Formação Profissional \"Engº James C. Stewart\"",
+            "São Paulo - Escola SENAI \"Anchieta\"",
+            "São Paulo - Escola SENAI \"Ary Torres\"",
+            "São Paulo - Escola SENAI \"Carlos Pasquale\"",
+            "São Paulo - Escola SENAI \"Conde José Vicente de Azevedo\"",
+            "São Paulo - Escola SENAI \"Dr. Celso Charuri\"",
+            "São Paulo - Escola SENAI \"Felício Lanzara\"",
+            "São Paulo - Escola SENAI \"Francisco Matarazzo\"",
+            "São Paulo - Escola SENAI \"Frederico Jacob\"",
+            "São Paulo - Escola SENAI \"Horácio Augusto da Silveira\"",
+            "São Paulo - Escola SENAI \"Humberto Reis Costa\"",
+            "São Paulo - Escola SENAI \"Jorge MAHFUZ\"",
+            "São Paulo - Escola SENAI \"Mariano Ferraz\"",
+            "São Paulo - Escola SENAI \"Morvan Figueiredo\"",
+            "São Paulo - Escola SENAI \"Orlando Laviero Ferraiuolo\"",
+            "São Paulo - Escola SENAI \"Oscar Rodrigues Alves\"",
+            "São Paulo - Escola SENAI \"Roberto Simonsen\"",
+            "São Paulo - Escola SENAI \"Suíço-Brasileira Paulo Ernesto Tolle\"",
+            "São Paulo - Escola SENAI \"Theobaldo de Nigris\"",
+            "São Paulo - Escola SENAI de Educação Online"
+          ]
+        },
+        {
+          "nome": "Taubaté",
+          "unidades": [
+            "Taubaté - Escola SENAI \"Félix Guisard\""
+          ]
+        },
+        {
+          "nome": "Valinhos",
+          "unidades": [
+            "Valinhos - Escola SENAI de Valinhos"
+          ]
+        },
+        {
+          "nome": "Votuporanga",
+          "unidades": [
+            "Votuporanga - Escola SENAI  \"Euclides Facchini\""
+          ]
+        }
+      ]
+    },
+    {
+      "sigla": "TO",
+      "nome": "Tocantins",
+      "municipios": [
+        {
+          "nome": "Araguaína",
+          "unidades": [
+            "Araguaína - CETEC Araguaína - Centro de Educação e Tecnologia"
+          ]
+        },
+        {
+          "nome": "Gurupi",
+          "unidades": [
+            "Gurupi - CT-Gurupi - Centro de Treinamento"
+          ]
+        },
+        {
+          "nome": "Palmas",
+          "unidades": [
+            "Palmas - CETEC PALMAS - Centro de Educação e Tecnologia",
+            "Palmas - CFP-Taquaralto-Centro de Formação Profissional"
+          ]
+        },
+        {
+          "nome": "Paraíso do Tocantins",
+          "unidades": [
+            "Paraíso do Tocantins - CFP-Paraíso-Centro de Formação Profissional"
+          ]
+        }
+      ]
+    }
+  ],
+  "opcaoOutra": "Outra (informar em observações)"
+}
