@@ -20,16 +20,17 @@ if (existingEnvPath) {
   require('dotenv').config();
 }
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const VERTEX_PROJECT_ID = process.env.VERTEX_PROJECT_ID;
+const VERTEX_LOCATION = process.env.VERTEX_LOCATION || 'us-central1';
 
 console.log(
-  'Chave de API atribuída à constante:',
-  GEMINI_API_KEY ? 'SUCESSO' : 'FALHA - undefined'
+  'Vertex AI Project ID configurado:',
+  VERTEX_PROJECT_ID ? 'SUCESSO' : 'FALHA - undefined'
 );
 
-if (!GEMINI_API_KEY) {
+if (!VERTEX_PROJECT_ID) {
   throw new Error(
-    'A chave GEMINI_API_KEY não foi encontrada no ficheiro .env. Verifique o ficheiro e reinicie o servidor.'
+    'O VERTEX_PROJECT_ID não foi encontrado no ficheiro .env. Verifique o ficheiro e reinicie o servidor.'
   );
 }
 
@@ -76,7 +77,8 @@ const LOGOTIPO_URL =
   'https://www.imagemhost.com.br/images/2024/11/22/Logo-novo-SENAI_-sem-slogan_755X325.png';
 
 module.exports = {
-  GEMINI_API_KEY,
+  VERTEX_PROJECT_ID,
+  VERTEX_LOCATION,
   PORT,
   corsOptions,
   APPS_SCRIPT_URL,
