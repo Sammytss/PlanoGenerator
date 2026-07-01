@@ -1,6 +1,6 @@
 const axios = require('axios');
 const XLSX = require('xlsx');
-const { model, textModel } = require('../config/ai');
+const { client, generationConfig } = require('../config/ai');
 const { APPS_SCRIPT_URL, LOGOTIPO_URL } = require('../config');
 
 /**
@@ -94,8 +94,12 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             }
         `;
 
-  const extractorResult = await model.generateContent([extractorPrompt, filePart]);
-  const topicListJson = JSON.parse(extractorResult.response.text());
+  const extractorResult = await client.models.generateContent({
+    model: 'gemini-3.5-flash',
+    contents: [extractorPrompt, filePart],
+    config: generationConfig
+  });
+  const topicListJson = JSON.parse(extractorResult.text);
   const topicTitles = topicListJson.topicos;
 
   if (!topicTitles || topicTitles.length === 0) {
@@ -140,11 +144,11 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
             `;
 
-    const saepResult = await textModel.generateContent([
-      saepAnalysisPrompt,
-      dossieMatriz,
-    ]);
-    const analysisResult = saepResult.response.text();
+    const saepResult = await client.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: [saepAnalysisPrompt, dossieMatriz]
+    });
+    const analysisResult = saepResult.text;
 
     // Verifica se a IA encontrou a UC
     if (analysisResult.trim() !== 'NAO_ENCONTRADO') {
@@ -219,8 +223,12 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
                     * Deixe as chaves "inicio" e "fim" como strings vazias.
             `;
 
-    const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
-    const topicDetailJson = JSON.parse(elaboratorResult.response.text());
+    const elaboratorResult = await client.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: [elaboratorPrompt, filePart],
+      config: generationConfig
+    });
+    const topicDetailJson = JSON.parse(elaboratorResult.text);
 
     // Adiciona o resultado da análise ao JSON
     topicDetailJson.saep = saepMatrixString;
@@ -253,8 +261,12 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
                 3.  **PARA A CHAVE "criterios":** Defina UM critério de avaliação claro, direto e no passado (formato "O aluno..."), que avalie o desempenho do aluno na atividade final proposta.
             `;
 
-    const assessmentResult = await model.generateContent([finalAssessmentPrompt, filePart]);
-    const assessmentJson = JSON.parse(assessmentResult.response.text());
+    const assessmentResult = await client.models.generateContent({
+      model: 'gemini-3.5-flash',
+      contents: [finalAssessmentPrompt, filePart],
+      config: generationConfig
+    });
+    const assessmentJson = JSON.parse(assessmentResult.text);
 
     // Substituição dos valores do último tópico pelos valores gerados
     ultimoTopico.instrumentos = assessmentJson.instrumentos || 'Prova Prática';
