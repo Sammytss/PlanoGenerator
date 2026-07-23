@@ -95,7 +95,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
         `;
 
   const extractorResult = await client.models.generateContent({
-    model: 'gemini-3.5-flash',
+    model: 'gemini-2.5-flash',
     contents: [extractorPrompt, filePart],
     config: generationConfig
   });
@@ -145,7 +145,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             `;
 
     const saepResult = await client.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-2.5-flash',
       contents: [saepAnalysisPrompt, dossieMatriz]
     });
     const analysisResult = saepResult.text;
@@ -224,7 +224,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             `;
 
     const elaboratorResult = await client.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-2.5-flash',
       contents: [elaboratorPrompt, filePart],
       config: generationConfig
     });
@@ -262,7 +262,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             `;
 
     const assessmentResult = await client.models.generateContent({
-      model: 'gemini-3.5-flash',
+      model: 'gemini-2.5-flash',
       contents: [finalAssessmentPrompt, filePart],
       config: generationConfig
     });
