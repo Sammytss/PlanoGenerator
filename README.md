@@ -43,6 +43,31 @@ O objetivo do **Plano Generator** é otimizar o tempo e o esforço de instrutore
   - **Tutorial em Vídeo:** Um modal que carrega e reproduz um vídeo explicativo diretamente.
 - **Geração de Planilha Automatizada:** A aplicação comunica-se com um script do Google (Apps Script) para criar uma planilha Google Sheets profissional, formatada e pronta para uso.
 
+### 📝 Ficha de Observação (`/ficha-observacao`)
+
+Gera o instrumento de avaliação para qualquer item do planejamento, com os critérios elaborados pela IA segundo a MSEP (mensuração, objetividade, granularidade e transparência).
+
+- **Dois métodos de descrição dos critérios**, conforme a MSEP (p.131-133):
+  - **Dicotómico** (Escala de Cotejo): arguições respondidas com Sim/Não.
+  - **Gradual**: quatro rubricas cumulativas por critério — método recomendado pela MSEP para capacidades socioemocionais.
+- **Ficha interativa:** o docente marca o desempenho de cada aluno nas colunas *Autoavaliação* e *Avaliação*; o aproveitamento e o **conceito (A/B/C/D)** são calculados automaticamente pela escala da MSEP (p.155).
+- **Filtro inteligente:** os itens cujo instrumento previsto é uma ficha de observação aparecem destacados e pré-selecionados.
+
+### 🎯 Situação de Aprendizagem (`/situacao-aprendizagem`)
+
+Elabora o documento completo da situação de aprendizagem seguindo a Etapa 2 da MSEP (p.137-143).
+
+- **Uma situação por bloco de ~60 horas:** pela MSEP, uma situação de aprendizagem agrupa várias capacidades e não corresponde a um conhecimento isolado. Cada aba da planilha (limite de 60h) dá origem a uma situação.
+- **Estratégias de aprendizagem desafiadoras:** Situação-Problema, Estudo de Caso, Projeto ou Pesquisa Aplicada — as quatro previstas na MSEP (p.114).
+- **Conteúdo gerado:** contextualização, desafio, resultados esperados, estratégias de ensino, recursos e ambientes, critérios e instrumentos de avaliação, e o detalhamento em etapas de plano de aula.
+- Na planilha, a coluna *Situação de Aprendizagem* passa a ser **mesclada por aba inteira**, com a referência à situação correspondente.
+
+### 📤 Reaproveitamento e exportação
+
+- **Importação de planilha:** as duas páginas aceitam o `.xlsx` de um planejamento já gerado, permitindo usá-las sem ter criado o plano na mesma sessão.
+- **Sessão do navegador:** o plano gerado fica em `sessionStorage`. Nada é persistido em disco no servidor.
+- **Exportação:** *Imprimir / Salvar em PDF* (nativo do navegador) e **Google Docs**, que devolve links para editar numa cópia da conta Google do docente, baixar em **DOCX** ou em **PDF**.
+
 ---
 
 ## 🛠️ Tecnologias Utilizadas
@@ -90,9 +115,34 @@ Siga estes passos para executar a aplicação na sua máquina local para testes 
 4. **Configure o Google Apps Script:**
     - Crie um novo projeto em [script.google.com](https://script.google.com).
     - Cole o conteúdo do ficheiro `apps-script/doPost.js` no editor.
-    - Clique em **Implantar > Nova implantação** (Tipo: "App da Web", Acesso: "Qualquer pessoa").
+    - Em **⚙️ Configurações do projeto**, ative *"Mostrar o arquivo de manifesto appsscript.json no editor"* e substitua o manifesto pelo conteúdo de `apps-script/appsscript.json`.
+    - No editor, selecione a função **`autorizarPermissoes`** e clique em **Executar**. Aceite as permissões solicitadas. ⚠️ **Este passo é obrigatório** — ver a nota abaixo.
+    - Clique em **Implantar > Nova implantação** (Tipo: "App da Web", Executar como: "Eu", Acesso: "Qualquer pessoa").
     - Copie a **URL do app da Web** gerada.
     - Adicione ao `.env`: `APPS_SCRIPT_URL=https://script.google.com/.../exec` (ou edite `src/config/index.js` se preferir).
+
+> ### ⚠️ Autorização OAuth ao atualizar o Apps Script
+>
+> O Apps Script deduz os escopos OAuth necessários a partir do código, mas **uma implantação já existente continua a correr com os escopos que foram autorizados anteriormente**. Publicar uma nova versão *não* desencadeia nova autorização.
+>
+> Por isso, sempre que o script passar a usar um serviço novo do Google, é preciso **executar uma função manualmente no editor** e aceitar as permissões. Sintoma de quem salta esta etapa:
+>
+> ```
+> Exception: Você não tem permissão para chamar DocumentApp.create.
+> Permissões necessárias: https://www.googleapis.com/auth/documents
+> ```
+>
+> **Correção:** no editor, execute a função `autorizarPermissoes`, aceite as permissões e depois publique uma **nova versão** da implantação (Implantar → Gerenciar implantações → ✏️ → Versão: *Nova versão*).
+>
+> #### Se o Google não voltar a pedir consentimento
+>
+> Declarar os escopos em `appsscript.json` informa o Google do que o script precisa, mas **não concede nada**. A concessão OAuth pertence à conta Google, não ao projeto nem à versão — por isso não é implantada nem versionada.
+>
+> Quando já existe uma concessão para o projeto, o Google pode não reexibir o diálogo de consentimento mesmo com escopos novos no manifesto. Nesse caso:
+>
+> 1. Recarregue o editor (F5) e execute `autorizarPermissoes` de novo — a análise de escopos fica em cache na sessão.
+> 2. Se persistir, **revogue o acesso** em [myaccount.google.com/permissions](https://myaccount.google.com/permissions), localizando o projeto do Apps Script. Volte ao editor e execute a função: o consentimento é pedido do zero, com o conjunto completo de escopos. *(Foi este passo que resolveu na prática.)*
+> 3. Se ainda falhar apenas `script.external_request`, verifique se o administrador do Google Workspace bloqueia requisições externas a partir de scripts — restrição comum em contas institucionais.
 
 5. **Execute o Servidor:**
     A partir da pasta raiz do projeto:
@@ -186,7 +236,9 @@ APPS_SCRIPT_URL=https://script.google.com/macros/s/.../exec
 ```
 
 **4. (IMPORTANTE) Configure o Apps Script:**
-   - Cole o conteúdo de `apps-script/doPost.js` no Google Apps Script.
+   - Cole o conteúdo de `apps-script/doPost.js` no Google Apps Script e o de `apps-script/appsscript.json` no manifesto.
+   - Execute a função `autorizarPermissoes` no editor e aceite as permissões (ver a nota sobre autorização OAuth acima).
+   - Publique uma **nova versão** da implantação.
    - Certifique-se de que `APPS_SCRIPT_URL` no `.env` contém o URL de implantação do seu App da Web.
 
 **5. Corrija a propriedade e instale as dependências:**
@@ -276,33 +328,60 @@ pm2 restart PlanoGenerator
 ```
 PlanoGenerator/
 ├── apps-script/
-│   └── doPost.js              # Código Google Apps Script (planilha)
+│   ├── appsscript.json         # Manifesto: escopos OAuth e configuração do App da Web
+│   └── doPost.js               # Apps Script: planilha + Google Docs (ficha e situação)
 ├── assets/
 │   ├── css/
-│   │   └── style.css
+│   │   ├── style.css
+│   │   └── documentos.css      # Ficha, situação e estilos de impressão (A4)
 │   ├── data/
 │   │   └── unidades-senai.json # Unidades SENAI por estado/município
 │   ├── Images/
 │   │   └── (imagens .png, .svg)
 │   └── js/
 │       ├── calendar-init.js
+│       ├── ficha-observacao.js      # Página da Ficha de Observação
+│       ├── plano-store.js           # Plano em sessionStorage + exportação
 │       ├── script.js
+│       ├── situacao-aprendizagem.js # Página da Situação de Aprendizagem
 │       └── ui-interactions.js
 ├── src/
 │   ├── config/
-│   │   ├── ai.js               # Configuração Gemini
+│   │   ├── ai.js               # Configuração Vertex AI
 │   │   ├── index.js            # Variáveis de ambiente, CORS, URLs
-│   │   └── upload.js           # Configuração Multer
+│   │   └── upload.js           # Configuração Multer (PDF, matriz e planilha)
 │   └── services/
-│       └── planGenerator.js   # Lógica de geração do plano
-├── .env                        # Chaves (GEMINI_API_KEY, APPS_SCRIPT_URL)
+│       ├── docExporter.js      # Criação de Google Docs (links DOCX/PDF)
+│       ├── fichaGenerator.js   # Critérios dicotómicos e graduais (MSEP)
+│       ├── instrumentos.js     # Normalização dos instrumentos de avaliação
+│       ├── planGenerator.js    # Lógica de geração do plano
+│       ├── planParser.js       # Importação de uma planilha .xlsx já gerada
+│       └── situacaoGenerator.js # Agrupamento por 60h e conteúdo da situação
+├── .env                        # Chaves (VERTEX_PROJECT_ID, APPS_SCRIPT_URL)
 ├── .gitignore
+├── ficha-observacao.html
 ├── index.html
 ├── package.json
 ├── package-lock.json
 ├── README.md
-└── server.js                   # Entrypoint Express (servidor + rotas)
+├── server.js                   # Entrypoint Express (servidor + rotas)
+└── situacao-aprendizagem.html
 ```
+
+### Rotas HTTP
+
+| Método | Rota | Descrição |
+|---|---|---|
+| `GET` | `/` | Formulário de planejamento docente |
+| `GET` | `/ficha-observacao` | Página da Ficha de Observação |
+| `GET` | `/situacao-aprendizagem` | Página da Situação de Aprendizagem |
+| `POST` | `/gerar-plano` | Gera a planilha (resposta em streaming) |
+| `POST` | `/api/importar-plano` | Importa um `.xlsx` já gerado |
+| `POST` | `/api/ficha-observacao` | Elabora os critérios da ficha |
+| `GET` | `/api/estrategias-desafiadoras` | Lista as 4 estratégias da MSEP |
+| `POST` | `/api/situacoes/agrupar` | Agrupa os conhecimentos em blocos de 60h |
+| `POST` | `/api/situacao-aprendizagem` | Elabora a situação de aprendizagem |
+| `POST` | `/api/exportar-documento` | Cria o Google Docs e devolve os links |
 ---
 
 ## 👤 Criador

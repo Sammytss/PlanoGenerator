@@ -1,0 +1,723 @@
+/* =========================================================================
+   Estilos das páginas de Ficha de Observação e Situação de Aprendizagem
+   Complementa assets/css/style.css, reaproveitando a identidade visual
+   (azul #02287a, verde #2f7a56, laranja #e1452a) e as classes existentes.
+   ========================================================================= */
+
+.main-content.wide {
+    max-width: 1180px;
+}
+
+/* ---------- Navegação entre as páginas ---------- */
+.app-nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.app-nav a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.92);
+    color: #02287a;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border: 2px solid transparent;
+    transition: all 0.25s ease;
+}
+
+.app-nav a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.app-nav a.active {
+    background: #02287a;
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---------- Cartões de origem do plano ---------- */
+.origem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.origem-card {
+    border: 2px dashed #cbd5e0;
+    border-radius: 14px;
+    padding: 1.5rem;
+    transition: all 0.25s ease;
+}
+
+.origem-card.pronta {
+    border-style: solid;
+    border-color: #2f7a56;
+    background: rgba(47, 122, 86, 0.06);
+}
+
+.origem-card h3 {
+    font-size: 1rem;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.origem-card p {
+    font-size: 0.85rem;
+    color: #718096;
+    margin-bottom: 1rem;
+}
+
+/* ---------- Resumo do plano carregado ---------- */
+.plano-resumo {
+    background: linear-gradient(135deg, rgba(2, 40, 122, 0.06), rgba(47, 122, 86, 0.06));
+    border-left: 4px solid #02287a;
+    border-radius: 10px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.plano-resumo h3 {
+    font-size: 1.05rem;
+    color: #02287a;
+    margin-bottom: 0.6rem;
+}
+
+.plano-resumo dl {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.4rem 1.5rem;
+    font-size: 0.86rem;
+}
+
+.plano-resumo dt {
+    font-weight: 600;
+    color: #4a5568;
+    display: inline;
+}
+
+.plano-resumo dd {
+    display: inline;
+    margin-left: 0.35rem;
+    color: #2d3748;
+}
+
+/* ---------- Lista selecionável de blocos / situações ---------- */
+.item-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.item-opcao {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #fff;
+}
+
+.item-opcao:hover {
+    border-color: #02287a;
+    background: rgba(2, 40, 122, 0.03);
+}
+
+.item-opcao.selecionado {
+    border-color: #02287a;
+    background: rgba(2, 40, 122, 0.07);
+    box-shadow: 0 4px 14px rgba(2, 40, 122, 0.12);
+}
+
+.item-opcao input {
+    margin-top: 0.3rem;
+    width: auto;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.item-opcao-corpo {
+    flex: 1;
+    min-width: 0;
+}
+
+.item-opcao-titulo {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.95rem;
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.item-opcao-meta {
+    font-size: 0.8rem;
+    color: #718096;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+.tag {
+    display: inline-block;
+    padding: 0.15rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.tag.ficha {
+    background: rgba(47, 122, 86, 0.15);
+    color: #2f7a56;
+}
+
+.tag.horas {
+    background: rgba(2, 40, 122, 0.12);
+    color: #02287a;
+}
+
+.tag.alerta {
+    background: rgba(225, 69, 42, 0.14);
+    color: #e1452a;
+}
+
+/* ---------- Botões ---------- */
+.botoes {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.btn {
+    border: none;
+    padding: 0.85rem 1.6rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    text-decoration: none;
+}
+
+.btn-primario {
+    background: linear-gradient(135deg, #02287a, #2f7a56);
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(2, 40, 122, 0.28);
+}
+
+.btn-secundario {
+    background: #fff;
+    color: #02287a;
+    border: 2px solid #02287a;
+}
+
+.btn-neutro {
+    background: #edf2f7;
+    color: #4a5568;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16);
+}
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ---------- Mensagens ---------- */
+.mensagem {
+    padding: 1rem 1.2rem;
+    border-radius: 10px;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.mensagem.erro {
+    background: rgba(225, 69, 42, 0.1);
+    border-left: 4px solid #e1452a;
+    color: #9b2c15;
+}
+
+.mensagem.sucesso {
+    background: rgba(47, 122, 86, 0.1);
+    border-left: 4px solid #2f7a56;
+    color: #22543d;
+}
+
+.mensagem.info {
+    background: rgba(2, 40, 122, 0.08);
+    border-left: 4px solid #02287a;
+    color: #1a365d;
+}
+
+/* ---------- Estado de carregamento ---------- */
+.carregando {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: #4a5568;
+}
+
+.carregando::before {
+    content: '';
+    display: block;
+    width: 42px;
+    height: 42px;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(2, 40, 122, 0.15);
+    border-top-color: #02287a;
+    border-radius: 50%;
+    animation: girar 0.9s linear infinite;
+}
+
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================================
+   DOCUMENTO (ficha preenchível e situação de aprendizagem)
+   ========================================================================= */
+
+.documento {
+    background: #fff;
+    border-radius: 16px;
+    padding: 2.5rem;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+    margin-top: 2rem;
+}
+
+.documento-cabecalho {
+    text-align: center;
+    border-bottom: 3px solid #02287a;
+    padding-bottom: 1.2rem;
+    margin-bottom: 1.8rem;
+}
+
+.documento-cabecalho img {
+    max-height: 62px;
+    margin-bottom: 0.8rem;
+}
+
+.documento-cabecalho h2 {
+    font-size: 1.5rem;
+    color: #02287a;
+    letter-spacing: 0.02em;
+}
+
+.documento-cabecalho p {
+    font-size: 0.82rem;
+    color: #718096;
+    font-style: italic;
+}
+
+.documento h3.bloco-titulo {
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #02287a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 0.35rem;
+    margin: 1.8rem 0 0.9rem;
+}
+
+.documento p,
+.documento li {
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: #2d3748;
+}
+
+.documento ul {
+    margin: 0 0 0.8rem 1.3rem;
+}
+
+.documento li {
+    margin-bottom: 0.35rem;
+}
+
+/* Grelha de identificação */
+.identificacao {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.identificacao .campo {
+    display: flex;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    overflow: hidden;
+    font-size: 0.85rem;
+}
+
+.identificacao .campo strong {
+    background: #f0f2f5;
+    padding: 0.5rem 0.7rem;
+    min-width: 130px;
+    color: #4a5568;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.identificacao .campo span {
+    padding: 0.5rem 0.7rem;
+    flex: 1;
+    color: #2d3748;
+    word-break: break-word;
+}
+
+/* Campos preenchíveis pelo professor */
+.campos-aluno {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+    background: rgba(2, 40, 122, 0.04);
+    border-radius: 10px;
+    padding: 1.2rem;
+    margin-bottom: 1.2rem;
+}
+
+.campos-aluno label {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+}
+
+.campos-aluno input {
+    padding: 0.55rem 0.7rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    width: 100%;
+}
+
+/* ---------- Tabela de critérios ---------- */
+.tabela-criterios {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.tabela-criterios th,
+.tabela-criterios td {
+    border: 1px solid #a0aec0;
+    padding: 0.6rem 0.7rem;
+    vertical-align: top;
+    text-align: left;
+}
+
+.tabela-criterios thead th {
+    background: #dbe5f1;
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #1a365d;
+    text-align: center;
+}
+
+.tabela-criterios td.capacidade {
+    background: #f7fafc;
+    font-weight: 600;
+    width: 24%;
+}
+
+.tabela-criterios td.centro {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.tabela-criterios tbody tr:hover {
+    background: rgba(2, 40, 122, 0.03);
+}
+
+/* Rubricas do método gradual */
+.rubricas {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    font-size: 0.78rem;
+    color: #4a5568;
+}
+
+.rubricas li {
+    padding: 0.2rem 0;
+    border-top: 1px dotted #cbd5e0;
+    line-height: 1.5;
+}
+
+.rubricas li strong {
+    color: #02287a;
+}
+
+/* Marcação de avaliação */
+.marcacao {
+    display: inline-flex;
+    gap: 0.3rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.marcacao label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 2px solid #cbd5e0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #718096;
+    margin: 0;
+    transition: all 0.15s ease;
+    user-select: none;
+}
+
+.marcacao input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.marcacao label:hover {
+    border-color: #02287a;
+}
+
+.marcacao input:checked + span,
+.marcacao label.marcado {
+    background: #02287a;
+    border-color: #02287a;
+    color: #fff;
+}
+
+.marcacao label.marcado.negativo {
+    background: #e1452a;
+    border-color: #e1452a;
+}
+
+/* ---------- Resultado ---------- */
+.resultado-painel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    background: linear-gradient(135deg, rgba(2, 40, 122, 0.07), rgba(47, 122, 86, 0.07));
+    border-radius: 12px;
+    padding: 1.3rem;
+    margin: 1rem 0;
+}
+
+.resultado-item {
+    text-align: center;
+}
+
+.resultado-item .valor {
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #02287a;
+    line-height: 1.2;
+}
+
+.resultado-item .rotulo {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #718096;
+    font-weight: 600;
+}
+
+.conceito-descricao {
+    font-size: 0.82rem;
+    color: #4a5568;
+    font-style: italic;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+.legenda {
+    font-size: 0.8rem;
+    color: #718096;
+    font-style: italic;
+    margin-bottom: 1rem;
+}
+
+.documento textarea {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #cbd5e0;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.88rem;
+    resize: vertical;
+}
+
+/* Assinaturas */
+.assinaturas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 3rem;
+    text-align: center;
+}
+
+/* Ficha de observação: apenas a assinatura do instrutor, centrada */
+.assinaturas.uma {
+    grid-template-columns: minmax(0, 320px);
+    justify-content: center;
+}
+
+.assinaturas div {
+    border-top: 1px solid #2d3748;
+    padding-top: 0.4rem;
+    font-size: 0.82rem;
+    color: #4a5568;
+}
+
+/* Links de exportação devolvidos pelo Google */
+.links-exportacao {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+/* =========================================================================
+   IMPRESSÃO / SALVAR EM PDF
+   ========================================================================= */
+@media print {
+    @page {
+        size: A4;
+        margin: 12mm;
+    }
+
+    body {
+        background: #fff !important;
+        color: #000;
+    }
+
+    .institutional-header,
+    .app-nav,
+    .page-header,
+    .form-container,
+    .botoes,
+    .links-exportacao,
+    .footer-info,
+    .no-print {
+        display: none !important;
+    }
+
+    .main-content,
+    .main-content.wide {
+        margin: 0;
+        padding: 0;
+        max-width: 100%;
+    }
+
+    .documento {
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+        margin: 0;
+    }
+
+    .documento h3.bloco-titulo {
+        page-break-after: avoid;
+    }
+
+    .tabela-criterios {
+        page-break-inside: auto;
+    }
+
+    .tabela-criterios tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+
+    .campos-aluno {
+        background: none;
+        border: 1px solid #999;
+    }
+
+    .campos-aluno input,
+    .documento textarea {
+        border: none;
+        border-bottom: 1px solid #666;
+        border-radius: 0;
+    }
+
+    /* Marcações precisam sair na impressão */
+    .marcacao label {
+        border: 1px solid #000;
+        color: #000;
+    }
+
+    .marcacao label.marcado {
+        background: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .tabela-criterios thead th,
+    .identificacao .campo strong,
+    .resultado-painel {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+/* ---------- Responsivo ---------- */
+@media (max-width: 768px) {
+    .origem-grid,
+    .assinaturas,
+    .form-group-row {
+        grid-template-columns: 1fr;
+    }
+
+    .documento {
+        padding: 1.5rem;
+    }
+
+    .tabela-criterios {
+        font-size: 0.78rem;
+    }
+
+    .tabela-criterios th,
+    .tabela-criterios td {
+        padding: 0.4rem;
+    }
+}
