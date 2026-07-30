@@ -83,7 +83,19 @@ app.post('/gerar-plano', upload, async (req, res) => {
     let userMessage = 'Ocorreu um erro interno ao gerar o plano. Tente novamente em alguns instantes.';
 
     if (error && typeof error.message === 'string') {
-      if (error.message.includes('É necessário enviar o PDF')) {
+      if (error.message === 'QUOTA_ESGOTADA') {
+        userMessage =
+          'O limite de uso da IA do Google foi atingido. Aguarde alguns minutos e tente novamente. ' +
+          'Se acontecer com frequência, será preciso aumentar a quota do projeto no Vertex AI.';
+      } else if (error.message === 'RESPOSTA_TRUNCADA') {
+        userMessage =
+          `A IA devolveu uma resposta incompleta em "${error.etapa || 'uma das etapas'}". ` +
+          'Tente novamente; se persistir, o conteúdo desta UC pode ser extenso demais para uma única resposta.';
+      } else if (error.message === 'JSON_INVALIDO' || error.message === 'RESPOSTA_VAZIA') {
+        userMessage =
+          `A IA devolveu uma resposta que não pôde ser interpretada em "${error.etapa || 'uma das etapas'}". ` +
+          'Tente novamente em alguns instantes.';
+      } else if (error.message.includes('É necessário enviar o PDF')) {
         // Erro de validação que o usuário precisa ver exatamente
         userMessage = 'É necessário enviar o PDF da Unidade Curricular para elaborar o plano.';
       } else if (error.message.includes('Nenhuma data de aula válida foi encontrada')) {
@@ -99,6 +111,38 @@ app.post('/gerar-plano', upload, async (req, res) => {
     res.end();
   }
 });
+
+/**
+ * Traduz os erros levantados por src/services/aiRunner.js em mensagens que o
+ * utilizador consegue interpretar e agir sobre.
+ *
+ * @param {Error} erro Erro capturado.
+ * @param {string} acao Descrição da ação que falhou (ex.: "gerar a ficha").
+ * @returns {string} Mensagem para o utilizador.
+ */
+function mensagemErroIa(erro, acao) {
+  const etapa = (erro && erro.etapa) || 'uma das etapas';
+
+  switch (erro && erro.message) {
+    case 'QUOTA_ESGOTADA':
+      return (
+        'O limite de uso da IA do Google foi atingido. Aguarde alguns minutos e tente novamente. ' +
+        'Se acontecer com frequência, será preciso aumentar a quota do projeto no Vertex AI.'
+      );
+    case 'RESPOSTA_TRUNCADA':
+      return (
+        `A IA devolveu uma resposta incompleta em "${etapa}". Tente novamente; se persistir, ` +
+        'reduza o número de capacidades deste item ou use o campo de instruções para pedir algo mais sucinto.'
+      );
+    case 'JSON_INVALIDO':
+    case 'RESPOSTA_VAZIA':
+      return `A IA devolveu uma resposta que não pôde ser interpretada em "${etapa}". Tente novamente em alguns instantes.`;
+    case 'FICHA_SEM_CRITERIOS':
+      return 'A IA não conseguiu elaborar critérios para este item. Tente novamente ou use o campo de instruções para dar mais contexto.';
+    default:
+      return `Ocorreu um erro ao ${acao}. Tente novamente em alguns instantes.`;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Importação de um plano a partir de uma planilha já gerada
@@ -151,12 +195,9 @@ app.post('/api/ficha-observacao', async (req, res) => {
     return res.json({ success: true, ficha });
   } catch (erro) {
     console.error('Erro ao gerar ficha de observação:', erro);
-    return res.status(500).json({
+    return res.status(erro.message === 'QUOTA_ESGOTADA' ? 429 : 500).json({
       success: false,
-      error:
-        erro.message === 'FICHA_SEM_CRITERIOS'
-          ? 'A IA não conseguiu elaborar critérios para este item. Tente novamente ou use o campo de instruções para dar mais contexto.'
-          : 'Ocorreu um erro ao gerar a ficha de observação. Tente novamente em alguns instantes.',
+      error: mensagemErroIa(erro, 'gerar a ficha de observação'),
     });
   }
 });
@@ -238,9 +279,9 @@ app.post('/api/situacao-aprendizagem', async (req, res) => {
     return res.json({ success: true, situacao });
   } catch (erro) {
     console.error('Erro ao gerar situação de aprendizagem:', erro);
-    return res.status(500).json({
+    return res.status(erro.message === 'QUOTA_ESGOTADA' ? 429 : 500).json({
       success: false,
-      error: 'Ocorreu um erro ao elaborar a situação de aprendizagem. Tente novamente em alguns instantes.',
+      error: mensagemErroIa(erro, 'elaborar a situação de aprendizagem'),
     });
   }
 });

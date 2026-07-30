@@ -1,6 +1,7 @@
 const axios = require('axios');
 const XLSX = require('xlsx');
-const { client, generationConfig } = require('../config/ai');
+const { generationConfig, generationConfigTexto } = require('../config/ai');
+const { gerarJson, gerarTexto } = require('./aiRunner');
 const { APPS_SCRIPT_URL, LOGOTIPO_URL } = require('../config');
 const { normalizarInstrumentos, usaFichaDeObservacao } = require('./instrumentos');
 const { separarCapacidadesEConhecimento } = require('./planParser');
@@ -96,12 +97,13 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             }
         `;
 
-  const extractorResult = await client.models.generateContent({
+  const topicListJson = await gerarJson({
     model: 'gemini-2.5-flash',
     contents: [extractorPrompt, filePart],
-    config: generationConfig
+    config: generationConfig,
+    etapa: 'Etapa 1: extração de tópicos',
+    sendUpdate,
   });
-  const topicListJson = JSON.parse(extractorResult.text);
   const topicTitles = topicListJson.topicos;
 
   if (!topicTitles || topicTitles.length === 0) {
@@ -146,11 +148,13 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
             `;
 
-    const saepResult = await client.models.generateContent({
+    const analysisResult = await gerarTexto({
       model: 'gemini-2.5-flash',
-      contents: [saepAnalysisPrompt, dossieMatriz]
+      contents: [saepAnalysisPrompt, dossieMatriz],
+      config: generationConfigTexto,
+      etapa: 'Etapa 2.1: análise da Matriz SAEP',
+      sendUpdate,
     });
-    const analysisResult = saepResult.text;
 
     // Verifica se a IA encontrou a UC
     if (analysisResult.trim() !== 'NAO_ENCONTRADO') {
@@ -233,12 +237,13 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
                     * Deixe as chaves "inicio" e "fim" como strings vazias.
             `;
 
-    const elaboratorResult = await client.models.generateContent({
+    const topicDetailJson = await gerarJson({
       model: 'gemini-2.5-flash',
       contents: [elaboratorPrompt, filePart],
-      config: generationConfig
+      config: generationConfig,
+      etapa: `Etapa 2.2: tópico ${index + 1}/${topicTitles.length}`,
+      sendUpdate,
     });
-    const topicDetailJson = JSON.parse(elaboratorResult.text);
 
     // Adiciona o resultado da análise ao JSON
     topicDetailJson.saep = saepMatrixString;
@@ -284,12 +289,13 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
                 3.  **PARA A CHAVE "criterios":** Defina UM critério de avaliação claro, direto e no passado (formato "O aluno..."), que avalie o desempenho do aluno na atividade final proposta.
             `;
 
-    const assessmentResult = await client.models.generateContent({
+    const assessmentJson = await gerarJson({
       model: 'gemini-2.5-flash',
       contents: [finalAssessmentPrompt, filePart],
-      config: generationConfig
+      config: generationConfig,
+      etapa: 'Etapa 2.3: avaliação final',
+      sendUpdate,
     });
-    const assessmentJson = JSON.parse(assessmentResult.text);
 
     // Substituição dos valores do último tópico pelos valores gerados
     ultimoTopico.instrumentos = assessmentJson.instrumentos || 'Prova Prática';

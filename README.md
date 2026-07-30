@@ -15,6 +15,7 @@
 - [🚀 Instalação para Desenvolvimento Local](#-instalação-para-desenvolvimento-local)
 - [💻 Instalação em Servidor de Produção (Ubuntu)](#-instalação-em-servidor-de-produção-ubuntu)
 - [⚡ Workflow de Atualização](#-workflow-de-atualização)
+- [🩺 Solução de Problemas](#-solução-de-problemas)
 - [📁 Estrutura do Projeto](#-estrutura-do-projeto)
 - [👤 Criador](#-criador)
 
@@ -311,6 +312,36 @@ sudo systemctl restart apache2
 
 ---
 
+## 🩺 Solução de Problemas
+
+### `Unexpected end of JSON input` / `Unterminated string in JSON`
+
+O `gemini-2.5-flash` é um modelo de raciocínio: os tokens de *thinking* são **descontados do `maxOutputTokens`**. Se o orçamento for apertado, o modelo gasta parte dele a pensar e devolve o JSON cortado a meio, com `finishReason: MAX_TOKENS`.
+
+Medição que originou os valores em `src/config/ai.js` (extração de 40 conhecimentos):
+
+| Config | finishReason | thinking | saída | tempo |
+|---|---|---|---|---|
+| 8192, thinking automático | `MAX_TOKENS` | 1.666 | 6.512 | 48s |
+| 8192, thinking desligado | `STOP` | — | 2.690 | 16s |
+| 32768, thinking automático | `STOP` | 8.722 | 9.823 | 105s |
+
+Por isso o projeto fixa um `thinkingBudget` explícito e baixo, com `maxOutputTokens` bastante acima dele — assim o espaço de saída deixa de depender de quanto o modelo decide pensar.
+
+**Ao diagnosticar respostas incompletas, inspecione sempre `candidates[0].finishReason` e `usageMetadata.thoughtsTokenCount`.** A mensagem do `JSON.parse` sozinha não revela a causa.
+
+### `429 RESOURCE_EXHAUSTED`
+
+Quota do Vertex AI esgotada. A elaboração faz uma chamada por conhecimento, portanto uma UC com muitos tópicos consome quota rapidamente — especialmente com tentativas repetidas.
+
+`src/services/aiRunner.js` repete automaticamente com espera exponencial (4s, 8s, 16s) antes de desistir, e informa o progresso ao utilizador. Se o erro for frequente, aumente a quota do projeto no Vertex AI.
+
+### Ausência do logotipo nos Google Docs
+
+Falta o escopo `script.external_request` na autorização do Apps Script. Ver a nota sobre [autorização OAuth](#️-autorização-oauth-ao-atualizar-o-apps-script).
+
+---
+
 ## ⚡ Workflow de Atualização
 
 Para atualizar a aplicação no servidor após um git push:
@@ -351,6 +382,7 @@ PlanoGenerator/
 │   │   ├── index.js            # Variáveis de ambiente, CORS, URLs
 │   │   └── upload.js           # Configuração Multer (PDF, matriz e planilha)
 │   └── services/
+│       ├── aiRunner.js         # Repetição em 429, validação de finishReason e JSON
 │       ├── docExporter.js      # Criação de Google Docs (links DOCX/PDF)
 │       ├── fichaGenerator.js   # Critérios dicotómicos e graduais (MSEP)
 │       ├── instrumentos.js     # Normalização dos instrumentos de avaliação

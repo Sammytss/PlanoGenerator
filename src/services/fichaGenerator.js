@@ -1,4 +1,5 @@
-const { client, generationConfig } = require('../config/ai');
+const { generationConfig } = require('../config/ai');
+const { gerarJson } = require('./aiRunner');
 
 // ---------------------------------------------------------------------------
 // Geração de Fichas de Observação segundo a MSEP 2019
@@ -16,8 +17,11 @@ const { client, generationConfig } = require('../config/ai');
 // objetividade, granularidade e transparência.
 // ---------------------------------------------------------------------------
 
-/** Config com folga de tokens: uma ficha pode ter dezenas de critérios. */
-const configFicha = { ...generationConfig, maxOutputTokens: 32768, temperature: 0.3 };
+// Config com folga de tokens: uma ficha gradual tem 4 rubricas por critério e
+// pode chegar facilmente às dezenas de milhares de caracteres. O thinkingBudget
+// vem de generationConfig e é deliberadamente baixo — ver a nota em config/ai.js
+// sobre os tokens de raciocínio consumirem o orçamento de saída.
+const configFicha = { ...generationConfig, maxOutputTokens: 40960, temperature: 0.3 };
 
 /** Escala de conceitos da MSEP (p.155). */
 const ESCALA_CONCEITOS = [
@@ -118,13 +122,12 @@ Responda EXCLUSIVAMENTE com um objeto JSON neste formato:
 }
 `;
 
-  const resultado = await client.models.generateContent({
+  return gerarJson({
     model: 'gemini-2.5-flash',
     contents: [prompt],
     config: configFicha,
+    etapa: 'Ficha de observação (dicotómico)',
   });
-
-  return JSON.parse(resultado.text);
 }
 
 /**
@@ -181,13 +184,12 @@ Responda EXCLUSIVAMENTE com um objeto JSON neste formato:
 }
 `;
 
-  const resultado = await client.models.generateContent({
+  return gerarJson({
     model: 'gemini-2.5-flash',
     contents: [prompt],
     config: configFicha,
+    etapa: 'Ficha de observação (gradual)',
   });
-
-  return JSON.parse(resultado.text);
 }
 
 /**

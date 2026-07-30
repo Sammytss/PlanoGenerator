@@ -1,4 +1,5 @@
-const { client, generationConfig } = require('../config/ai');
+const { generationConfig } = require('../config/ai');
+const { gerarJson } = require('./aiRunner');
 
 // ---------------------------------------------------------------------------
 // Elaboração de Situações de Aprendizagem segundo a MSEP 2019 (§3.2.1.4)
@@ -19,8 +20,10 @@ const { client, generationConfig } = require('../config/ai');
 //   h) Detalhamento em planos de aula
 // ---------------------------------------------------------------------------
 
-/** Config com folga: uma SA reúne muitas capacidades e conhecimentos. */
-const configSituacao = { ...generationConfig, maxOutputTokens: 32768, temperature: 0.5 };
+// Config com folga: uma SA reúne muitas capacidades e conhecimentos. O
+// thinkingBudget vem de generationConfig e é deliberadamente baixo — ver a nota
+// em config/ai.js sobre os tokens de raciocínio consumirem o orçamento de saída.
+const configSituacao = { ...generationConfig, maxOutputTokens: 40960, temperature: 0.5 };
 
 /**
  * Estratégias de aprendizagem desafiadoras definidas pela MSEP (p.114).
@@ -258,13 +261,12 @@ Responda EXCLUSIVAMENTE com um objeto JSON neste formato:
 }
 `;
 
-  const resultado = await client.models.generateContent({
+  const bruto = await gerarJson({
     model: 'gemini-2.5-flash',
     contents: [prompt],
     config: configSituacao,
+    etapa: `Situação de aprendizagem ${numero}`,
   });
-
-  const bruto = JSON.parse(resultado.text);
   const lista = (valor) => (Array.isArray(valor) ? valor.map(String).filter(Boolean) : []);
 
   return {
