@@ -2,7 +2,7 @@ const axios = require('axios');
 const XLSX = require('xlsx');
 const { generationConfig, generationConfigTexto } = require('../config/ai');
 const { gerarJson, gerarTexto } = require('./aiRunner');
-const { APPS_SCRIPT_URL, LOGOTIPO_URL } = require('../config');
+const { APPS_SCRIPT_URL, LOGOTIPO_URL, GEMINI_MODEL } = require('../config');
 const { normalizarInstrumentos, usaFichaDeObservacao } = require('./instrumentos');
 const { separarCapacidadesEConhecimento } = require('./planParser');
 
@@ -98,7 +98,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
         `;
 
   const topicListJson = await gerarJson({
-    model: 'gemini-2.5-flash',
+    model: GEMINI_MODEL,
     contents: [extractorPrompt, filePart],
     config: generationConfig,
     etapa: 'Etapa 1: extração de tópicos',
@@ -149,7 +149,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             `;
 
     const analysisResult = await gerarTexto({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_MODEL,
       contents: [saepAnalysisPrompt, dossieMatriz],
       config: generationConfigTexto,
       etapa: 'Etapa 2.1: análise da Matriz SAEP',
@@ -238,7 +238,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             `;
 
     const topicDetailJson = await gerarJson({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_MODEL,
       contents: [elaboratorPrompt, filePart],
       config: generationConfig,
       etapa: `Etapa 2.2: tópico ${index + 1}/${topicTitles.length}`,
@@ -290,7 +290,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             `;
 
     const assessmentJson = await gerarJson({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_MODEL,
       contents: [finalAssessmentPrompt, filePart],
       config: generationConfig,
       etapa: 'Etapa 2.3: avaliação final',

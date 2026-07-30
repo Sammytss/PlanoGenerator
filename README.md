@@ -76,7 +76,7 @@ Elabora o documento completo da situação de aprendizagem seguindo a Etapa 2 da
 - **Frontend:** HTML5, CSS3, JavaScript
 - **Backend:** Node.js, Express.js
 - **Servidor:** Apache2 (como Proxy Reverso), PM2 (Gestor de Processos)
-- **IA Generativa:** Google Gemini 2.5 Pro
+- **IA Generativa:** Google Gemini via Vertex AI (`gemini-3.6-flash`, região `global`; configurável em `GEMINI_MODEL`)
 - **Geração de Planilhas:** Google Apps Script
 - **Dependências Principais:** `axios`, `cors`, `dotenv`, `multer`, `xlsx`, `@google/generative-ai`
 
@@ -106,12 +106,15 @@ Siga estes passos para executar a aplicação na sua máquina local para testes 
     ```
 
 3. **Configure o Backend:**
-    - Crie um ficheiro `.env` na **raiz do projeto**.
-    - Adicione a sua chave de API:
+    - Crie um ficheiro `.env` na **raiz do projeto**:
       ```
-      GEMINI_API_KEY=SUA_CHAVE_DE_API_AQUI
+      VERTEX_PROJECT_ID=seu-projeto-gcp
+      VERTEX_LOCATION=global
+      GOOGLE_APPLICATION_CREDENTIALS=caminho/para/service-account.json
       ```
-    - (Opcional) `APPS_SCRIPT_URL` e `LOGOTIPO_URL` podem ser definidos no `.env` se precisar sobrescrever os valores padrão.
+    - ⚠️ **`VERTEX_LOCATION` deve ser `global`.** Os modelos Gemini 3.x não são servidos em regiões concretas — ver [Solução de Problemas](#-solução-de-problemas).
+    - (Opcional) `GEMINI_MODEL` sobrescreve o modelo, que por omissão é `gemini-3.6-flash`. Atualizar de versão é só mudar esta variável.
+    - (Opcional) `APPS_SCRIPT_URL`, `LOGOTIPO_URL`, `PORT` e `CORS_ORIGINS` também podem ser definidos no `.env`.
 
 4. **Configure o Google Apps Script:**
     - Crie um novo projeto em [script.google.com](https://script.google.com).
@@ -329,6 +332,20 @@ Medição que originou os valores em `src/config/ai.js` (extração de 40 conhec
 Por isso o projeto fixa um `thinkingBudget` explícito e baixo, com `maxOutputTokens` bastante acima dele — assim o espaço de saída deixa de depender de quanto o modelo decide pensar.
 
 **Ao diagnosticar respostas incompletas, inspecione sempre `candidates[0].finishReason` e `usageMetadata.thoughtsTokenCount`.** A mensagem do `JSON.parse` sozinha não revela a causa.
+
+### `404 NOT_FOUND` ao usar um modelo Gemini 3.x
+
+Os modelos **Gemini 3.x só são servidos na região `global`**. Em regiões concretas, como `us-central1`, a chamada devolve `404 NOT_FOUND`.
+
+A armadilha é que `models.list()` **lista** `gemini-3.5-flash` e `gemini-3.6-flash` mesmo quando configurado para `us-central1` — o catálogo de modelos do publisher é global, a disponibilidade de invocação não é. Não confie na listagem para concluir que um modelo está acessível: teste uma chamada real.
+
+```bash
+# .env
+VERTEX_LOCATION=global
+GEMINI_MODEL=gemini-3.6-flash
+```
+
+O arranque avisa quando esta combinação está errada, em vez de deixar falhar só na primeira geração.
 
 ### `429 RESOURCE_EXHAUSTED`
 

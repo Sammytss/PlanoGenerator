@@ -1,4 +1,5 @@
 const { generationConfig } = require('../config/ai');
+const { GEMINI_MODEL } = require('../config');
 const { gerarJson } = require('./aiRunner');
 
 // ---------------------------------------------------------------------------
@@ -262,7 +263,7 @@ Responda EXCLUSIVAMENTE com um objeto JSON neste formato:
 `;
 
   const bruto = await gerarJson({
-    model: 'gemini-2.5-flash',
+    model: GEMINI_MODEL,
     contents: [prompt],
     config: configSituacao,
     etapa: `Situação de aprendizagem ${numero}`,

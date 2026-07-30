@@ -21,12 +21,36 @@ if (existingEnvPath) {
 }
 
 const VERTEX_PROJECT_ID = process.env.VERTEX_PROJECT_ID;
-const VERTEX_LOCATION = process.env.VERTEX_LOCATION || 'us-central1';
+
+// ---------------------------------------------------------------------------
+// Região e modelo do Vertex AI
+// ---------------------------------------------------------------------------
+// Os modelos Gemini 3.x são servidos na região "global". Em regiões concretas,
+// como us-central1, a chamada devolve 404 NOT_FOUND — mesmo que o modelo apareça
+// no catálogo devolvido por models.list(), que é global e não regional.
+// Ver a secção de solução de problemas do README.
+const VERTEX_LOCATION = process.env.VERTEX_LOCATION || 'global';
+
+// Modelo usado em todas as chamadas. Centralizado aqui para que a atualização
+// de versão seja uma variável de ambiente, e não uma edição em vários ficheiros.
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+
+// Aviso de arranque para a combinação que falha silenciosamente até à primeira
+// geração: modelo 3.x fora da região global.
+const modeloExigeGlobal = /^gemini-3/.test(GEMINI_MODEL);
+if (modeloExigeGlobal && VERTEX_LOCATION !== 'global') {
+  console.warn(
+    `AVISO: o modelo "${GEMINI_MODEL}" só responde em VERTEX_LOCATION=global, ` +
+      `mas está configurado "${VERTEX_LOCATION}". As gerações vão falhar com 404 NOT_FOUND. ` +
+      'Corrija o .env ou use um modelo 2.x.'
+  );
+}
 
 console.log(
   'Vertex AI Project ID configurado:',
   VERTEX_PROJECT_ID ? 'SUCESSO' : 'FALHA - undefined'
 );
+console.log(`Modelo: ${GEMINI_MODEL} | Região: ${VERTEX_LOCATION}`);
 
 if (!VERTEX_PROJECT_ID) {
   throw new Error(
@@ -79,6 +103,7 @@ const LOGOTIPO_URL =
 module.exports = {
   VERTEX_PROJECT_ID,
   VERTEX_LOCATION,
+  GEMINI_MODEL,
   PORT,
   corsOptions,
   APPS_SCRIPT_URL,
