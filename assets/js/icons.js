@@ -9,10 +9,10 @@
    preto na impressão.
 
    Uso em HTML estático:
-     <svg class="icon" aria-hidden="true"><use href="#ico-alvo"></use></svg>
+     <svg class="icon" aria-hidden="true"><use href="#ico-calendario"></use></svg>
 
    Uso em HTML gerado por JavaScript:
-     Icons.html('alvo')
+     Icons.html('calendario')
 
    O sprite é injetado no início do <body>, antes de qualquer referência, por
    isso este ficheiro deve ser carregado logo a seguir à abertura do <body>.
@@ -26,10 +26,16 @@
      * atributo href (prefixado com "ico-").
      */
     var DESENHOS = {
-        alvo: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+        // Central de Ajuda: acompanha o botão "?" do cabeçalho que abre o modal
+        ajuda: '<circle cx="12" cy="12" r="9"/>' +
+            '<path d="M9.4 9.3a2.7 2.7 0 0 1 5.2.9c0 1.8-2.6 2.6-2.6 2.6"/>' +
+            '<path d="M12 17.2h.01"/>',
 
-        brilho: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/>' +
-            '<path d="M18 15l.7 1.8L20.5 17.5l-1.8.7L18 20l-.7-1.8-1.8-.7 1.8-.7L18 15z"/>',
+        // Guia Interativo: percurso orientado campo a campo pelo formulário
+        bussola: '<circle cx="12" cy="12" r="9"/><path d="M15.9 8.1 14 14l-5.9 1.9L10 10l5.9-1.9z"/>',
+
+        // Situação de Aprendizagem: a peça que encaixa capacidades num desafio
+        quebraCabeca: '<path d="M5.5 5.5h4.2a2.3 2.3 0 1 1 4.6 0h4.2v4.2a2.3 2.3 0 1 0 0 4.6v4.2H5.5v-4.2a2.3 2.3 0 1 1 0-4.6V5.5z"/>',
 
         escola: '<path d="M12 3 2 8l10 5 10-5-10-5z"/><path d="M6 10.5V16c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5v-5.5"/>' +
             '<path d="M20 9v5"/>',
@@ -37,11 +43,6 @@
         prancheta: '<rect x="8" y="3" width="8" height="4" rx="1"/>' +
             '<path d="M9 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3"/>' +
             '<path d="M8 12h8M8 16h5"/>',
-
-        foguete: '<path d="M12 2.6c2.7 2.6 4.3 6.2 4.3 10.1v3.6H7.7v-3.6c0-3.9 1.6-7.5 4.3-10.1z"/>' +
-            '<circle cx="12" cy="10" r="1.9"/>' +
-            '<path d="M7.7 13.1 4.9 16v3.6l2.8-1.5"/><path d="M16.3 13.1 19.1 16v3.6l-2.8-1.5"/>' +
-            '<path d="M10.4 19.4 12 22l1.6-2.6"/>',
 
         video: '<rect x="2" y="6" width="13" height="12" rx="2"/><path d="M22 8.5v7l-7-3.5 7-3.5z"/>',
 

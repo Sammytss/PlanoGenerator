@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
             PlanoStore.mensagem(mensagemGeracao, 'erro', erro.message);
         } finally {
             btnGerar.disabled = false;
-            btnGerar.innerHTML = Icons.html('brilho') + ' Gerar ficha de observação';
+            btnGerar.textContent = 'Gerar ficha de observação';
         }
     });
 

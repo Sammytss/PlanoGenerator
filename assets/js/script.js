@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const atalhos = planoGuardado
                             ? `<div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                                 <p style="margin-bottom: 12px; color: #4a5568;">Continue o planejamento com este plano já carregado:</p>
-                                <a href="/situacao-aprendizagem" style="display:inline-block;margin:4px;padding:10px 18px;background:#02287a;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-alvo"></use></svg> Situação de Aprendizagem</a>
+                                <a href="/situacao-aprendizagem" style="display:inline-block;margin:4px;padding:10px 18px;background:#02287a;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-quebraCabeca"></use></svg> Situação de Aprendizagem</a>
                                 <a href="/ficha-observacao" style="display:inline-block;margin:4px;padding:10px 18px;background:#2f7a56;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-documentoEditar"></use></svg> Ficha de Observação</a>
                                </div>`
                             : '';
@@ -156,8 +156,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             resultArea.innerHTML = `<p style="color: red; text-align: center;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-erro"></use></svg> ${userMessage}</p>`;
         } finally {
             submitBtn.disabled = false;
-            // innerHTML para repor o ícone, que textContent removeria
-            submitBtn.innerHTML = Icons.html('foguete') + ' Gerar Plano de Curso';
+            submitBtn.textContent = 'Gerar Plano de Curso';
         }
     });
 });
