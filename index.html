@@ -13,6 +13,9 @@
 </head>
 
 <body>
+    <!-- Sprite de icones SVG: injetado antes de qualquer referencia <use> -->
+    <script src="assets/js/icons.js"></script>
+
     <!-- Cabeçalho institucional -->
     <div class="institutional-header">
         <div class="header-content">
@@ -63,16 +66,16 @@
 
         <!-- Modal de boas-vindas - primeira tela que o usuário vê -->
         <div id="guideWelcome" class="guide-welcome">
-            <h2>🎯 Bem-vindo ao Plano Generator!</h2>
+            <h2><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-alvo"></use></svg>Bem-vindo ao Plano Generator!</h2>
             <p>Vamos te guiar passo a passo pelo preenchimento do formulário para criar seu planejamento com facilidade.
             </p>
 
             <div class="updates-container">
-                <h3 class="updates-header">✨ Novidades da Versão 2.0.1</h3>
+                <h3 class="updates-header"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-brilho"></use></svg>Novidades da Versão 2.0.1</h3>
                 <div class="updates-list">
 
                     <div class="update-item">
-                        <div class="update-icon-box">🏫</div>
+                        <div class="update-icon-box"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-escola"></use></svg></div>
                         <div class="update-text">
                             <strong>Seleção de Unidade Escolar</strong>
                             <p>Selecione primeiro o <strong>Estado</strong>, depois o <strong>Município</strong> e por fim a <strong>Unidade Escolar</strong> onde o curso será ministrado. A lista segue as unidades SENAI do Portal da Indústria.</p>
@@ -81,7 +84,7 @@
                     </div>
 
                     <div class="update-item">
-                        <div class="update-icon-box">📋</div>
+                        <div class="update-icon-box"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-prancheta"></use></svg></div>
                         <div class="update-text">
                             <strong>Modalidade em lista</strong>
                             <p>O campo Modalidade passou a ser uma lista: Doutorado, Mestrado, Pós Graduação, Graduação, Habilitação técnica, Aprendizagem, Qualificação, Aperfeiçoamento e Cursos Livres. Para algumas modalidades, a coluna SAEP não aparece na planilha.</p>
@@ -142,7 +145,7 @@
     <div id="helpCard" class="help-card hidden">
         <div class="help-card-content">
             <div class="help-card-header">
-                <h3>🎯 Central de Ajuda</h3>
+                <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-alvo"></use></svg>Central de Ajuda</h3>
                 <button class="help-close-btn">✕</button>
             </div>
             <div class="help-card-body">
@@ -150,7 +153,7 @@
 
                 <div class="help-options">
                     <div id="startGuideOption" class="help-option">
-                        <div class="help-option-icon">🚀</div>
+                        <div class="help-option-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-foguete"></use></svg></div>
                         <div class="help-option-content">
                             <h4>Guia Interativo</h4>
                             <p>Tutorial passo a passo que te guia pelo formulário explicando cada campo</p>
@@ -158,7 +161,7 @@
                     </div>
 
                     <div id="showVideoOption" class="help-option">
-                        <div class="help-option-icon">🎥</div>
+                        <div class="help-option-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-video"></use></svg></div>
                         <div class="help-option-content">
                             <h4>Vídeo Tutorial</h4>
                             <p>Assista a um vídeo completo mostrando como usar todas as funcionalidades</p>
@@ -171,19 +174,19 @@
     <div id="videoModal" class="video-modal hidden">
         <div class="video-modal-content">
             <div class="video-modal-header">
-                <h3>📹 Tutorial em Vídeo</h3>
+                <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-video"></use></svg>Tutorial em Vídeo</h3>
                 <button id="closeVideoBtn" class="video-close-btn">✕</button>
             </div>
             <div id="videoContainer" class="video-container">
                 <div class="video-placeholder">
-                    <div class="video-icon">🎬</div>
+                    <div class="video-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-filme"></use></svg></div>
                     <h4>Tutorial: Como Usar o Plano Generator</h4>
                     <p>Este vídeo mostra passo a passo como preencher o formulário e gerar seu planejamento docente.</p>
                     <div class="video-info">
-                        <span>⏱️ Duração: 3:19 minutos</span>
+                        <span><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-relogio"></use></svg> Duração: 3:19 minutos</span>
                     </div>
                     <button id="playVideoBtn" class="video-play-btn">
-                        ▶️ Reproduzir Tutorial
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-reproduzir"></use></svg> Reproduzir Tutorial
                     </button>
                 </div>
             </div>
@@ -191,9 +194,9 @@
     </div>
     <div class="main-content">
         <nav class="app-nav">
-            <a href="/" class="active">📋 Planejamento Docente</a>
-            <a href="/ficha-observacao">📝 Ficha de Observação</a>
-            <a href="/situacao-aprendizagem">🎯 Situação de Aprendizagem</a>
+            <a href="/" class="active"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-prancheta"></use></svg> Planejamento Docente</a>
+            <a href="/ficha-observacao"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-documentoEditar"></use></svg> Ficha de Observação</a>
+            <a href="/situacao-aprendizagem"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-alvo"></use></svg> Situação de Aprendizagem</a>
         </nav>
         <div class="form-container">
             <div class="progress-indicator">
@@ -213,7 +216,7 @@
             <form id="courseForm">
                 <div class="form-section">
                     <div class="section-title">
-                        <div class="section-icon">📋</div>
+                        <div class="section-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-prancheta"></use></svg></div>
                         Informações Básicas
                     </div>
                     <div class="form-group-row">
@@ -286,7 +289,7 @@
 
                 <div class="form-section">
                     <div class="section-title">
-                        <div class="section-icon">📅</div>
+                        <div class="section-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-calendario"></use></svg></div>
                         Cronograma
                     </div>
 
@@ -319,7 +322,7 @@
                         </div>
                     </div>
                     <div class="section-title">
-                        ⏳ Definição dos Dias de Aula</div>
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-ampulheta"></use></svg> Definição dos Dias de Aula</div>
                     <div class="form-group-row">
                         <div class="form-group">
                             <label for="weekdays">Dias da Semana (se aplicável):</label>
@@ -363,7 +366,7 @@
 
                 <div class="form-section">
                     <div class="section-title">
-                        <div class="section-icon">📄</div>
+                        <div class="section-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-documento"></use></svg></div>
                         Documentação
                     </div>
 
@@ -389,7 +392,7 @@
                 </div>
 
                 <div class="submit-section">
-                    <button type="submit" id="submitBtn">🚀 Gerar Plano de Curso</button>
+                    <button type="submit" id="submitBtn"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-foguete"></use></svg> Gerar Plano de Curso</button>
                 </div>
             </form>
 
@@ -397,7 +400,7 @@
         </div>
 
         <div class="footer-info">
-            <p>💡 <strong>Dica:</strong> Certifique-se de que o PDF da UC contém todas as informações necessárias para
+            <p><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-lampada"></use></svg> <strong>Dica:</strong> Certifique-se de que o PDF da UC contém todas as informações necessárias para
                 um plano completo.</p>
         </div>
     </div>

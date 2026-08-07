@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
      */
     function desenharGrupos(grupos) {
         if (!grupos || grupos.length === 0) {
-            listaGrupos.innerHTML = '<div class="mensagem info">ℹ️ Nenhum bloco de horas foi identificado no plano.</div>';
+            listaGrupos.innerHTML = '<div class="mensagem info">' + Icons.html('informacao') + ' Nenhum bloco de horas foi identificado no plano.</div>';
             return;
         }
 
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
             PlanoStore.mensagem(mensagemGeracao, 'erro', erro.message);
         } finally {
             btnGerar.disabled = false;
-            btnGerar.textContent = '✨ Elaborar situação de aprendizagem';
+            btnGerar.innerHTML = Icons.html('brilho') + ' Elaborar situação de aprendizagem';
         }
     });
 
@@ -355,9 +355,9 @@ document.addEventListener('DOMContentLoaded', function () {
             'Coordenações Técnica e Pedagógica (MSEP 2019, Etapa 3).</p>' +
 
             '<div class="botoes no-print">' +
-            '<button type="button" class="btn btn-primario" id="btnImprimir">🖨️ Imprimir / Salvar em PDF</button>' +
-            '<button type="button" class="btn btn-secundario" id="btnExportar">📄 Exportar para Google Docs</button>' +
-            '<button type="button" class="btn btn-neutro" id="btnFicha">📝 Gerar ficha deste bloco</button>' +
+            '<button type="button" class="btn btn-primario" id="btnImprimir">' + Icons.html('impressora') + ' Imprimir / Salvar em PDF</button>' +
+            '<button type="button" class="btn btn-secundario" id="btnExportar">' + Icons.html('documento') + ' Exportar para Google Docs</button>' +
+            '<button type="button" class="btn btn-neutro" id="btnFicha">' + Icons.html('documentoEditar') + ' Gerar ficha deste bloco</button>' +
             '</div>' +
             '<div id="areaExportacao" class="no-print"></div>' +
             '</div>';
@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
             PlanoStore.mensagem(area, 'erro', erro.message);
         } finally {
             botao.disabled = false;
-            botao.textContent = '📄 Exportar para Google Docs';
+            botao.innerHTML = Icons.html('documento') + ' Exportar para Google Docs';
         }
     }
 });

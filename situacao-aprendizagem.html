@@ -11,6 +11,9 @@
 </head>
 
 <body>
+    <!-- Sprite de icones SVG: injetado antes de qualquer referencia <use> -->
+    <script src="assets/js/icons.js"></script>
+
     <!-- Cabeçalho institucional -->
     <div class="institutional-header">
         <div class="header-content">
@@ -40,9 +43,9 @@
 
     <div class="main-content wide">
         <nav class="app-nav">
-            <a href="/">📋 Planejamento Docente</a>
-            <a href="/ficha-observacao">📝 Ficha de Observação</a>
-            <a href="/situacao-aprendizagem" class="active">🎯 Situação de Aprendizagem</a>
+            <a href="/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-prancheta"></use></svg> Planejamento Docente</a>
+            <a href="/ficha-observacao"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-documentoEditar"></use></svg> Ficha de Observação</a>
+            <a href="/situacao-aprendizagem" class="active"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-alvo"></use></svg> Situação de Aprendizagem</a>
         </nav>
 
         <div class="page-header">
@@ -64,7 +67,7 @@
 
             <div class="origem-grid" id="origemGrid">
                 <div class="origem-card" id="cardSessao">
-                    <h3>🗂️ Plano desta sessão</h3>
+                    <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-pasta"></use></svg>Plano desta sessão</h3>
                     <p>Se você gerou o planejamento agora, ele já está disponível no navegador.</p>
                     <button type="button" class="btn btn-secundario" id="btnUsarSessao" disabled>
                         Nenhum plano nesta sessão
@@ -72,7 +75,7 @@
                 </div>
 
                 <div class="origem-card">
-                    <h3>📤 Enviar planilha (.xlsx)</h3>
+                    <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-enviar"></use></svg>Enviar planilha (.xlsx)</h3>
                     <p>
                         Baixe a planilha do Google Sheets em <strong>Arquivo → Fazer download → Microsoft Excel
                             (.xlsx)</strong> e envie aqui.
@@ -99,7 +102,7 @@
 
             <div class="form-section">
                 <div class="section-title">
-                    <div class="section-icon">📦</div>
+                    <div class="section-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-caixa"></use></svg></div>
                     Blocos de 60 horas da Unidade Curricular
                 </div>
                 <div class="item-lista" id="listaGrupos"></div>
@@ -107,7 +110,7 @@
 
             <div class="form-section">
                 <div class="section-title">
-                    <div class="section-icon">🎯</div>
+                    <div class="section-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-alvo"></use></svg></div>
                     Estratégia de aprendizagem desafiadora
                 </div>
                 <div class="item-lista" id="listaEstrategias"></div>
@@ -122,8 +125,8 @@
             </div>
 
             <div class="botoes">
-                <button type="button" class="btn btn-primario" id="btnGerar">✨ Elaborar situação de aprendizagem</button>
-                <button type="button" class="btn btn-neutro" id="btnTrocarPlano">🔄 Trocar planejamento</button>
+                <button type="button" class="btn btn-primario" id="btnGerar"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-brilho"></use></svg> Elaborar situação de aprendizagem</button>
+                <button type="button" class="btn btn-neutro" id="btnTrocarPlano"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-atualizar"></use></svg> Trocar planejamento</button>
             </div>
 
             <div id="mensagemGeracao"></div>
@@ -133,7 +136,7 @@
         <div id="areaSituacao"></div>
 
         <div class="footer-info no-print">
-            <p>💡 <strong>Dica:</strong> após elaborar a situação, use a página <a href="/ficha-observacao"
+            <p><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-lampada"></use></svg> <strong>Dica:</strong> após elaborar a situação, use a página <a href="/ficha-observacao"
                     style="color:#02287a;">Ficha de Observação</a> para criar o instrumento de avaliação dos itens deste
                 mesmo bloco.</p>
         </div>

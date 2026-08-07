@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
             PlanoStore.mensagem(mensagemGeracao, 'erro', erro.message);
         } finally {
             btnGerar.disabled = false;
-            btnGerar.textContent = '✨ Gerar ficha de observação';
+            btnGerar.innerHTML = Icons.html('brilho') + ' Gerar ficha de observação';
         }
     });
 
@@ -314,9 +314,9 @@ document.addEventListener('DOMContentLoaded', function () {
             '</div>' +
 
             '<div class="botoes no-print">' +
-            '<button type="button" class="btn btn-primario" id="btnImprimir">🖨️ Imprimir / Salvar em PDF</button>' +
-            '<button type="button" class="btn btn-secundario" id="btnExportar">📄 Exportar para Google Docs</button>' +
-            '<button type="button" class="btn btn-neutro" id="btnLimparMarcacoes">🧹 Limpar marcações</button>' +
+            '<button type="button" class="btn btn-primario" id="btnImprimir">' + Icons.html('impressora') + ' Imprimir / Salvar em PDF</button>' +
+            '<button type="button" class="btn btn-secundario" id="btnExportar">' + Icons.html('documento') + ' Exportar para Google Docs</button>' +
+            '<button type="button" class="btn btn-neutro" id="btnLimparMarcacoes">' + Icons.html('borracha') + ' Limpar marcações</button>' +
             '</div>' +
             '<div id="areaExportacao" class="no-print"></div>' +
             '</div>';
@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function () {
             '</div>' +
             '<p class="conceito-descricao">' + esc(conceito.descricao) + '</p>' +
             (avaliados < total
-                ? '<p class="legenda">⚠️ Ainda faltam ' + (total - avaliados) +
+                ? '<p class="legenda">' + Icons.html('aviso') + ' Ainda faltam ' + (total - avaliados) +
                   ' critério(s) por avaliar. O conceito considera todos os critérios da ficha.</p>'
                 : '');
     }
@@ -485,7 +485,7 @@ document.addEventListener('DOMContentLoaded', function () {
             PlanoStore.mensagem(area, 'erro', erro.message);
         } finally {
             botao.disabled = false;
-            botao.textContent = '📄 Exportar para Google Docs';
+            botao.innerHTML = Icons.html('documento') + ' Exportar para Google Docs';
         }
     }
 

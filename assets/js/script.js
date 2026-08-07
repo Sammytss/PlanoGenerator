@@ -121,14 +121,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const atalhos = planoGuardado
                             ? `<div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                                 <p style="margin-bottom: 12px; color: #4a5568;">Continue o planejamento com este plano já carregado:</p>
-                                <a href="/situacao-aprendizagem" style="display:inline-block;margin:4px;padding:10px 18px;background:#02287a;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">🎯 Situação de Aprendizagem</a>
-                                <a href="/ficha-observacao" style="display:inline-block;margin:4px;padding:10px 18px;background:#2f7a56;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;">📝 Ficha de Observação</a>
+                                <a href="/situacao-aprendizagem" style="display:inline-block;margin:4px;padding:10px 18px;background:#02287a;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-alvo"></use></svg> Situação de Aprendizagem</a>
+                                <a href="/ficha-observacao" style="display:inline-block;margin:4px;padding:10px 18px;background:#2f7a56;color:#fff;text-decoration:none;border-radius:8px;font-weight:600;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-documentoEditar"></use></svg> Ficha de Observação</a>
                                </div>`
                             : '';
 
                         resultArea.innerHTML = `
                         <div style="text-align: center;">
-                            <h2 style="color: #1e8e3e;">✅ Planilha Gerada com Sucesso!</h2>
+                            <h2 style="color: #1e8e3e;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-sucesso"></use></svg> Planilha Gerada com Sucesso!</h2>
                             <p>O seu plano de curso "<strong>${finalData.spreadsheetName}</strong>" está pronto.</p>
                             <a href="${finalData.spreadsheetUrl}" target="_blank" style="display: inline-block; font-size: 1.1em; padding: 12px 20px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
                                 Clique aqui para abrir a planilha
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>`;
                     } else if (message.startsWith('ERRO:')) {
                         const userMessage = message.substring(5).trim() || 'Ocorreu um erro ao gerar o plano. Tente novamente em alguns instantes.';
-                        resultArea.innerHTML = `<p style="color: red; text-align: center;">❌ ${userMessage}</p>`;
+                        resultArea.innerHTML = `<p style="color: red; text-align: center;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-erro"></use></svg> ${userMessage}</p>`;
                     } else if (progressTextElement) {
                         // Atualiza o texto do elemento em vez de criar um novo
                         progressTextElement.textContent = message;
@@ -153,10 +153,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.'
                 : 'Ocorreu um erro ao processar sua solicitação. Tente novamente em alguns instantes.';
 
-            resultArea.innerHTML = `<p style="color: red; text-align: center;">❌ ${userMessage}</p>`;
+            resultArea.innerHTML = `<p style="color: red; text-align: center;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-erro"></use></svg> ${userMessage}</p>`;
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Gerar Plano de Curso';
+            // innerHTML para repor o ícone, que textContent removeria
+            submitBtn.innerHTML = Icons.html('foguete') + ' Gerar Plano de Curso';
         }
     });
 });

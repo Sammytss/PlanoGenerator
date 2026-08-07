@@ -389,6 +389,7 @@ PlanoGenerator/
 │   └── js/
 │       ├── calendar-init.js
 │       ├── ficha-observacao.js      # Página da Ficha de Observação
+│       ├── icons.js                 # Sprite de ícones SVG + helper Icons.html()
 │       ├── plano-store.js           # Plano em sessionStorage + exportação
 │       ├── script.js
 │       ├── situacao-aprendizagem.js # Página da Situação de Aprendizagem

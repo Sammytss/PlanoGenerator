@@ -137,7 +137,7 @@ window.PlanoStore = (function () {
         }, 0);
 
         destino.innerHTML =
-            '<h3>📘 ' + esc(id.unidadeCurricular || 'Unidade Curricular') + '</h3>' +
+            '<h3>' + Icons.html('livro') + ' ' + esc(id.unidadeCurricular || 'Unidade Curricular') + '</h3>' +
             '<dl>' +
             '<div><dt>Curso:</dt><dd>' + esc(id.curso || '—') + '</dd></div>' +
             '<div><dt>Instrutor:</dt><dd>' + esc(id.instrutor || '—') + '</dd></div>' +
@@ -161,7 +161,7 @@ window.PlanoStore = (function () {
      */
     function mensagem(destino, tipo, texto) {
         if (!destino) return;
-        var icone = tipo === 'erro' ? '❌' : tipo === 'sucesso' ? '✅' : 'ℹ️';
+        var icone = Icons.html(tipo === 'erro' ? 'erro' : tipo === 'sucesso' ? 'sucesso' : 'informacao');
         destino.innerHTML = '<div class="mensagem ' + tipo + '">' + icone + ' ' + esc(texto) + '</div>';
     }
 
@@ -196,12 +196,12 @@ window.PlanoStore = (function () {
     function desenharLinksExportacao(destino, documento) {
         if (!destino || !documento) return;
         destino.innerHTML =
-            '<div class="mensagem sucesso">✅ Documento criado no Google Docs.</div>' +
+            '<div class="mensagem sucesso">' + Icons.html('sucesso') + ' Documento criado no Google Docs.</div>' +
             '<div class="links-exportacao">' +
-            '<a class="btn btn-primario" target="_blank" rel="noopener" href="' + esc(documento.copyUrl) + '">📝 Abrir e editar no Google Docs</a>' +
-            '<a class="btn btn-secundario" target="_blank" rel="noopener" href="' + esc(documento.docxUrl) + '">⬇️ Baixar DOCX</a>' +
-            '<a class="btn btn-secundario" target="_blank" rel="noopener" href="' + esc(documento.pdfUrl) + '">⬇️ Baixar PDF</a>' +
-            '<a class="btn btn-neutro" target="_blank" rel="noopener" href="' + esc(documento.docUrl) + '">👁️ Visualizar original</a>' +
+            '<a class="btn btn-primario" target="_blank" rel="noopener" href="' + esc(documento.copyUrl) + '">' + Icons.html('documentoEditar') + ' Abrir e editar no Google Docs</a>' +
+            '<a class="btn btn-secundario" target="_blank" rel="noopener" href="' + esc(documento.docxUrl) + '">' + Icons.html('baixar') + ' Baixar DOCX</a>' +
+            '<a class="btn btn-secundario" target="_blank" rel="noopener" href="' + esc(documento.pdfUrl) + '">' + Icons.html('baixar') + ' Baixar PDF</a>' +
+            '<a class="btn btn-neutro" target="_blank" rel="noopener" href="' + esc(documento.docUrl) + '">' + Icons.html('olho') + ' Visualizar original</a>' +
             '</div>' +
             '<p style="font-size:0.8rem;color:#718096;text-align:center;margin-top:0.6rem;">' +
             '"Abrir e editar" cria uma cópia no Drive da conta Google em que você está autenticado, ' +
