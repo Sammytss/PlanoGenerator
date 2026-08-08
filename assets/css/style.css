@@ -1308,7 +1308,7 @@ body.guide-is-active {
 
 /* Lista com Scroll suave se houver muitos itens */
 .updates-list {
-    max-height: 180px; /* Limita a altura para não quebrar o modal */
+    max-height: 260px; /* Limita a altura para não quebrar o modal */
     overflow-y: auto;
     padding-right: 5px; /* Espaço para a scrollbar */
 }
