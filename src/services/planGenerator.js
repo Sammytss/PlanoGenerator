@@ -1,7 +1,10 @@
 const axios = require('axios');
 const XLSX = require('xlsx');
-const { model, textModel } = require('../config/ai');
-const { APPS_SCRIPT_URL, LOGOTIPO_URL } = require('../config');
+const { generationConfig, generationConfigTexto } = require('../config/ai');
+const { gerarJson, gerarTexto } = require('./aiRunner');
+const { APPS_SCRIPT_URL, LOGOTIPO_URL, GEMINI_MODEL } = require('../config');
+const { normalizarInstrumentos, usaFichaDeObservacao } = require('./instrumentos');
+const { separarCapacidadesEConhecimento } = require('./planParser');
 
 /**
  * Fluxo completo de geração do plano.
@@ -94,8 +97,13 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             }
         `;
 
-  const extractorResult = await model.generateContent([extractorPrompt, filePart]);
-  const topicListJson = JSON.parse(extractorResult.response.text());
+  const topicListJson = await gerarJson({
+    model: GEMINI_MODEL,
+    contents: [extractorPrompt, filePart],
+    config: generationConfig,
+    etapa: 'Etapa 1: extração de tópicos',
+    sendUpdate,
+  });
   const topicTitles = topicListJson.topicos;
 
   if (!topicTitles || topicTitles.length === 0) {
@@ -140,11 +148,13 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
             Se NÃO encontrar a UC "${ucName}" no dossiê, responda APENAS com a palavra "NAO_ENCONTRADO".
             `;
 
-    const saepResult = await textModel.generateContent([
-      saepAnalysisPrompt,
-      dossieMatriz,
-    ]);
-    const analysisResult = saepResult.response.text();
+    const analysisResult = await gerarTexto({
+      model: GEMINI_MODEL,
+      contents: [saepAnalysisPrompt, dossieMatriz],
+      config: generationConfigTexto,
+      etapa: 'Etapa 2.1: análise da Matriz SAEP',
+      sendUpdate,
+    });
 
     // Verifica se a IA encontrou a UC
     if (analysisResult.trim() !== 'NAO_ENCONTRADO') {
@@ -186,10 +196,15 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
                     * Em seguida, para o Conhecimento "${title}", identifique e selecione da lista completa **APENAS a(s) Capacidade(s) Técnica(s) que são diretamente desenvolvidas por este Conhecimento**.
                     * **FORMATAÇÃO OBRIGATÓRIA:** Formate o valor EXATAMENTE assim:
                         "[Liste AQUI a(s) capacidade(s) técnica(s) que você selecionou];
-                        
+
                         Por meio de:
-                        
-                        ${title}" 
+
+                        ${title}"
+
+                1.1 **PARA A CHAVE "capacidades" (lista estruturada):**
+                    * Devolva AS MESMAS capacidades usadas na chave "oque", mas como um ARRAY DE STRINGS.
+                    * Cada string deve conter o código e a descrição integral da capacidade (ex.: "H99 - Aplicar linguagem de programação por meio do ambiente integrado de desenvolvimento (IDE)").
+                    * Esta lista é usada para montar as Fichas de Observação e as Situações de Aprendizagem, por isso NÃO abrevie e NÃO agrupe capacidades diferentes na mesma string.
 
                 2.  **PARA A CHAVE "como" (Estratégia de Ensino):**
                     * ESCOLHA no mínimo 1 e no máximo 2 estratégias da lista a seguir: ["Exposição dialogada", "Atividade prática", "Trabalho em grupo"].
@@ -206,8 +221,11 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
                     * **REGRA DE FIM DE CURSO:** Se este for o último ou penúltimo conhecimento, você PODE escolher "Prova Prática", "Prova Objetiva" ou "Trabalho em Grupo" se for lógico.
                     * **"criterios":** Defina UM critério de avaliação claro, direto e no passado, no formato "O aluno...", que se relacione DIRETAMENTE com o instrumento escolhido.
                          
-                4.  **PARA AS OUTRAS CHAVES ("onde", "recursos", "situacaoAprendizagem"):**
+                4.  **PARA AS OUTRAS CHAVES ("onde", "recursos"):**
                     * Preencha com informações pertinentes para o conhecimento em questão.
+                    * **NÃO gere "situacaoAprendizagem".** Pela MSEP, uma situação de aprendizagem agrupa várias
+                      capacidades e corresponde a um bloco de aproximadamente 60 horas, e não a um único
+                      conhecimento. Esse campo é preenchido posteriormente, por bloco de 60 horas.
                 
                 5.  **PARA A CHAVE "recursos" (Formatação Específica):**
                     * **FORMATAÇÃO OBRIGATÓRIA:** Formate o resultado como uma ÚNICA string de texto onde CADA recurso individual está em uma NOVA LINHA e TERMINA com um PONTO E VÍRGULA (;).
@@ -219,11 +237,29 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
                     * Deixe as chaves "inicio" e "fim" como strings vazias.
             `;
 
-    const elaboratorResult = await model.generateContent([elaboratorPrompt, filePart]);
-    const topicDetailJson = JSON.parse(elaboratorResult.response.text());
+    const topicDetailJson = await gerarJson({
+      model: GEMINI_MODEL,
+      contents: [elaboratorPrompt, filePart],
+      config: generationConfig,
+      etapa: `Etapa 2.2: tópico ${index + 1}/${topicTitles.length}`,
+      sendUpdate,
+    });
 
     // Adiciona o resultado da análise ao JSON
     topicDetailJson.saep = saepMatrixString;
+
+    // Dados estruturados usados pelas páginas de Ficha de Observação e de
+    // Situação de Aprendizagem. Mantemos "oque" intacto para a planilha.
+    topicDetailJson.conhecimento = title;
+    if (!Array.isArray(topicDetailJson.capacidades)) {
+      const { capacidades } = separarCapacidadesEConhecimento(topicDetailJson.oque || '');
+      topicDetailJson.capacidades = capacidades;
+    }
+
+    // Normaliza os instrumentos para permitir filtrar os blocos que pedem ficha
+    topicDetailJson.instrumentosNormalizados = normalizarInstrumentos(
+      topicDetailJson.instrumentos
+    );
 
     conteudoDetalhado.push(topicDetailJson);
   }
@@ -253,8 +289,13 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
                 3.  **PARA A CHAVE "criterios":** Defina UM critério de avaliação claro, direto e no passado (formato "O aluno..."), que avalie o desempenho do aluno na atividade final proposta.
             `;
 
-    const assessmentResult = await model.generateContent([finalAssessmentPrompt, filePart]);
-    const assessmentJson = JSON.parse(assessmentResult.response.text());
+    const assessmentJson = await gerarJson({
+      model: GEMINI_MODEL,
+      contents: [finalAssessmentPrompt, filePart],
+      config: generationConfig,
+      etapa: 'Etapa 2.3: avaliação final',
+      sendUpdate,
+    });
 
     // Substituição dos valores do último tópico pelos valores gerados
     ultimoTopico.instrumentos = assessmentJson.instrumentos || 'Prova Prática';
@@ -400,8 +441,9 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
       recursos: [],
       instrumentos: [],
       criterios: [],
-      situacaoAprendizagem: [],
       onde: [],
+      capacidades: [],
+      conhecimentos: [],
       saep: '',
       cargaHoraria: cargaDiaria.toString(),
     }));
@@ -429,26 +471,34 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
       }
 
       if (item.criterios) diaAlvo.criterios.push(item.criterios);
-      if (item.situacaoAprendizagem) {
-        diaAlvo.situacaoAprendizagem.push(item.situacaoAprendizagem);
-      }
+
+      // Preserva os dados estruturados usados pelas fichas e situações
+      (item.capacidades || []).forEach((c) => {
+        if (!diaAlvo.capacidades.includes(c)) diaAlvo.capacidades.push(c);
+      });
+      if (item.conhecimento) diaAlvo.conhecimentos.push(item.conhecimento);
 
       if (!diaAlvo.saep) diaAlvo.saep = item.saep;
     });
 
     // Converte os arrays de volta para strings formatadas
-    planoFinal = planoFinal.map((dia) => ({
-      oque: dia.oque.join('\n\n---\n\n'),
-      como: dia.como.join('\n\n'),
-      recursos: dia.recursos.join('\n'),
-      instrumentos: dia.instrumentos.join(' / '),
-      criterios: dia.criterios.join('\n'),
-      situacaoAprendizagem: dia.situacaoAprendizagem.join('\n\n'),
-      // Junta os locais removendo duplicatas (ex: Lab Info / Sala Aula)
-      onde: [...new Set(dia.onde)].join(' / '),
-      saep: dia.saep,
-      cargaHoraria: dia.cargaHoraria,
-    }));
+    planoFinal = planoFinal.map((dia) => {
+      const instrumentos = dia.instrumentos.join(' / ');
+      return {
+        oque: dia.oque.join('\n\n---\n\n'),
+        como: dia.como.join('\n\n'),
+        recursos: dia.recursos.join('\n'),
+        instrumentos,
+        instrumentosNormalizados: normalizarInstrumentos(instrumentos),
+        criterios: dia.criterios.join('\n'),
+        // Junta os locais removendo duplicatas (ex: Lab Info / Sala Aula)
+        onde: [...new Set(dia.onde)].join(' / '),
+        capacidades: dia.capacidades,
+        conhecimento: dia.conhecimentos.join('; '),
+        saep: dia.saep,
+        cargaHoraria: dia.cargaHoraria,
+      };
+    });
   }
 
   // Substitui o array original pelo processado
@@ -486,8 +536,130 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
     payloadParaAppsScript
   );
 
-  // Devolve apenas os dados; quem chama decide como enviar o DONE
-  return appsScriptResponse.data;
+  // ---------------------------------------------------------------------
+  // Plano em formato estruturado, devolvido ao navegador para ser guardado
+  // em sessionStorage e reutilizado pelas páginas de Ficha de Observação e
+  // de Situação de Aprendizagem. Nada é persistido no servidor.
+  // ---------------------------------------------------------------------
+  const plano = montarPlanoEstruturado({
+    payload: payloadParaAppsScript,
+    conteudoDetalhado,
+    diasDeAula: payloadParaAppsScript.diasDeAulaValidos,
+  });
+
+  return {
+    ...appsScriptResponse.data,
+    plano,
+  };
+}
+
+/**
+ * Converte o conteúdo enviado ao Apps Script na mesma estrutura devolvida pelo
+ * planParser, de forma que as páginas seguintes funcionem indistintamente com
+ * um plano recém-gerado ou com um plano importado de uma planilha.
+ *
+ * O agrupamento em páginas reproduz o limite de 60 horas por aba aplicado pelo
+ * Apps Script, fazendo cada página corresponder a uma situação de aprendizagem.
+ *
+ * @param {{ payload: object, conteudoDetalhado: object[], diasDeAula: string[] }} params
+ * @returns {object} Plano estruturado.
+ */
+function montarPlanoEstruturado({ payload, conteudoDetalhado, diasDeAula }) {
+  const LIMITE_HORAS_POR_PAGINA = 60;
+
+  const blocos = [];
+  const paginas = [];
+
+  let paginaIndex = 1;
+  let horasNaPagina = 0;
+  let diaIndex = 0;
+  let paginaAtual = { nome: `Plano (Parte ${paginaIndex})`, horas: 0, blocosIds: [] };
+  paginas.push(paginaAtual);
+
+  conteudoDetalhado.forEach((item, index) => {
+    const horasArray = String(item.cargaHoraria || '')
+      .split(',')
+      .map((h) => parseInt(h.trim(), 10) || 0)
+      .filter((h) => h > 0);
+
+    const instrumentos =
+      item.instrumentosNormalizados || normalizarInstrumentos(item.instrumentos);
+
+    const bloco = {
+      id: `bloco-${index + 1}`,
+      pagina: paginaAtual.nome,
+      oque: item.oque || '',
+      capacidades: item.capacidades || [],
+      conhecimento: item.conhecimento || '',
+      saep: item.saep || '',
+      como: item.como || '',
+      onde: item.onde || '',
+      recursos: item.recursos || '',
+      criterios: item.criterios || '',
+      instrumentosTexto: item.instrumentos || '',
+      instrumentos,
+      usaFichaObservacao: usaFichaDeObservacao(instrumentos),
+      situacaoAprendizagem: '',
+      cargaHoraria: 0,
+      aulas: [],
+    };
+
+    // Um bloco pode atravessar a quebra de página. Nesse caso o Apps Script
+    // reescreve o conhecimento na aba seguinte, logo o bloco pertence a todas
+    // as páginas que as suas aulas tocam — e, portanto, às situações de
+    // aprendizagem correspondentes.
+    const paginasTocadas = [];
+
+    horasArray.forEach((horasDoDia) => {
+      if (diaIndex >= diasDeAula.length) return;
+
+      // Reproduz a quebra de página do Apps Script
+      if (horasNaPagina > 0 && horasNaPagina + horasDoDia > LIMITE_HORAS_POR_PAGINA) {
+        paginaIndex += 1;
+        horasNaPagina = 0;
+        paginaAtual = { nome: `Plano (Parte ${paginaIndex})`, horas: 0, blocosIds: [] };
+        paginas.push(paginaAtual);
+      }
+
+      if (paginasTocadas.indexOf(paginaAtual) === -1) {
+        paginasTocadas.push(paginaAtual);
+        if (paginasTocadas.length === 1) bloco.pagina = paginaAtual.nome;
+      }
+
+      bloco.cargaHoraria += horasDoDia;
+      bloco.aulas.push({ horas: horasDoDia, data: diasDeAula[diaIndex] });
+      horasNaPagina += horasDoDia;
+      // A carga horária da página conta as aulas efetivamente nela realizadas
+      paginaAtual.horas += horasDoDia;
+      diaIndex += 1;
+    });
+
+    if (bloco.aulas.length > 0) {
+      paginasTocadas.forEach((pagina) => {
+        if (!pagina.blocosIds.includes(bloco.id)) pagina.blocosIds.push(bloco.id);
+      });
+      blocos.push(bloco);
+    }
+  });
+
+  return {
+    origem: 'plano-gerado',
+    importadoEm: new Date().toISOString(),
+    identificacao: {
+      unidadeEscolar: payload.unidadeEscolar,
+      curso: payload.nomeCurso,
+      codigoTurma: payload.codigoTurma,
+      unidadeCurricular: payload.nomeUC,
+      periodo: `${payload.dataInicioCurso} - ${payload.dataFimCurso}`,
+      dataInicio: payload.dataInicioCurso,
+      dataFim: payload.dataFimCurso,
+      modalidade: payload.modalidade,
+      cargaHorariaTotal: payload.cargaHorariaTotal,
+      instrutor: payload.instrutor,
+    },
+    paginas: paginas.filter((p) => p.blocosIds.length > 0),
+    blocos,
+  };
 }
 
 module.exports = {

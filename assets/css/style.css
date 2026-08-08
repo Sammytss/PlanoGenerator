@@ -22,6 +22,75 @@ body {
     color: #02287a;
 }
 
+/* =========================================================================
+   Ícones SVG (ver assets/js/icons.js)
+   Dimensionados em em para acompanharem o texto e desenhados com
+   stroke: currentColor para herdarem a cor do contexto — incluindo o branco
+   dentro das caixas com gradiente e o preto na impressão.
+   ========================================================================= */
+.icon {
+    width: 1.05em;
+    height: 1.05em;
+    flex: 0 0 auto;
+    vertical-align: -0.15em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* Ícone dentro da caixa com gradiente dos títulos de secção */
+.section-icon .icon {
+    width: 13px;
+    height: 13px;
+    vertical-align: 0;
+    stroke-width: 2.2;
+}
+
+/* Caixa branca dos itens de novidades: ícone na cor institucional */
+.update-icon-box .icon {
+    width: 18px;
+    height: 18px;
+    vertical-align: 0;
+    color: #02287a;
+}
+
+.help-option-icon .icon,
+.video-icon .icon {
+    vertical-align: 0;
+    color: #02287a;
+    stroke-width: 1.8;
+}
+
+/* Ícone antes do texto em títulos e ligações */
+h2 .icon,
+h3 .icon,
+h4 .icon {
+    margin-right: 0.45rem;
+}
+
+/* Botões e ligações de navegação alinham ícone e texto pelo centro */
+#submitBtn,
+.app-nav a,
+.help-option-icon,
+.video-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.help-option-icon .icon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.video-icon .icon {
+    width: 3rem;
+    height: 3rem;
+}
+
 /* Cabeçalho institucional */
 .institutional-header {
     background: rgba(255, 255, 255, 0.95);
@@ -874,7 +943,7 @@ body.guide-is-active {
 }
 
 /* =======================================================
-   ✨ POSICIONAMENTO RESPONSIVO DO TOOLTIP ✨
+   POSICIONAMENTO RESPONSIVO DO TOOLTIP
    ======================================================= */
 
 .guide-tooltip {
@@ -889,7 +958,7 @@ body.guide-is-active {
     margin-left: 2rem;
 }
 
-/* ✨ REGRA para posicionar o tooltip EM BAIXO (ecrãs estreitos) ✨ */
+/* REGRA para posicionar o tooltip EM BAIXO (ecrãs estreitos) */
 .guide-tooltip.bottom {
     top: 100%;
     left: 50%;
@@ -916,7 +985,7 @@ body.guide-is-active {
     border-right-color: white;
 }
 
-/* ✨ REGRA para a seta na posição EM BAIXO ✨ */
+/* REGRA para a seta na posição EM BAIXO */
 .guide-tooltip.bottom::before {
     top: -10px;
     left: 50%;
@@ -1039,7 +1108,7 @@ body.guide-is-active {
     background: white;
     border-radius: 16px;
     box-shadow: 0 0 0 4px #02287a;
-    /* ✨ AZUL ORIGINAL ✨ */
+    /* AZUL ORIGINAL */
     transition: box-shadow 0.3s ease-out;
     margin: -12px;
     padding: 12px;
@@ -1239,7 +1308,7 @@ body.guide-is-active {
 
 /* Lista com Scroll suave se houver muitos itens */
 .updates-list {
-    max-height: 180px; /* Limita a altura para não quebrar o modal */
+    max-height: 260px; /* Limita a altura para não quebrar o modal */
     overflow-y: auto;
     padding-right: 5px; /* Espaço para a scrollbar */
 }

@@ -50,7 +50,31 @@ const upload = multer({
   { name: 'matrixFile', maxCount: 1 },
 ]);
 
+// Upload da planilha de planejamento já gerada (.xlsx), usada pelas páginas de
+// Ficha de Observação e Situação de Aprendizagem para reaproveitar um plano que
+// não foi gerado na sessão atual do navegador.
+const uploadPlanilha = multer({
+  storage,
+  limits: {
+    fileSize: 15 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    const name = (file.originalname || '').toLowerCase();
+    const allowedMimes = [
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ];
+    const allowedExt = ['.xls', '.xlsx'];
+
+    if (allowedMimes.includes(file.mimetype) || allowedExt.some((ext) => name.endsWith(ext))) {
+      return cb(null, true);
+    }
+    return cb(null, false);
+  },
+}).single('planilhaFile');
+
 module.exports = {
   upload,
+  uploadPlanilha,
 };
 
