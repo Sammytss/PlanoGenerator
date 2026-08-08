@@ -14,6 +14,8 @@
     <!-- Sprite de icones SVG: injetado antes de qualquer referencia <use> -->
     <script src="assets/js/icons.js"></script>
 
+    <!-- Vista trocada pelo roteador sem recarregar a página (assets/js/spa.js) -->
+    <div id="app-view" data-pagina="ficha">
     <!-- Cabeçalho institucional -->
     <div class="institutional-header">
         <div class="header-content">
@@ -151,6 +153,9 @@
         </div>
     </div>
 
+    </div>
+
+    <script src="assets/js/spa.js"></script>
     <script src="assets/js/plano-store.js"></script>
     <script src="assets/js/ficha-observacao.js"></script>
 </body>

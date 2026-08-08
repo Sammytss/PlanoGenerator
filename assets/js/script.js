@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', async () => {
+SPA.pagina('plano', async function () {
     const form = document.getElementById('courseForm');
     const submitBtn = document.getElementById('submitBtn');
     const resultArea = document.getElementById('resultArea');

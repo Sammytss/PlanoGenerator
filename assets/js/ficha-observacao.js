@@ -9,7 +9,7 @@
         vê o conceito calculado e imprime ou exporta o documento.
    ========================================================================= */
 
-document.addEventListener('DOMContentLoaded', function () {
+SPA.pagina('ficha', function () {
     'use strict';
 
     var esc = PlanoStore.esc;
@@ -40,12 +40,30 @@ document.addEventListener('DOMContentLoaded', function () {
     // Etapa 1 — origem do plano
     // ---------------------------------------------------------------------
 
-    var planoDaSessao = PlanoStore.carregar();
-    if (planoDaSessao) {
-        btnUsarSessao.disabled = false;
-        btnUsarSessao.textContent = 'Usar "' + (planoDaSessao.identificacao.unidadeCurricular || 'plano da sessão') + '"';
-        document.getElementById('cardSessao').classList.add('pronta');
+    var cardSessao = document.getElementById('cardSessao');
+    var planoDaSessao = null;
+
+    /**
+     * Refresca o cartão do plano da sessão. Corre a cada montagem da vista,
+     * porque o utilizador pode ter gerado um plano na página de Planejamento
+     * Docente depois de já ter visitado esta.
+     */
+    function atualizarPlanoDaSessao() {
+        planoDaSessao = PlanoStore.carregar();
+
+        if (planoDaSessao) {
+            btnUsarSessao.disabled = false;
+            btnUsarSessao.textContent =
+                'Usar "' + (planoDaSessao.identificacao.unidadeCurricular || 'plano da sessão') + '"';
+            if (cardSessao) cardSessao.classList.add('pronta');
+        } else {
+            btnUsarSessao.disabled = true;
+            btnUsarSessao.textContent = 'Nenhum plano nesta sessão';
+            if (cardSessao) cardSessao.classList.remove('pronta');
+        }
     }
+
+    SPA.aoMontar('ficha', atualizarPlanoDaSessao);
 
     btnUsarSessao.addEventListener('click', function () {
         if (planoDaSessao) aplicarPlano(planoDaSessao);

@@ -63,6 +63,14 @@ Elabora o documento completo da situação de aprendizagem seguindo a Etapa 2 da
 - **Conteúdo gerado:** contextualização, desafio, resultados esperados, estratégias de ensino, recursos e ambientes, critérios e instrumentos de avaliação, e o detalhamento em etapas de plano de aula.
 - Na planilha, a coluna *Situação de Aprendizagem* passa a ser **mesclada por aba inteira**, com a referência à situação correspondente.
 
+### 🔀 Navegação sem recarregar
+
+As três páginas trocam entre si sem recarregar o navegador, para que **nada do que já foi preenchido se perca**.
+
+A vista de cada página é guardada em memória como um **nó destacado do documento**, e não regenerada a partir do HTML. Essa distinção é o ponto central: um `<input type="file">` não pode ter o seu valor reposto por JavaScript, por segurança do navegador. Se o DOM fosse destruído e recriado, o PDF da Unidade Curricular e a Matriz SAEP já escolhidos seriam perdidos. Como o nó continua vivo, preservam-se campos de texto, datas, ficheiros selecionados, fichas já geradas e a posição de deslocamento.
+
+Cada página continua a ser um ficheiro HTML servido pelo Express, pelo que **ligações diretas, atualização da página e os botões de avançar e retroceder do navegador continuam a funcionar**.
+
 ### 📤 Reaproveitamento e exportação
 
 - **Importação de planilha:** as duas páginas aceitam o `.xlsx` de um planejamento já gerado, permitindo usá-las sem ter criado o plano na mesma sessão.
@@ -393,6 +401,7 @@ PlanoGenerator/
 │       ├── plano-store.js           # Plano em sessionStorage + exportação
 │       ├── script.js
 │       ├── situacao-aprendizagem.js # Página da Situação de Aprendizagem
+│       ├── spa.js                   # Navegação sem recarregar (cache de DOM destacado)
 │       └── ui-interactions.js
 ├── src/
 │   ├── config/

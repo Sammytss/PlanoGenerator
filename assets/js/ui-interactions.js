@@ -2,7 +2,7 @@
 // UI-INTERACTIONS.JS
 // =========================================================================
 
-document.addEventListener('DOMContentLoaded', function () {
+SPA.pagina('plano', function () {
 
     // --- LÓGICA DO CARD DE AJUDA ---
     const helpCard = document.getElementById('helpCard');
