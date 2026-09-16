@@ -14,6 +14,18 @@ window.PlanoStore = (function () {
 
     var CHAVE = 'planoGenerator.plano';
 
+    // As situações de aprendizagem elaboradas na sessão ficam guardadas à parte,
+    // indexadas pelo número do bloco de 60 horas. O Plano de Ensino (FO-178)
+    // repete, uma vez por situação, o bloco de estratégia desafiadora,
+    // contextualização, desafio e resultados esperados — sem isto, o docente
+    // teria de reelaborar as situações só para exportar o formulário.
+    var CHAVE_SITUACOES = 'planoGenerator.situacoes';
+
+    // Nas UFs que entregam o planejamento no FO-178, o documento já é elaborado
+    // na própria geração do plano. Fica guardado aqui para que a página do Plano
+    // de Ensino o abra para revisão sem repetir as chamadas à IA.
+    var CHAVE_PLANO_ENSINO = 'planoGenerator.planoEnsino';
+
     // Logotipo institucional usado no topo dos documentos gerados. É o mesmo
     // que a planilha e os Google Docs usam, vindo de LOGOTIPO_URL no .env.
     var logotipoUrl = '';
@@ -80,12 +92,90 @@ window.PlanoStore = (function () {
         }
     }
 
-    /** Remove o plano da sessão. */
+    /** Remove o plano, as situações e o plano de ensino da sessão. */
     function limpar() {
         try {
             sessionStorage.removeItem(CHAVE);
+            sessionStorage.removeItem(CHAVE_SITUACOES);
+            sessionStorage.removeItem(CHAVE_PLANO_ENSINO);
         } catch (e) {
             console.warn('Não foi possível limpar o plano da sessão.', e);
+        }
+    }
+
+    /**
+     * Lê o Plano de Ensino (FO-178) elaborado nesta sessão.
+     * @returns {object|null} Plano de ensino, ou null se não houver.
+     */
+    function carregarPlanoEnsino() {
+        try {
+            var bruto = sessionStorage.getItem(CHAVE_PLANO_ENSINO);
+            if (!bruto) return null;
+            var guardado = JSON.parse(bruto);
+            return guardado && Array.isArray(guardado.linhas) ? guardado : null;
+        } catch (e) {
+            console.warn('Não foi possível ler o plano de ensino da sessão.', e);
+            return null;
+        }
+    }
+
+    /**
+     * Guarda o Plano de Ensino (FO-178) elaborado nesta sessão.
+     * @param {object} planoEnsino
+     * @returns {boolean} true se conseguiu guardar.
+     */
+    function guardarPlanoEnsino(planoEnsino) {
+        if (!planoEnsino || !Array.isArray(planoEnsino.linhas)) return false;
+        try {
+            sessionStorage.setItem(CHAVE_PLANO_ENSINO, JSON.stringify(planoEnsino));
+            return true;
+        } catch (e) {
+            console.warn('Não foi possível guardar o plano de ensino na sessão.', e);
+            return false;
+        }
+    }
+
+    /**
+     * Lê as situações de aprendizagem elaboradas nesta sessão, por ordem de
+     * número de bloco.
+     * @returns {object[]} Lista de situações (vazia se não houver).
+     */
+    function carregarSituacoes() {
+        try {
+            var bruto = sessionStorage.getItem(CHAVE_SITUACOES);
+            if (!bruto) return [];
+            var guardadas = JSON.parse(bruto);
+            if (!guardadas || typeof guardadas !== 'object') return [];
+
+            return Object.keys(guardadas)
+                .sort(function (a, b) { return Number(a) - Number(b); })
+                .map(function (chave) { return guardadas[chave]; });
+        } catch (e) {
+            console.warn('Não foi possível ler as situações da sessão.', e);
+            return [];
+        }
+    }
+
+    /**
+     * Guarda uma situação de aprendizagem, substituindo a anterior do mesmo
+     * bloco. Reelaborar a situação 2 não apaga a 1.
+     * @param {object} situacao Situação devolvida por /api/situacao-aprendizagem.
+     * @returns {boolean} true se conseguiu guardar.
+     */
+    function guardarSituacao(situacao) {
+        if (!situacao || !situacao.numero) return false;
+
+        try {
+            var bruto = sessionStorage.getItem(CHAVE_SITUACOES);
+            var guardadas = bruto ? JSON.parse(bruto) : {};
+            if (!guardadas || typeof guardadas !== 'object') guardadas = {};
+
+            guardadas[situacao.numero] = situacao;
+            sessionStorage.setItem(CHAVE_SITUACOES, JSON.stringify(guardadas));
+            return true;
+        } catch (e) {
+            console.warn('Não foi possível guardar a situação na sessão.', e);
+            return false;
         }
     }
 
@@ -212,6 +302,10 @@ window.PlanoStore = (function () {
         carregar: carregar,
         guardar: guardar,
         limpar: limpar,
+        carregarSituacoes: carregarSituacoes,
+        guardarSituacao: guardarSituacao,
+        carregarPlanoEnsino: carregarPlanoEnsino,
+        guardarPlanoEnsino: guardarPlanoEnsino,
         carregarLogotipo: carregarLogotipo,
         htmlLogotipo: htmlLogotipo,
         importarPlanilha: importarPlanilha,

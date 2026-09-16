@@ -257,6 +257,9 @@ SPA.pagina('situacao', function () {
             }
 
             situacao = corpo.situacao;
+            // Guardada na sessão para que o Plano de Ensino (FO-178) possa
+            // reaproveitá-la sem obrigar o docente a reelaborá-la.
+            PlanoStore.guardarSituacao(situacao);
             desenharSituacao();
         } catch (erro) {
             areaSituacao.innerHTML = '';

@@ -31,7 +31,9 @@ O objetivo do **Plano Generator** é otimizar o tempo e o esforço de instrutore
 
 - **Interface Web Intuitiva:** Um formulário simples para inserir todas as informações do curso e da Unidade Curricular.
 - **Extração Inteligente de PDF:** A IA analisa o PDF do Plano de Curso e extrai a lista de Conhecimentos, lidando com formatos complexos (listas hierárquicas com subtópicos) e formatos simples (listas de texto separadas por vírgula).
-- **Elaboração Pedagógica:** Para cada Conhecimento, a IA gera um plano detalhado, associando as Capacidades Técnicas corretas e sugerindo estratégias de ensino, instrumentos de avaliação e formatação de recursos didáticos (com ponto e vírgula e novas linhas).
+- **Documento de capacidades em separado (opcional):** nem todo plano de curso lista as capacidades. Os planos no formato antigo trazem apenas a *Organização Curricular* — conteúdo programático numerado, sem capacidades e, por vezes, sem sequer nomear as Unidades Curriculares. Nesses casos, anexe um segundo PDF (o plano de curso detalhado ou o itinerário formativo): os **conhecimentos** são lidos do primeiro documento e as **capacidades** do segundo. Sem ele, a IA não teria de onde tirar as capacidades e acabaria por as inventar a partir dos conhecimentos.
+  - **Planos de curso que não nomeiam as UCs:** quando o documento oficial traz o conteúdo de todo o curso numa secção corrida, os blocos de cada Unidade Curricular vêm em sequência e distinguem-se porque **a numeração dos tópicos reinicia em "1"**. A extração usa o documento de apoio para descobrir a que bloco a UC corresponde — pela correspondência de assunto, não pela posição, porque os dois documentos podem ter um número diferente de UCs. Os conhecimentos continuam a sair sempre do documento oficial.
+- **Elaboração Pedagógica:** Para cada Conhecimento, a IA gera um plano detalhado, associando as Capacidades corretas — Básicas, Técnicas e Socioemocionais — e sugerindo estratégias de ensino, instrumentos de avaliação e formatação de recursos didáticos (com ponto e vírgula e novas linhas).
 - **Seleção de Unidade Escolar:** Escolha em cascata (Estado → Município → Unidade) com base na lista de unidades SENAI do [Portal da Indústria](https://www.portaldaindustria.com.br/senai/canais/transparencia/unidades-nos-estados/).
 - **Modalidade do Curso:** Dropdown com categorias (Doutorado, Mestrado, Pós Graduação, Graduação, Habilitação técnica, Aprendizagem, Qualificação, Aperfeiçoamento, Cursos Livres). Para Aprendizagem, Qualificação, Aperfeiçoamento e Cursos Livres, a coluna SAEP é omitida na planilha.
 - **Agendamento Flexível:** Um sistema de cálculo de datas híbrido que permite:
@@ -62,6 +64,45 @@ Elabora o documento completo da situação de aprendizagem seguindo a Etapa 2 da
 - **Estratégias de aprendizagem desafiadoras:** Situação-Problema, Estudo de Caso, Projeto ou Pesquisa Aplicada — as quatro previstas na MSEP (p.114).
 - **Conteúdo gerado:** contextualização, desafio, resultados esperados, estratégias de ensino, recursos e ambientes, critérios e instrumentos de avaliação, e o detalhamento em etapas de plano de aula.
 - Na planilha, a coluna *Situação de Aprendizagem* passa a ser **mesclada por aba inteira**, com a referência à situação correspondente.
+
+### 📄 Plano de Ensino — formulário FO-178 (`/plano-ensino`)
+
+Gera o **Plano de Ensino** no formulário controlado **FO-178, revisão 05**, e exporta-o em `.docx`.
+
+#### O formato de saída depende da UF
+
+**Nas unidades de Goiás, o planejamento docente sai diretamente no FO-178 — a planilha não chega a ser criada.** Escolher um estado cuja sigla conste de `UFS_COM_FORMULARIO_FO178` (em [`src/services/planGenerator.js`](src/services/planGenerator.js), hoje apenas `GO`) muda o formulário de planejamento: aparece o seletor da **estratégia de aprendizagem desafiadora** e o botão passa a *Gerar Plano de Ensino (FO-178)*.
+
+Nesse fluxo, o `/gerar-plano` executa as etapas normais (extração, elaboração, cronograma) e depois, em vez de falar com o Apps Script, elabora **uma situação de aprendizagem por bloco de 60 horas** e os campos próprios do formulário — devolvendo o documento pronto para baixar. Um clique, sem planilha intermédia.
+
+O documento fica em `sessionStorage`, e `/plano-ensino` abre-o para revisão sem repetir as chamadas à IA. Nas restantes UFs nada muda: continua a ser gerada a planilha.
+
+> Incluir outra UF é acrescentar a sigla a `UFS_COM_FORMULARIO_FO178` — e à lista homónima em [`assets/js/script.js`](assets/js/script.js), que decide o que mostrar no formulário.
+
+**Um documento por Unidade Curricular.** A tabela de aulas cobre a UC inteira, com uma linha por conhecimento: a coluna *Aula nº* traz o intervalo (`5 a 8`) e a coluna *CH* a soma das horas. Quando a UC tem mais do que uma situação de aprendizagem, o bloco descritivo do formulário — estratégia desafiadora, contextualização, desafio e resultados esperados — **repete-se uma vez por situação**, antes da tabela.
+
+**Reaproveitamento.** As quatro estratégias desafiadoras do formulário são exatamente as quatro da página de Situação de Aprendizagem, pelo que contextualização, desafio e resultados esperados vêm de lá sem retrabalho. As situações elaboradas na sessão ficam guardadas em `sessionStorage` e são recolhidas automaticamente.
+
+**Seis campos que não existem em lado nenhum.** O FO-178 pede informação que não consta do planejamento *nem dos planos de curso analisados*: Função, Subfunção, Objetivo Geral da UC, a classificação de cada capacidade em Básica/Técnica/Socioemocional, a composição da média e as referências bibliográficas. São elaborados pela IA numa única chamada e **apresentados para revisão do docente antes da exportação** — o formulário segue para a área educacional, e Função, Subfunção e Objetivo Geral são propostas, não extrações.
+
+A classificação das capacidades é devolvida como um mapa e não altera a forma dos blocos do plano, pelo que as páginas de Ficha de Observação e de Situação de Aprendizagem continuam a funcionar sem alteração.
+
+#### Como o `.docx` é gerado
+
+O documento é montado sobre o **próprio formulário oficial**, guardado em `assets/templates/FO-178.docx`. Todas as partes do pacote OOXML são reaproveitadas tal como estão — estilos, fontes, numeração, tema e, sobretudo, o **cabeçalho de documento controlado** (ID `FO-178`, revisão, data e paginação) com o logotipo SENAI. Apenas `word/document.xml` é reescrito.
+
+Do `document.xml` original aproveitam-se ainda duas peças, em vez de ficarem fixas no código: a declaração de espaços de nomes e o `<w:sectPr>` final, que define A4 paisagem, margens e as referências ao cabeçalho e rodapé. **Se o SENAI publicar uma revisão nova do formulário, basta substituir o `.docx` do template.**
+
+A geometria de cada tabela — grelha de colunas, largura e recuo — está medida no formulário e declarada em constantes no topo de `src/services/docx/fo178.js`. Não há uma largura única: as tabelas de identificação, perfil, estratégias e descrição têm larguras diferentes entre si, e as quatro do rodapé recuam mais à esquerda. Dois pormenores são o que mantém as colunas alinhadas:
+
+- **As faixas de título levam `gridSpan`.** Uma linha com menos células do que as colunas da grelha faz o Word ignorar as larguras declaradas e redistribuir as colunas de toda a tabela.
+- **Os rótulos da tabela de descrição usam `vMerge`**, para ficarem centrados ao longo das duas linhas de cada secção, como no formulário impresso.
+
+Como um plano real ocupa várias páginas — ao contrário do formulário em branco —, acrescentam-se três comportamentos que o original não precisa de ter: o cabeçalho da tabela de aulas repete-se no topo de cada página (`tblHeader`), cada linha de conhecimento fica inteira (`cantSplit`) e as faixas de título nunca ficam órfãs no fim de uma página (`keepNext`).
+
+Optou-se por não passar pelo Google Docs (caminho usado pela ficha e pela situação): o cabeçalho de documento controlado, a orientação paisagem e as larguras fixas de coluna perder-se-iam na conversão. A leitura e escrita do pacote ZIP é feita em `src/services/docx/zip.js`, **sem nenhuma dependência nova** — o `zlib` do Node basta.
+
+> O corpo da tabela de aulas sai a 8 pt. Um plano gerado traz bem mais texto do que um formulário preenchido à mão, e aos 10 pt do original uma UC inteira não caberia nas colunas de capacidades e conhecimentos.
 
 ### 🔀 Navegação sem recarregar
 
@@ -361,6 +402,14 @@ Quota do Vertex AI esgotada. A elaboração faz uma chamada por conhecimento, po
 
 `src/services/aiRunner.js` repete automaticamente com espera exponencial (4s, 8s, 16s) antes de desistir, e informa o progresso ao utilizador. Se o erro for frequente, aumente a quota do projeto no Vertex AI.
 
+### `TypeError: fetch failed` / `ECONNRESET` a meio da elaboração
+
+Queda de ligação ao Vertex AI. É repetida com a mesma espera exponencial do 429: estes erros vêm do socket, sem código de estado HTTP, pelo que escapavam à repetição por status e abortavam a geração inteira — perdendo todos os tópicos já processados. Se falhar em todas as tentativas, o utilizador recebe `FALHA_DE_REDE`, que nomeia a etapa onde parou.
+
+### `A Etapa 1 não conseguiu encontrar os conhecimentos da UC`
+
+O nome da Unidade Curricular não foi localizado no plano de curso. Causa mais comum: o documento lista apenas o conteúdo programático, sem nomear as UCs — nesse caso é obrigatório anexar também o **PDF com as capacidades da UC**, que é o que permite identificar a que bloco de conteúdo a UC corresponde. A mensagem de erro já diz qual UC falhou e o que fazer.
+
 ### Ausência do logotipo nos Google Docs
 
 Falta o escopo `script.external_request` na autorização do Apps Script. Ver a nota sobre [autorização OAuth](#️-autorização-oauth-ao-atualizar-o-apps-script).
@@ -389,16 +438,19 @@ PlanoGenerator/
 ├── assets/
 │   ├── css/
 │   │   ├── style.css
-│   │   └── documentos.css      # Ficha, situação e estilos de impressão (A4)
+│   │   └── documentos.css      # Ficha, situação, FO-178 e estilos de impressão (A4)
 │   ├── data/
 │   │   └── unidades-senai.json # Unidades SENAI por estado/município
 │   ├── Images/
 │   │   └── (imagens .png, .svg)
+│   ├── templates/
+│   │   └── FO-178.docx         # Formulário oficial usado como molde da exportação
 │   └── js/
 │       ├── calendar-init.js
 │       ├── ficha-observacao.js      # Página da Ficha de Observação
 │       ├── icons.js                 # Sprite de ícones SVG + helper Icons.html()
-│       ├── plano-store.js           # Plano em sessionStorage + exportação
+│       ├── plano-ensino.js          # Página do Plano de Ensino (FO-178)
+│       ├── plano-store.js           # Plano e situações em sessionStorage + exportação
 │       ├── script.js
 │       ├── situacao-aprendizagem.js # Página da Situação de Aprendizagem
 │       ├── spa.js                   # Navegação sem recarregar (cache de DOM destacado)
@@ -407,20 +459,25 @@ PlanoGenerator/
 │   ├── config/
 │   │   ├── ai.js               # Configuração Vertex AI
 │   │   ├── index.js            # Variáveis de ambiente, CORS, URLs
-│   │   └── upload.js           # Configuração Multer (PDF, matriz e planilha)
+│   │   └── upload.js           # Configuração Multer (PDFs, matriz e planilha)
 │   └── services/
-│       ├── aiRunner.js         # Repetição em 429, validação de finishReason e JSON
+│       ├── docx/
+│       │   ├── fo178.js        # Monta o word/document.xml do formulário FO-178
+│       │   └── zip.js          # Leitura/escrita de pacotes OOXML (sem dependências)
+│       ├── aiRunner.js         # Repetição em 429 e falhas de rede, validação de finishReason e JSON
 │       ├── docExporter.js      # Criação de Google Docs (links DOCX/PDF)
 │       ├── fichaGenerator.js   # Critérios dicotómicos e graduais (MSEP)
 │       ├── instrumentos.js     # Normalização dos instrumentos de avaliação
 │       ├── planGenerator.js    # Lógica de geração do plano
 │       ├── planParser.js       # Importação de uma planilha .xlsx já gerada
+│       ├── planoEnsinoGenerator.js # Campos do FO-178 em falta e montagem do plano
 │       └── situacaoGenerator.js # Agrupamento por 60h e conteúdo da situação
 ├── .env                        # Chaves (VERTEX_PROJECT_ID, APPS_SCRIPT_URL)
 ├── .gitignore
 ├── ficha-observacao.html
 ├── index.html
 ├── package.json
+├── plano-ensino.html
 ├── package-lock.json
 ├── README.md
 ├── server.js                   # Entrypoint Express (servidor + rotas)
@@ -434,10 +491,13 @@ PlanoGenerator/
 | `GET` | `/` | Formulário de planejamento docente |
 | `GET` | `/ficha-observacao` | Página da Ficha de Observação |
 | `GET` | `/situacao-aprendizagem` | Página da Situação de Aprendizagem |
-| `POST` | `/gerar-plano` | Gera a planilha (resposta em streaming) |
+| `GET` | `/plano-ensino` | Página do Plano de Ensino (FO-178) |
+| `POST` | `/gerar-plano` | Gera a planilha — ou o FO-178, nas UFs configuradas (resposta em streaming) |
 | `POST` | `/api/importar-plano` | Importa um `.xlsx` já gerado |
 | `POST` | `/api/ficha-observacao` | Elabora os critérios da ficha |
 | `GET` | `/api/estrategias-desafiadoras` | Lista as 4 estratégias da MSEP |
+| `POST` | `/api/plano-ensino` | Elabora os campos do FO-178 em falta no planejamento |
+| `POST` | `/api/plano-ensino/docx` | Devolve o Plano de Ensino em `.docx` |
 | `POST` | `/api/situacoes/agrupar` | Agrupa os conhecimentos em blocos de 60h |
 | `POST` | `/api/situacao-aprendizagem` | Elabora a situação de aprendizagem |
 | `POST` | `/api/exportar-documento` | Cria o Google Docs e devolve os links |

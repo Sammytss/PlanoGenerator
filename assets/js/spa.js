@@ -26,6 +26,7 @@ window.SPA = (function () {
         '/index.html': 'plano',
         '/ficha-observacao': 'ficha',
         '/situacao-aprendizagem': 'situacao',
+        '/plano-ensino': 'planoEnsino',
     };
 
     /** nome -> [funções de arranque, executadas uma única vez] */

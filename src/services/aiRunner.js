@@ -33,6 +33,30 @@ const ESPERA_BASE_MS = 4000;
 const STATUS_REPETIVEIS = [429, 500, 502, 503, 504];
 
 /**
+ * Códigos de erro de rede que compensa repetir.
+ *
+ * A ligação ao Vertex AI cai por vezes a meio de uma geração longa. O SDK
+ * envolve isso num "TypeError: fetch failed" sem código de estado HTTP, pelo
+ * que estes casos escapavam a STATUS_REPETIVEIS e a elaboração era abortada —
+ * perdendo todos os tópicos já processados.
+ */
+const CODIGOS_DE_REDE_REPETIVEIS = [
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'ECONNABORTED',
+  'ETIMEDOUT',
+  'EPIPE',
+  'EAI_AGAIN',
+  'ENOTFOUND',
+  'EHOSTUNREACH',
+  'ENETUNREACH',
+  'UND_ERR_CONNECT_TIMEOUT',
+  'UND_ERR_HEADERS_TIMEOUT',
+  'UND_ERR_BODY_TIMEOUT',
+  'UND_ERR_SOCKET',
+];
+
+/**
  * Pausa a execução.
  * @param {number} ms
  * @returns {Promise<void>}
@@ -57,6 +81,29 @@ function statusDoErro(erro) {
 }
 
 /**
+ * Indica se o erro é uma falha de rede transitória, que vale a pena repetir.
+ *
+ * O código real vem normalmente em `erro.cause.code`, porque o `fetch` do Node
+ * envolve o erro do socket num TypeError genérico.
+ *
+ * @param {any} erro
+ * @returns {boolean}
+ */
+function erroDeRede(erro) {
+  if (!erro) return false;
+
+  for (let atual = erro, profundidade = 0; atual && profundidade < 5; profundidade += 1) {
+    if (typeof atual.code === 'string' && CODIGOS_DE_REDE_REPETIVEIS.includes(atual.code)) {
+      return true;
+    }
+    atual = atual.cause;
+  }
+
+  // Última rede de segurança: o SDK devolve este texto sem qualquer código.
+  return /fetch failed|socket hang up|network error/i.test(erro.message || '');
+}
+
+/**
  * Chama o modelo repetindo em caso de quota esgotada ou falha temporária.
  *
  * @param {object} params
@@ -77,13 +124,21 @@ async function chamarModelo({ model, contents, config, etapa, sendUpdate }) {
     } catch (erro) {
       ultimoErro = erro;
       const status = statusDoErro(erro);
+      const rede = erroDeRede(erro);
 
-      if (!STATUS_REPETIVEIS.includes(status) || tentativa === MAX_TENTATIVAS) {
+      if ((!STATUS_REPETIVEIS.includes(status) && !rede) || tentativa === MAX_TENTATIVAS) {
         break;
       }
 
       const espera = ESPERA_BASE_MS * Math.pow(2, tentativa - 1);
-      const motivo = status === 429 ? 'limite de uso da IA atingido' : `falha temporária (${status})`;
+      let motivo;
+      if (status === 429) {
+        motivo = 'limite de uso da IA atingido';
+      } else if (rede) {
+        motivo = 'falha de ligação ao Vertex AI';
+      } else {
+        motivo = `falha temporária (${status})`;
+      }
 
       console.warn(
         `[${etapa}] ${motivo}. Nova tentativa ${tentativa + 1}/${MAX_TENTATIVAS} em ${espera / 1000}s.`
@@ -100,6 +155,17 @@ async function chamarModelo({ model, contents, config, etapa, sendUpdate }) {
 
   if (statusDoErro(ultimoErro) === 429) {
     const erro = new Error('QUOTA_ESGOTADA');
+    erro.etapa = etapa;
+    erro.causa = ultimoErro;
+    throw erro;
+  }
+
+  if (erroDeRede(ultimoErro)) {
+    console.error(
+      `[${etapa}] Ligação ao Vertex AI falhou em todas as ${MAX_TENTATIVAS} tentativas.`,
+      ultimoErro && ultimoErro.message
+    );
+    const erro = new Error('FALHA_DE_REDE');
     erro.etapa = etapa;
     erro.causa = ultimoErro;
     throw erro;
@@ -185,4 +251,5 @@ module.exports = {
   chamarModelo,
   validarResposta,
   statusDoErro,
+  erroDeRede,
 };

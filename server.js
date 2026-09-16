@@ -12,6 +12,8 @@ const {
   ESTRATEGIAS_DESAFIADORAS,
 } = require('./src/services/situacaoGenerator');
 const { exportarDocumento } = require('./src/services/docExporter');
+const { montarPlanoEnsino } = require('./src/services/planoEnsinoGenerator');
+const { gerarDocx } = require('./src/services/docx/fo178');
 
 const app = express();
 
@@ -41,6 +43,10 @@ app.get('/situacao-aprendizagem', (req, res) => {
   res.sendFile(path.join(__dirname, 'situacao-aprendizagem.html'));
 });
 
+app.get('/plano-ensino', (req, res) => {
+  res.sendFile(path.join(__dirname, 'plano-ensino.html'));
+});
+
 // ---------------------------------------------------------------------------
 // Rota principal de geração de plano
 // ---------------------------------------------------------------------------
@@ -61,6 +67,14 @@ app.post('/gerar-plano', upload, async (req, res) => {
         ? req.files.pdfFile[0]
         : null;
 
+    const capacidadesFile =
+      req.files &&
+      req.files.capacidadesFile &&
+      Array.isArray(req.files.capacidadesFile) &&
+      req.files.capacidadesFile[0]
+        ? req.files.capacidadesFile[0]
+        : null;
+
     const matrixFile =
       req.files &&
       req.files.matrixFile &&
@@ -70,7 +84,7 @@ app.post('/gerar-plano', upload, async (req, res) => {
         : null;
 
     const data = await gerarPlano(
-      { body: req.body, pdfFile, matrixFile },
+      { body: req.body, pdfFile, capacidadesFile, matrixFile },
       sendUpdate
     );
 
@@ -87,6 +101,10 @@ app.post('/gerar-plano', upload, async (req, res) => {
         userMessage =
           'O limite de uso da IA do Google foi atingido. Aguarde alguns minutos e tente novamente. ' +
           'Se acontecer com frequência, será preciso aumentar a quota do projeto no Vertex AI.';
+      } else if (error.message === 'FALHA_DE_REDE') {
+        userMessage =
+          `A ligação ao Vertex AI falhou em "${error.etapa || 'uma das etapas'}" e não recuperou ` +
+          'após várias tentativas. Verifique a ligação à internet do servidor e tente novamente.';
       } else if (error.message === 'RESPOSTA_TRUNCADA') {
         userMessage =
           `A IA devolveu uma resposta incompleta em "${error.etapa || 'uma das etapas'}". ` +
@@ -101,9 +119,10 @@ app.post('/gerar-plano', upload, async (req, res) => {
       } else if (error.message.includes('Nenhuma data de aula válida foi encontrada')) {
         userMessage =
           'Nenhuma data de aula válida foi encontrada. Verifique datas de início e término, dias de aula, feriados e férias.';
-      } else if (error.message.includes('Etapa 1 não conseguiu encontrar tópicos')) {
-        userMessage =
-          'Não foi possível identificar os conhecimentos no PDF da UC. Confira se o documento está no formato esperado.';
+      } else if (error.message.includes('A Etapa 1 não conseguiu encontrar')) {
+        // Esta mensagem já diz qual UC falhou e o que fazer a seguir — é mais
+        // útil ao docente do que um texto genérico.
+        userMessage = error.message;
       }
     }
 
@@ -128,6 +147,11 @@ function mensagemErroIa(erro, acao) {
       return (
         'O limite de uso da IA do Google foi atingido. Aguarde alguns minutos e tente novamente. ' +
         'Se acontecer com frequência, será preciso aumentar a quota do projeto no Vertex AI.'
+      );
+    case 'FALHA_DE_REDE':
+      return (
+        `A ligação ao Vertex AI falhou em "${etapa}" e não recuperou após várias tentativas. ` +
+        'Verifique a ligação à internet do servidor e tente novamente.'
       );
     case 'RESPOSTA_TRUNCADA':
       return (
@@ -282,6 +306,80 @@ app.post('/api/situacao-aprendizagem', async (req, res) => {
     return res.status(erro.message === 'QUOTA_ESGOTADA' ? 429 : 500).json({
       success: false,
       error: mensagemErroIa(erro, 'elaborar a situação de aprendizagem'),
+    });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Plano de Ensino no formulário FO-178
+// ---------------------------------------------------------------------------
+
+// Elabora os campos do FO-178 que o planejamento não contém (perfil
+// profissional, classificação das capacidades, composição da média e
+// referências) e devolve o documento pronto para revisão do docente.
+app.post('/api/plano-ensino', async (req, res) => {
+  const { plano, situacoes, instrucoes } = req.body || {};
+
+  if (!plano || !Array.isArray(plano.blocos) || plano.blocos.length === 0) {
+    return res.status(400).json({
+      success: false,
+      error: 'Nenhum planejamento carregado. Gere um plano ou importe a planilha.',
+    });
+  }
+
+  try {
+    const planoEnsino = await montarPlanoEnsino({ plano, situacoes, instrucoes });
+    return res.json({ success: true, planoEnsino });
+  } catch (erro) {
+    console.error('Erro ao montar o plano de ensino FO-178:', erro);
+    return res.status(erro.message === 'QUOTA_ESGOTADA' ? 429 : 500).json({
+      success: false,
+      error: mensagemErroIa(erro, 'elaborar o Plano de Ensino'),
+    });
+  }
+});
+
+// Gera o ficheiro .docx a partir do plano de ensino já revisto pelo docente.
+// O documento é montado sobre o próprio formulário oficial, pelo que conserva o
+// cabeçalho de documento controlado, o logotipo e a orientação paisagem.
+app.post('/api/plano-ensino/docx', (req, res) => {
+  const { planoEnsino } = req.body || {};
+
+  if (!planoEnsino || !Array.isArray(planoEnsino.linhas)) {
+    return res.status(400).json({
+      success: false,
+      error: 'Conteúdo inválido para exportação do Plano de Ensino.',
+    });
+  }
+
+  try {
+    const ficheiro = gerarDocx(planoEnsino);
+    const uc =
+      (planoEnsino.identificacao && planoEnsino.identificacao.unidadeCurricular) ||
+      'Plano de Ensino';
+    // O nome vai num cabeçalho HTTP: mantemos apenas caracteres seguros.
+    const nome = `FO-178 - ${uc}`.replace(/[^\w\s.-]/g, '').trim() || 'FO-178';
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    );
+    res.setHeader('Content-Disposition', `attachment; filename="${nome}.docx"`);
+    res.setHeader('Content-Length', ficheiro.length);
+    return res.end(ficheiro);
+  } catch (erro) {
+    console.error('Erro ao gerar o .docx do FO-178:', erro);
+
+    const mensagens = {
+      TEMPLATE_AUSENTE:
+        'O modelo assets/templates/FO-178.docx não foi encontrado no servidor.',
+      TEMPLATE_INVALIDO:
+        'O modelo FO-178.docx não tem o formato esperado. Substitua-o pelo formulário oficial.',
+    };
+
+    return res.status(500).json({
+      success: false,
+      error: mensagens[erro.message] || 'Não foi possível gerar o ficheiro .docx.',
     });
   }
 });

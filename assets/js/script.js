@@ -29,14 +29,43 @@ SPA.pagina('plano', async function () {
         return (s || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
     }
 
+    // ---------------------------------------------------------------------
+    // Formato do planejamento conforme a UF
+    // ---------------------------------------------------------------------
+    // Nas unidades de Goiás o planejamento docente é entregue no formulário
+    // FO-178, e não na planilha. A sigla vai para o servidor num campo oculto,
+    // porque o select de estado guarda o índice do array, de que a cascata de
+    // municípios depende.
+    const UFS_COM_FORMULARIO_FO178 = ['GO'];
+
+    const campoUf = document.getElementById('ufUnidade');
+    const blocoFo178 = document.getElementById('blocoFo178');
+
+    /** @returns {boolean} true se a UF escolhida usa o formulário FO-178. */
+    function ufUsaFo178() {
+        return UFS_COM_FORMULARIO_FO178.includes((campoUf && campoUf.value) || '');
+    }
+
+    /** Mostra o bloco do FO-178 e ajusta o botão conforme a UF escolhida. */
+    function atualizarFormatoDeSaida() {
+        const fo178 = ufUsaFo178();
+        if (blocoFo178) blocoFo178.hidden = !fo178;
+        submitBtn.textContent = fo178 ? 'Gerar Plano de Ensino (FO-178)' : 'Gerar Plano de Curso';
+    }
+
     selectEstado.addEventListener('change', function () {
         const idx = parseInt(this.value, 10);
         selectMunicipio.disabled = true;
         selectMunicipio.innerHTML = '<option value="" disabled selected>Selecione o município</option>';
         selectUnidade.disabled = true;
         selectUnidade.innerHTML = '<option value="" disabled selected>Selecione primeiro o município</option>';
-        if (isNaN(idx) || idx < 0 || !dadosUnidades.estados[idx]) return;
-        const municipios = dadosUnidades.estados[idx].municipios || [];
+
+        const estado = dadosUnidades.estados[idx];
+        if (campoUf) campoUf.value = (estado && estado.sigla) || '';
+        atualizarFormatoDeSaida();
+
+        if (isNaN(idx) || idx < 0 || !estado) return;
+        const municipios = estado.municipios || [];
         selectMunicipio.innerHTML = '<option value="" disabled selected>Selecione o município</option>' +
             municipios.map((m, i) => `<option value="${i}">${esc(m.nome)}</option>`).join('');
         selectMunicipio.disabled = false;
@@ -118,6 +147,14 @@ SPA.pagina('plano', async function () {
                             planoGuardado = window.PlanoStore.guardar(finalData.plano);
                         }
 
+                        // As situações elaboradas no mesmo fluxo ficam na sessão,
+                        // para a página do FO-178 as reaproveitar sem refazer.
+                        if (Array.isArray(finalData.situacoes) && window.PlanoStore) {
+                            finalData.situacoes.forEach(function (s) {
+                                window.PlanoStore.guardarSituacao(s);
+                            });
+                        }
+
                         const atalhos = planoGuardado
                             ? `<div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
                                 <p style="margin-bottom: 12px; color: #4a5568;">Continue o planejamento com este plano já carregado:</p>
@@ -126,15 +163,19 @@ SPA.pagina('plano', async function () {
                                </div>`
                             : '';
 
-                        resultArea.innerHTML = `
-                        <div style="text-align: center;">
-                            <h2 style="color: #1e8e3e;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-sucesso"></use></svg> Planilha Gerada com Sucesso!</h2>
-                            <p>O seu plano de curso "<strong>${finalData.spreadsheetName}</strong>" está pronto.</p>
-                            <a href="${finalData.spreadsheetUrl}" target="_blank" style="display: inline-block; font-size: 1.1em; padding: 12px 20px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
-                                Clique aqui para abrir a planilha
-                            </a>
-                            ${atalhos}
-                        </div>`;
+                        if (finalData.formato === 'fo178') {
+                            mostrarResultadoFo178(finalData, atalhos);
+                        } else {
+                            resultArea.innerHTML = `
+                            <div style="text-align: center;">
+                                <h2 style="color: #1e8e3e;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-sucesso"></use></svg> Planilha Gerada com Sucesso!</h2>
+                                <p>O seu plano de curso "<strong>${finalData.spreadsheetName}</strong>" está pronto.</p>
+                                <a href="${finalData.spreadsheetUrl}" target="_blank" style="display: inline-block; font-size: 1.1em; padding: 12px 20px; background-color: #1a73e8; color: white; text-decoration: none; border-radius: 5px; margin-top: 10px;">
+                                    Clique aqui para abrir a planilha
+                                </a>
+                                ${atalhos}
+                            </div>`;
+                        }
                     } else if (message.startsWith('ERRO:')) {
                         const userMessage = message.substring(5).trim() || 'Ocorreu um erro ao gerar o plano. Tente novamente em alguns instantes.';
                         resultArea.innerHTML = `<p style="color: red; text-align: center;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-erro"></use></svg> ${userMessage}</p>`;
@@ -156,7 +197,89 @@ SPA.pagina('plano', async function () {
             resultArea.innerHTML = `<p style="color: red; text-align: center;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-erro"></use></svg> ${userMessage}</p>`;
         } finally {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Gerar Plano de Curso';
+            atualizarFormatoDeSaida();
         }
     });
+
+    /**
+     * Desenha o resultado do fluxo FO-178: o documento já vem elaborado, e o
+     * botão apenas pede o ficheiro ao servidor.
+     *
+     * @param {object} finalData Resposta de /gerar-plano com formato "fo178".
+     * @param {string} atalhos HTML dos atalhos para as outras páginas.
+     */
+    function mostrarResultadoFo178(finalData, atalhos) {
+        const planoEnsino = finalData.planoEnsino || {};
+        const ident = planoEnsino.identificacao || {};
+        const totalLinhas = (planoEnsino.linhas || []).length;
+        const totalSituacoes = (planoEnsino.situacoes || []).length;
+
+        if (window.PlanoStore) window.PlanoStore.guardarPlanoEnsino(planoEnsino);
+
+        resultArea.innerHTML = `
+        <div style="text-align: center;">
+            <h2 style="color: #1e8e3e;"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-sucesso"></use></svg> Plano de Ensino (FO-178) Elaborado!</h2>
+            <p>"<strong>${esc(ident.unidadeCurricular)}</strong>" — ${totalLinhas} linha(s) na tabela de aulas
+               e ${totalSituacoes} situação(ões) de aprendizagem.</p>
+            <button type="button" id="btnBaixarFo178" style="display:inline-block;font-size:1.1em;padding:12px 20px;background-color:#1a73e8;color:#fff;border:none;border-radius:5px;margin-top:10px;cursor:pointer;font-weight:600;">
+                Baixar o Plano de Ensino (.docx)
+            </button>
+            <p style="margin-top:14px;color:#4a5568;font-size:0.9em;">
+                Confira o perfil profissional e as referências antes de submeter —
+                <a href="/plano-ensino">revisar e editar o FO-178</a>.
+            </p>
+            <div id="areaDownloadFo178"></div>
+            ${atalhos}
+        </div>`;
+
+        document.getElementById('btnBaixarFo178').addEventListener('click', function () {
+            baixarFo178(planoEnsino, this);
+        });
+    }
+
+    /**
+     * Pede o .docx ao servidor e entrega-o ao navegador.
+     * @param {object} planoEnsino
+     * @param {HTMLButtonElement} botao
+     */
+    async function baixarFo178(planoEnsino, botao) {
+        const area = document.getElementById('areaDownloadFo178');
+        const rotulo = botao.textContent;
+
+        botao.disabled = true;
+        botao.textContent = 'Gerando documento...';
+        area.innerHTML = '';
+
+        try {
+            const resposta = await fetch('/api/plano-ensino/docx', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ planoEnsino })
+            });
+
+            if (!resposta.ok) {
+                const corpo = await resposta.json().catch(() => ({}));
+                throw new Error(corpo.error || 'Não foi possível gerar o ficheiro .docx.');
+            }
+
+            const uc = (planoEnsino.identificacao && planoEnsino.identificacao.unidadeCurricular) || 'UC';
+            const nome = 'FO-178 - ' + uc.replace(/[\\/:*?"<>|]/g, '') + '.docx';
+
+            const url = URL.createObjectURL(await resposta.blob());
+            const ligacao = document.createElement('a');
+            ligacao.href = url;
+            ligacao.download = nome;
+            document.body.appendChild(ligacao);
+            ligacao.click();
+            document.body.removeChild(ligacao);
+            URL.revokeObjectURL(url);
+
+            area.innerHTML = `<p style="color:#1e8e3e;margin-top:10px;">Documento gerado: ${esc(nome)}</p>`;
+        } catch (erro) {
+            area.innerHTML = `<p style="color:red;margin-top:10px;">${esc(erro.message)}</p>`;
+        } finally {
+            botao.disabled = false;
+            botao.textContent = rotulo;
+        }
+    }
 });

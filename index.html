@@ -199,6 +199,7 @@
             <a href="/" class="active">Planejamento Docente</a>
             <a href="/ficha-observacao">Ficha de Observação</a>
             <a href="/situacao-aprendizagem">Situação de Aprendizagem</a>
+            <a href="/plano-ensino">Plano de Ensino (FO-178)</a>
         </nav>
         <div class="form-container">
             <div class="progress-indicator">
@@ -227,6 +228,10 @@
                             <select id="estadoUnidade" required aria-describedby="tip-estado">
                                 <option value="" disabled selected>Selecione o estado</option>
                             </select>
+                            <!-- O select acima guarda o índice do estado, de que a
+                                 cascata depende. A sigla vai neste campo, porque é
+                                 ela que decide o formato do planejamento. -->
+                            <input type="hidden" id="ufUnidade" name="ufUnidade" value="">
                             <span id="tip-estado" class="sr-only">Primeiro passo: escolha o estado (UF) em que a unidade SENAI está localizada.</span>
                         </div>
                         <div class="form-group">
@@ -246,6 +251,25 @@
                         <p style="font-size: 0.8em; color: #666;">Unidade onde o curso será ministrado. Lista baseada no
                             <a href="https://www.portaldaindustria.com.br/senai/canais/transparencia/unidades-nos-estados/"
                                 target="_blank" rel="noopener">Portal da Indústria SENAI</a>.</p>
+                    </div>
+
+                    <!-- Só aparece nas UFs que entregam o planejamento no FO-178 -->
+                    <div class="form-group" id="blocoFo178" hidden>
+                        <div class="aviso-fo178">
+                            <strong>Unidade em Goiás: o planejamento sai no formulário FO-178.</strong>
+                            Em vez da planilha, será gerado o Plano de Ensino (FO-178, revisão 05) pronto para
+                            baixar em <code>.docx</code>, já com as situações de aprendizagem elaboradas.
+                        </div>
+                        <label for="estrategiaDesafiadora">Estratégia de Aprendizagem Desafiadora <span
+                                class="required">*</span></label>
+                        <select id="estrategiaDesafiadora" name="estrategiaDesafiadora">
+                            <option value="situacao-problema" selected>Situação-Problema</option>
+                            <option value="estudo-de-caso">Estudo de Caso</option>
+                            <option value="projeto">Projeto (elaboração ou execução)</option>
+                            <option value="pesquisa-aplicada">Pesquisa Aplicada</option>
+                        </select>
+                        <p style="font-size: 0.8em; color: #666;">* As quatro previstas na MSEP (p.114). A escolha é
+                            do docente e vale para todas as situações de aprendizagem desta UC.</p>
                     </div>
 
                     <div class="form-group">
@@ -383,6 +407,15 @@
                             <input type="file" id="matrixFile" name="matrixFile"
                                 accept=".xls, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="capacidadesFile">PDF com as Capacidades da UC (apenas se estiverem noutro
+                            documento):</label>
+                        <input type="file" id="capacidadesFile" name="capacidadesFile" accept=".pdf">
+                        <p style="font-size: 0.8em; color: #666;">* Planos de curso no formato antigo listam só o
+                            conteúdo programático, sem as capacidades. Nesse caso, anexe aqui o documento que as
+                            contém (plano de curso detalhado ou itinerário formativo): os conhecimentos serão lidos do
+                            PDF acima e as capacidades, deste.</p>
                     </div>
                     <div class="form-group">
                         <label for="observacoes">Observações e Instruções Especiais para a IA (Opcional):</label>

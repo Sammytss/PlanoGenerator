@@ -5,6 +5,26 @@ const { gerarJson, gerarTexto } = require('./aiRunner');
 const { APPS_SCRIPT_URL, LOGOTIPO_URL, GEMINI_MODEL } = require('../config');
 const { normalizarInstrumentos, usaFichaDeObservacao } = require('./instrumentos');
 const { separarCapacidadesEConhecimento } = require('./planParser');
+const { gerarSituacao, agruparBlocosPorCargaHoraria } = require('./situacaoGenerator');
+const { montarPlanoEnsino } = require('./planoEnsinoGenerator');
+
+// ---------------------------------------------------------------------------
+// UFs cujo planejamento docente é entregue no formulário FO-178
+// ---------------------------------------------------------------------------
+// Em Goiás o documento exigido é o Plano de Ensino FO-178, e não a planilha de
+// planejamento. Está numa constante, e não espalhado por comparações, para que
+// incluir outra UF seja acrescentar uma sigla a esta lista.
+const UFS_COM_FORMULARIO_FO178 = ['GO'];
+
+/**
+ * Indica se a UF da unidade escolar usa o formulário FO-178.
+ * @param {string} uf Sigla da unidade federativa (ex.: "GO").
+ * @returns {boolean}
+ */
+function usaFormularioFo178(uf) {
+  if (!uf || typeof uf !== 'string') return false;
+  return UFS_COM_FORMULARIO_FO178.includes(uf.trim().toUpperCase());
+}
 
 /**
  * Fluxo completo de geração do plano.
@@ -17,7 +37,7 @@ const { separarCapacidadesEConhecimento } = require('./planParser');
  * @param {(msg: string) => void} sendUpdate função para enviar mensagens de progresso (streaming)
  * @returns {Promise<any>} dados retornados pelo Apps Script (spreadsheetUrl e spreadsheetName)
  */
-async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
+async function gerarPlano({ body, pdfFile, capacidadesFile, matrixFile }, sendUpdate) {
   let {
     courseName,
     ucName,
@@ -25,6 +45,8 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
     classCode,
     modality,
     unidadeEscolar,
+    ufUnidade,
+    estrategiaDesafiadora,
     startDate,
     endDate,
     totalHours,
@@ -67,24 +89,115 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
     },
   };
 
+  // ---------------------------------------------------------------------
+  // Documento de capacidades (opcional)
+  // ---------------------------------------------------------------------
+  // Nem todo plano de curso lista as capacidades. Os planos no formato antigo
+  // trazem apenas a "Organização Curricular" — conteúdo programático numerado,
+  // sem capacidades e, por vezes, sem sequer nomear as Unidades Curriculares.
+  // Nesses casos o docente envia um segundo PDF (o plano de curso detalhado,
+  // ou o itinerário formativo) de onde as capacidades são efetivamente lidas.
+  //
+  // Sem este segundo documento, a IA não teria de onde tirar as capacidades e
+  // acabaria por as inventar a partir dos conhecimentos.
+  const capacidadesPart = capacidadesFile
+    ? {
+        inlineData: {
+          data: capacidadesFile.buffer.toString('base64'),
+          mimeType: capacidadesFile.mimetype,
+        },
+      }
+    : null;
+
+  // Os dois documentos seguem juntos em todas as etapas que precisam de saber o
+  // que pertence à UC. A Etapa 1 também precisa deles: quando o plano de curso
+  // oficial não nomeia as Unidades Curriculares, é o documento de apoio que
+  // permite descobrir qual bloco de conteúdo corresponde à UC pedida.
+  const documentosDaElaboracao = capacidadesPart
+    ? [filePart, capacidadesPart]
+    : [filePart];
+
+  const origemDasCapacidades = capacidadesPart
+    ? 'As capacidades estão no SEGUNDO documento PDF anexado. Use exclusivamente esse documento ' +
+      'para as capacidades: procure nele a Unidade Curricular "' + ucName + '" e as suas secções ' +
+      '"Capacidades Básicas", "Capacidades Técnicas", "Capacidades Socioemocionais" ou ' +
+      '"Capacidades sociais, organizativas e metodológicas". NÃO invente capacidades que não ' +
+      'estejam escritas nesse documento.'
+    : 'As capacidades estão no mesmo PDF, na secção da Unidade Curricular "' + ucName + '".';
+
+  if (capacidadesFile) {
+    sendUpdate('Documento de capacidades recebido: será usado na associação capacidade-conhecimento');
+  }
+
   // --- ETAPA 1: O EXTRATOR ---
   sendUpdate('ETAPA 1: A extrair a lista de tópicos do PDF');
+
+  // -------------------------------------------------------------------------
+  // Planos de curso que não nomeiam as Unidades Curriculares
+  // -------------------------------------------------------------------------
+  // Os planos de curso no formato antigo (ex.: SENAI DR/GO, revisão 04) trazem
+  // uma única secção "B - Organização Curricular" com o conteúdo programático
+  // numerado de todo o curso, sem nomear as UCs. Os blocos correspondentes a
+  // cada UC vêm em sequência e distinguem-se porque a numeração reinicia em "1".
+  //
+  // Nesses casos, procurar a UC pelo nome no documento não devolve nada — era a
+  // causa de "A Etapa 1 não conseguiu encontrar tópicos no PDF". O documento de
+  // apoio, que nomeia as UCs e lista os conhecimentos de cada uma, é o que
+  // permite identificar de qual bloco se trata.
+  const instrucoesDeLocalizacao = capacidadesPart
+    ? `Foram anexados DOIS documentos PDF:
+              - DOCUMENTO 1 (o primeiro): o plano de curso oficial. É SEMPRE daqui que os conhecimentos
+                devem ser extraídos.
+              - DOCUMENTO 2 (o segundo): documento de apoio, que nomeia as Unidades Curriculares e lista
+                os conhecimentos de cada uma. Serve APENAS para identificar o que pertence à UC.
+
+            Siga o caso que se aplicar:
+
+            CASO A — o DOCUMENTO 1 nomeia a Unidade Curricular "${ucName}":
+              Extraia os conhecimentos que estão sob essa UC no DOCUMENTO 1. Pare quando começar outra UC.
+
+            CASO B — o DOCUMENTO 1 NÃO nomeia Unidades Curriculares (traz apenas uma secção corrida de
+            conteúdo programático, como "Organização Curricular" ou "Conteúdo Programático"):
+              1. Nesse documento, o conteúdo de todo o curso está dividido em BLOCOS CONSECUTIVOS, um por
+                 Unidade Curricular, na ordem em que são ensinadas. Um bloco novo começa exatamente onde a
+                 numeração dos tópicos REINICIA EM "1". Identifique todos os blocos.
+              2. No DOCUMENTO 2, localize a UC "${ucName}" e leia os conhecimentos que lhe pertencem.
+              3. Escolha o bloco do DOCUMENTO 1 cujo ASSUNTO corresponde ao da UC "${ucName}".
+                 Decida pela correspondência de conteúdo — os títulos dos tópicos do bloco devem tratar
+                 das mesmas matérias que os conhecimentos lidos no DOCUMENTO 2. A ordem das UCs é uma
+                 pista secundária, mas NÃO é fiável: os dois documentos podem ter um número diferente de
+                 UCs (por exemplo, um deles pode incluir uma UC introdutória que o outro não tem).
+              4. Extraia os tópicos APENAS desse bloco do DOCUMENTO 1. Não misture tópicos de blocos
+                 vizinhos e NÃO copie os conhecimentos do DOCUMENTO 2.`
+    : `Foi anexado UM documento PDF: o plano de curso.
+            Percorra-o e localize o ponto exato onde a Unidade Curricular "${ucName}" é formalmente
+            introduzida. IGNORE todo o conteúdo que aparecer ANTES desse ponto. Pare a análise assim que
+            encontrar o início de uma NOVA Unidade Curricular ou uma secção não relacionada aos
+            conhecimentos (como "Avaliação" ou "Certificação").`;
 
   const extractorPrompt = `
         Você é um especialista em análise de documentos pedagógicos.
         ${userInstructionsContext} // <<-- INSTRUÇÕES INJETADAS AQUI
-            Sua tarefa é analisar o Plano de Curso em PDF fornecido e extrair a lista de "Conhecimentos" associada à Unidade Curricular especificada.
+            Sua tarefa é extrair a lista de "Conhecimentos" da Unidade Curricular "${ucName}".
 
-            1.  **Encontre o Ponto de Início:** Percorra o documento e localize o ponto exato onde a Unidade Curricular "${ucName}" é formalmente introduzida. IGNORE todo o conteúdo que aparecer ANTES deste ponto.
-            2.  **Localize a Secção de Conhecimentos:** Após encontrar a UC "${ucName}", procure pela secção que lista os conteúdos a serem ensinados. Esta secção pode chamar-se "Conhecimento", "Conhecimentos", "Conteúdo Programático" ou similar.
-            3.  **Identifique o Formato da Lista:** Verifique se os conhecimentos estão apresentados como:
+            ${instrucoesDeLocalizacao}
+
+            REGRAS DE FORMATAÇÃO DOS TÓPICOS
+
+            Identifique como os conhecimentos estão apresentados:
                 * a) Uma lista numerada (com ou sem subtópicos).
                 * b) Uma única string de texto onde os itens são separados por vírgulas.
-            4.  **Extraia e Formate os Tópicos:**
-                * **Se for uma lista numerada (Formato a):** Para cada item principal, crie uma string contendo o item principal e todos os seus subtópicos, cada um em nova linha (como no exemplo de MICROCONTROLADORES).
-                * **Se for uma string com vírgulas (Formato b):** Identifique a string completa que contém os conhecimentos. Divida esta string usando a vírgula como delimitador. Remova quaisquer espaços em branco extras no início ou fim de cada item resultante.
-            5.  **Defina o Ponto Final:** Pare a sua análise assim que encontrar o início de uma NOVA Unidade Curricular ou uma secção claramente não relacionada aos conhecimentos (como "Habilidades", "Avaliação", etc.). A sua extração deve conter APENAS os conhecimentos da UC "${ucName}".
-            6.  **Formato de Saída:** Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave chamada "topicos". O valor desta chave deve ser um array de strings, onde cada string é um conhecimento individual extraído e formatado conforme o passo 4.
+
+            * **Se for uma lista numerada (Formato a):** para cada item principal, crie uma string
+              contendo o item principal e todos os seus subtópicos, cada um em nova linha.
+            * **Se for uma string com vírgulas (Formato b):** divida a string usando a vírgula como
+              delimitador e remova espaços em branco extras.
+
+            Sua resposta deve ser EXCLUSIVAMENTE um objeto JSON com uma única chave "topicos", cujo valor
+            é um array de strings — cada string um conhecimento individual, formatado como acima.
+
+            Se, e apenas se, for genuinamente impossível identificar os conhecimentos desta UC, devolva
+            {"topicos": []}.
 
             **Exemplo de Saída (Formato b):**
             Se o PDF contiver "Conhecimento: Abstração lógica, álgebra booleana, fluxogramas.", a saída DEVE ser:
@@ -99,7 +212,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
 
   const topicListJson = await gerarJson({
     model: GEMINI_MODEL,
-    contents: [extractorPrompt, filePart],
+    contents: [extractorPrompt, ...documentosDaElaboracao],
     config: generationConfig,
     etapa: 'Etapa 1: extração de tópicos',
     sendUpdate,
@@ -107,7 +220,15 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
   const topicTitles = topicListJson.topicos;
 
   if (!topicTitles || topicTitles.length === 0) {
-    throw new Error('A Etapa 1 não conseguiu encontrar tópicos no PDF.');
+    const causaProvavel = capacidadesPart
+      ? 'Confirme que a Unidade Curricular está escrita da mesma forma num dos dois documentos.'
+      : 'Se o plano de curso lista apenas o conteúdo programático, sem nomear as Unidades ' +
+        'Curriculares, anexe também o PDF com as capacidades da UC: é ele que permite identificar ' +
+        'qual bloco de conteúdo pertence a esta UC.';
+
+    throw new Error(
+      `A Etapa 1 não conseguiu encontrar os conhecimentos da UC "${ucName}" no PDF. ${causaProvavel}`
+    );
   }
 
   sendUpdate(`Extração concluída. Encontrados ${topicTitles.length} tópicos`);
@@ -191,9 +312,11 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
 
                 Gere um único objeto JSON aplicando as seguintes regras de conteúdo:
 
+                **ONDE ESTÃO AS CAPACIDADES:** ${origemDasCapacidades}
+
                 1.  **PARA A CHAVE "oque" (Associação Capacidade-Conhecimento):**
-                    * Primeiro, analise a lista completa de "Capacidades Técnicas" apresentada no PDF para a Unidade Curricular "${ucName}".
-                    * Em seguida, para o Conhecimento "${title}", identifique e selecione da lista completa **APENAS a(s) Capacidade(s) Técnica(s) que são diretamente desenvolvidas por este Conhecimento**.
+                    * Primeiro, analise a lista completa de capacidades da Unidade Curricular "${ucName}", de TODOS os tipos: Básicas, Técnicas e Socioemocionais.
+                    * Em seguida, para o Conhecimento "${title}", identifique e selecione da lista completa **APENAS a(s) Capacidade(s) que são diretamente desenvolvidas por este Conhecimento**.
                     * **FORMATAÇÃO OBRIGATÓRIA:** Formate o valor EXATAMENTE assim:
                         "[Liste AQUI a(s) capacidade(s) técnica(s) que você selecionou];
 
@@ -239,7 +362,7 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
 
     const topicDetailJson = await gerarJson({
       model: GEMINI_MODEL,
-      contents: [elaboratorPrompt, filePart],
+      contents: [elaboratorPrompt, ...documentosDaElaboracao],
       config: generationConfig,
       etapa: `Etapa 2.2: tópico ${index + 1}/${topicTitles.length}`,
       sendUpdate,
@@ -530,12 +653,6 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
     shift: shift,
   };
 
-  sendUpdate('ETAPA 3: A comunicar com o Google e a criar a sua planilha');
-  const appsScriptResponse = await axios.post(
-    APPS_SCRIPT_URL,
-    payloadParaAppsScript
-  );
-
   // ---------------------------------------------------------------------
   // Plano em formato estruturado, devolvido ao navegador para ser guardado
   // em sessionStorage e reutilizado pelas páginas de Ficha de Observação e
@@ -547,8 +664,95 @@ async function gerarPlano({ body, pdfFile, matrixFile }, sendUpdate) {
     diasDeAula: payloadParaAppsScript.diasDeAulaValidos,
   });
 
+  // ---------------------------------------------------------------------
+  // ETAPA 3 — o formato de saída depende da UF da unidade escolar
+  // ---------------------------------------------------------------------
+  // Nas unidades de Goiás o planejamento docente é entregue no formulário
+  // controlado FO-178, e não na planilha. Gerar a planilha para depois a
+  // converter seria trabalho desperdiçado, por isso o fluxo é decidido aqui:
+  // ou se fala com o Apps Script, ou se monta o FO-178 — nunca ambos.
+  if (usaFormularioFo178(ufUnidade)) {
+    return gerarFormularioFo178({
+      plano,
+      estrategiaDesafiadora,
+      observacoes,
+      sendUpdate,
+    });
+  }
+
+  sendUpdate('ETAPA 3: A comunicar com o Google e a criar a sua planilha');
+  const appsScriptResponse = await axios.post(
+    APPS_SCRIPT_URL,
+    payloadParaAppsScript
+  );
+
   return {
+    formato: 'planilha',
     ...appsScriptResponse.data,
+    plano,
+  };
+}
+
+/**
+ * Monta o Plano de Ensino FO-178 completo a partir de um plano já elaborado.
+ *
+ * Elabora primeiro uma situação de aprendizagem por bloco de 60 horas — o
+ * formulário tem um bloco descritivo (estratégia desafiadora, contextualização,
+ * desafio e resultados esperados) que sem elas sairia em branco — e só depois
+ * os campos que nem o planejamento nem os planos de curso contêm.
+ *
+ * @param {object} params
+ * @param {object} params.plano Plano estruturado.
+ * @param {string} params.estrategiaDesafiadora Estratégia escolhida pelo docente.
+ * @param {string} params.observacoes Instruções livres do docente.
+ * @param {(msg: string) => void} params.sendUpdate
+ * @returns {Promise<object>} Resposta com o plano de ensino pronto.
+ */
+async function gerarFormularioFo178({
+  plano,
+  estrategiaDesafiadora,
+  observacoes,
+  sendUpdate,
+}) {
+  const grupos = agruparBlocosPorCargaHoraria(plano);
+
+  sendUpdate(
+    `ETAPA 3: A elaborar ${grupos.length} situação(ões) de aprendizagem para o formulário FO-178`
+  );
+
+  const situacoes = [];
+
+  for (const grupo of grupos) {
+    sendUpdate(
+      `   - Situação de aprendizagem ${grupo.numero} de ${grupos.length} (${grupo.horas}h)`
+    );
+
+    situacoes.push(
+      await gerarSituacao({
+        grupo,
+        identificacao: plano.identificacao || {},
+        estrategiaId: estrategiaDesafiadora,
+        numero: grupo.numero,
+        totalSituacoes: grupos.length,
+        instrucoes: observacoes,
+      })
+    );
+  }
+
+  sendUpdate('ETAPA 4: A elaborar o perfil profissional e os demais campos do FO-178');
+
+  const planoEnsino = await montarPlanoEnsino({
+    plano,
+    situacoes,
+    instrucoes: observacoes,
+  });
+
+  sendUpdate('Plano de Ensino FO-178 pronto');
+
+  return {
+    formato: 'fo178',
+    planoEnsino,
+    situacoes,
     plano,
   };
 }
@@ -664,5 +868,7 @@ function montarPlanoEstruturado({ payload, conteudoDetalhado, diasDeAula }) {
 
 module.exports = {
   gerarPlano,
+  usaFormularioFo178,
+  UFS_COM_FORMULARIO_FO178,
 };
 
