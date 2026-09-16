@@ -1,8 +1,8 @@
 // =========================================================================
-// ✨ ✨ ✨ UI-INTERACTIONS.JS ✨ ✨ ✨
+// UI-INTERACTIONS.JS
 // =========================================================================
 
-document.addEventListener('DOMContentLoaded', function () {
+SPA.pagina('plano', function () {
 
     // --- LÓGICA DO CARD DE AJUDA ---
     const helpCard = document.getElementById('helpCard');
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // ✨ LISTENER DE EVENTOS CENTRALIZADO (DELEGAÇÃO DE EVENTOS) ✨
+        // LISTENER DE EVENTOS CENTRALIZADO (DELEGAÇÃO DE EVENTOS)
         document.addEventListener('click', function (event) {
             // Botões do Guia Interativo
             const welcomeSkipBtn = event.target.closest('#guideWelcome .guide-btn-secondary');
@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (showVideoOption) {
                 if (helpCard) helpCard.classList.add('hidden');
 
-                // ✨ CARREGA O VÍDEO E ABRE O MODAL ✨
+                // CARREGA O VÍDEO E ABRE O MODAL
                 if (videoContainer && videoModal) {
                     const videoURL = 'https://www.youtube.com/embed/R1VWZB9lMHw?si=Jhg_PnzFEMPMMl0H';
 
