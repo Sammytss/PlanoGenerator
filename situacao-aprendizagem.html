@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Situação de Aprendizagem | Plano Generator</title>
+    <link rel="icon" type="image/x-icon" href="assets/Images/LogoTipo_PlanoGenerator.png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/documentos.css">
+</head>
+
+<body>
+    <!-- Sprite de icones SVG: injetado antes de qualquer referencia <use> -->
+    <script src="assets/js/icons.js"></script>
+
+    <!-- Vista trocada pelo roteador sem recarregar a página (assets/js/spa.js) -->
+    <div id="app-view" data-pagina="situacao">
+    <!-- Cabeçalho institucional -->
+    <div class="institutional-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo-space">
+                    <a href="/">
+                        <img src="assets/Images/Logo_P_G.png" alt="Logo Plano Generator">
+                    </a>
+                </div>
+                <div class="institution-info">
+                    <h1>
+                        <azul class="azul">Plano</azul>
+                        <laranja class="laranja">Generator</laranja>
+                    </h1>
+                    <p>Situação de Aprendizagem</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar">in</div>
+                    <a class='criador' href="https://linkedin.com/in/samuel-teles-dos-santos-662003237"><span>Samuel
+                            Teles</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content wide">
+        <nav class="app-nav">
+            <a href="/">Planejamento Docente</a>
+            <a href="/ficha-observacao">Ficha de Observação</a>
+            <a href="/situacao-aprendizagem" class="active">Situação de Aprendizagem</a>
+        </nav>
+
+        <!-- ETAPA 1: origem do plano -->
+        <div class="form-container" id="etapaOrigem">
+            <div class="form-header">
+                <h2 class="form-title">Carregar o planejamento</h2>
+                <p class="form-description">Use o plano gerado nesta sessão ou envie a planilha já criada</p>
+            </div>
+
+            <div id="areaResumo"></div>
+
+            <div class="origem-grid" id="origemGrid">
+                <div class="origem-card" id="cardSessao">
+                    <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-pasta"></use></svg>Plano desta sessão</h3>
+                    <p>Se você gerou o planejamento agora, ele já está disponível no navegador.</p>
+                    <button type="button" class="btn btn-secundario" id="btnUsarSessao" disabled>
+                        Nenhum plano nesta sessão
+                    </button>
+                </div>
+
+                <div class="origem-card">
+                    <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-enviar"></use></svg>Enviar planilha (.xlsx)</h3>
+                    <p>
+                        Baixe a planilha do Google Sheets em <strong>Arquivo → Fazer download → Microsoft Excel
+                            (.xlsx)</strong> e envie aqui.
+                    </p>
+                    <input type="file" id="planilhaFile" accept=".xlsx,.xls">
+                    <button type="button" class="btn btn-secundario" id="btnImportar" style="margin-top:0.8rem;">
+                        Importar planilha
+                    </button>
+                </div>
+            </div>
+
+            <div id="mensagemOrigem"></div>
+        </div>
+
+        <!-- ETAPA 2: escolha do bloco e da estratégia -->
+        <div class="form-container" id="etapaSelecao" style="display:none; margin-top:2rem;">
+            <div class="form-header">
+                <h2 class="form-title">Escolher o bloco e a estratégia</h2>
+                <p class="form-description">
+                    A MSEP prevê que as capacidades de uma UC sejam desenvolvidas por meio de uma ou mais situações
+                    de aprendizagem. Aqui cada bloco de até 60 horas dá origem a uma situação.
+                </p>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">
+                    <div class="section-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-caixa"></use></svg></div>
+                    Blocos de 60 horas da Unidade Curricular
+                </div>
+                <div class="item-lista" id="listaGrupos"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">
+                    <div class="section-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-quebraCabeca"></use></svg></div>
+                    Estratégia de aprendizagem desafiadora
+                </div>
+                <div class="item-lista" id="listaEstrategias"></div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="instrucoes">Instruções adicionais para a IA (opcional):</label>
+                    <textarea id="instrucoes" rows="3"
+                        placeholder="Ex.: ambientar o cenário numa indústria alimentícia local; o produto final deve ser um protótipo funcional..."></textarea>
+                </div>
+            </div>
+
+            <div class="botoes">
+                <button type="button" class="btn btn-primario" id="btnGerar">Elaborar situação de aprendizagem</button>
+                <button type="button" class="btn btn-neutro" id="btnTrocarPlano"><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-atualizar"></use></svg> Trocar planejamento</button>
+            </div>
+
+            <div id="mensagemGeracao"></div>
+        </div>
+
+        <!-- ETAPA 3: documento -->
+        <div id="areaSituacao"></div>
+
+        <div class="footer-info no-print">
+            <p><svg class="icon" aria-hidden="true" focusable="false"><use href="#ico-lampada"></use></svg> <strong>Dica:</strong> após elaborar a situação, use a página <a href="/ficha-observacao"
+                    style="color:#02287a;">Ficha de Observação</a> para criar o instrumento de avaliação dos itens deste
+                mesmo bloco.</p>
+        </div>
+    </div>
+
+    </div>
+
+    <script src="assets/js/spa.js"></script>
+    <script src="assets/js/plano-store.js"></script>
+    <script src="assets/js/situacao-aprendizagem.js"></script>
+</body>
+
+</html>
