@@ -123,6 +123,8 @@ SPA.pagina('plano', function () {
 
             { field: 'matrixFile', title: 'Matriz de Referência (Opcional)', description: 'Anexe aqui a Matriz SAEP em formato Excel (.xls ou .xlsx). Este campo é opcional, pois é voltado para UCs que possuem matriz SAEP.' },
 
+            { field: 'capacidadesFile', title: 'PDF com as Capacidades da UC (Opcional)', description: 'Use apenas se as capacidades estiverem em outro documento. Planos de curso no formato antigo listam só o conteúdo programático, sem as capacidades nem o nome das unidades curriculares. Nesse caso, anexe aqui o plano de curso detalhado ou o itinerário formativo: os conhecimentos serão lidos do PDF da UC e as capacidades, deste documento.' },
+
             { field: 'observacoes', title: 'Observações para a IA (Opcional)', description: 'Use este campo poderoso para "conversar" com a IA. Dê instruções em linguagem natural para personalizar o conteúdo, a metodologia ou a avaliação. Ex: "A avaliação final deve ser um projeto prático".' }
 
         ];
