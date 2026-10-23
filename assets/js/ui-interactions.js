@@ -1,8 +1,8 @@
 // =========================================================================
-// ✨ ✨ ✨ UI-INTERACTIONS.JS ✨ ✨ ✨
+// UI-INTERACTIONS.JS
 // =========================================================================
 
-document.addEventListener('DOMContentLoaded', function () {
+SPA.pagina('plano', function () {
 
     // --- LÓGICA DO CARD DE AJUDA ---
     const helpCard = document.getElementById('helpCard');
@@ -122,6 +122,8 @@ document.addEventListener('DOMContentLoaded', function () {
             { field: 'pdfFile', title: 'Arquivo PDF da UC', description: 'Faça o upload do documento PDF que contém as informações oficiais da Unidade Curricular. O sistema analisará este arquivo para gerar o plano automaticamente. Obs.: Edite o PDF, deixando apenas a unidade curricular que será gerada, para evirar sobrecarga de informações. Este campo é obrigatório.' },
 
             { field: 'matrixFile', title: 'Matriz de Referência (Opcional)', description: 'Anexe aqui a Matriz SAEP em formato Excel (.xls ou .xlsx). Este campo é opcional, pois é voltado para UCs que possuem matriz SAEP.' },
+
+            { field: 'capacidadesFile', title: 'PDF com as Capacidades da UC (Opcional)', description: 'Use apenas se as capacidades estiverem em outro documento. Planos de curso no formato antigo listam só o conteúdo programático, sem as capacidades nem o nome das unidades curriculares. Nesse caso, anexe aqui o plano de curso detalhado ou o itinerário formativo: os conhecimentos serão lidos do PDF da UC e as capacidades, deste documento.' },
 
             { field: 'observacoes', title: 'Observações para a IA (Opcional)', description: 'Use este campo poderoso para "conversar" com a IA. Dê instruções em linguagem natural para personalizar o conteúdo, a metodologia ou a avaliação. Ex: "A avaliação final deve ser um projeto prático".' }
 
@@ -247,7 +249,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // ✨ LISTENER DE EVENTOS CENTRALIZADO (DELEGAÇÃO DE EVENTOS) ✨
+        // LISTENER DE EVENTOS CENTRALIZADO (DELEGAÇÃO DE EVENTOS)
         document.addEventListener('click', function (event) {
             // Botões do Guia Interativo
             const welcomeSkipBtn = event.target.closest('#guideWelcome .guide-btn-secondary');
@@ -275,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (showVideoOption) {
                 if (helpCard) helpCard.classList.add('hidden');
 
-                // ✨ CARREGA O VÍDEO E ABRE O MODAL ✨
+                // CARREGA O VÍDEO E ABRE O MODAL
                 if (videoContainer && videoModal) {
                     const videoURL = 'https://www.youtube.com/embed/R1VWZB9lMHw?si=Jhg_PnzFEMPMMl0H';
 

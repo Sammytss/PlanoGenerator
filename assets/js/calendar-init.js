@@ -1,5 +1,5 @@
 // Espera que todo o conteúdo da página seja carregado
-document.addEventListener('DOMContentLoaded', function () {
+SPA.pagina('plano', function () {
 
     // Ativa o calendário no campo de feriados
     flatpickr("#holidays", {
